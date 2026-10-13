@@ -1,0 +1,308 @@
+/* Identité du Mur (référence : design/forge-v2-final/mur.html) : appareillage de briques sombres,
+   titre gravé, fissure tracée à l'arrivée, ruban rouge pour les ajouts récents. */
+.page {
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(5, 5, 5, 0.2), rgba(5, 5, 5, 0.92) 92%),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(0, 0, 0, 0.65) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 118px, rgba(0, 0, 0, 0.6) 118px 120px),
+    linear-gradient(180deg, #1a1212, #0c0909);
+}
+/* Joints décalés d'une rangée sur deux. */
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: repeating-linear-gradient(90deg, transparent 0 58px, rgba(0, 0, 0, 0.6) 58px 60px, transparent 60px 120px);
+  -webkit-mask: repeating-linear-gradient(0deg, transparent 0 48px, #000 48px 96px);
+  mask: repeating-linear-gradient(0deg, transparent 0 48px, #000 48px 96px);
+  opacity: 0.9;
+}
+.hero {
+  position: relative;
+  padding: clamp(48px, 6cqi, 96px) var(--pad) clamp(28px, 3cqi, 44px);
+}
+.engraved {
+  margin: 16px 0 0;
+  font: 900 clamp(44px, 8.4cqi, 132px) / 0.86 var(--f);
+  font-stretch: 125%;
+  letter-spacing: -0.035em;
+  color: #d9d4d0;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 -2px 0 rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(0, 0, 0, 0.6);
+}
+.engraved span {
+  display: block;
+}
+.red {
+  color: var(--brand-hi);
+  text-shadow:
+    0 0 30px rgba(255, 42, 31, 0.35),
+    0 -2px 0 rgba(0, 0, 0, 0.8);
+}
+.crack {
+  position: absolute;
+  right: var(--pad);
+  top: 28px;
+  width: min(42cqi, 520px);
+  height: auto;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.crack path {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.9);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: crack 1.6s 0.3s var(--ease) forwards;
+}
+.disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 760px;
+  margin: 22px 0 0;
+  padding: 14px 16px;
+  background: rgba(5, 5, 5, 0.75);
+  border-left: 3px solid var(--brand-hi);
+  font-size: 14.5px;
+  color: var(--silver);
+}
+.disclaimer svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  color: var(--brand-hi);
+}
+.disclaimer b {
+  color: #fff;
+}
+
+/* Barre : compteur, recherche, ordre */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+  padding: 0 var(--pad) 24px;
+}
+.counter {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.counter b {
+  font: 900 clamp(56px, 6cqi, 88px) / 0.8 var(--f);
+  font-stretch: 110%;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.counter span {
+  max-width: 14ch;
+  font: 700 14px/1.2 var(--f);
+  color: var(--silver);
+}
+.search {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+.manageAll {
+  margin-left: auto;
+}
+
+/* Briques */
+.bricks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0 var(--pad) clamp(56px, 6cqi, 96px);
+  list-style: none;
+}
+.brick {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px 16px 14px 14px;
+  background: linear-gradient(180deg, #221a19, #151110);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.6);
+  transition:
+    transform 0.3s var(--ease),
+    border-color 0.25s;
+  animation: brickIn 0.5s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+.brick:hover,
+.brick:focus-within {
+  transform: translateY(-3px);
+  border-color: rgba(255, 60, 40, 0.4);
+}
+.tape {
+  position: absolute;
+  right: -4px;
+  top: 10px;
+  padding: 3px 8px;
+  background: var(--brand-hi);
+  color: #fff;
+  font: 800 10px/1 var(--f);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: rotate(3deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.id {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.id b {
+  overflow: hidden;
+  font: 800 17px/1.15 var(--f);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.elo {
+  color: var(--white);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ft {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 10px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+.date {
+  font: 500 11px/1 var(--mono);
+  color: var(--dim);
+  white-space: nowrap;
+}
+.links {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fl,
+.manage {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid var(--line-2);
+  font: 700 13px/1 var(--f);
+  color: var(--white);
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.fl:hover,
+.manage:hover {
+  border-color: var(--brand-hi);
+  background: rgba(255, 42, 31, 0.1);
+}
+.fl svg {
+  width: 13px;
+  height: 13px;
+}
+.manage {
+  color: var(--muted);
+}
+.empty {
+  margin: 0 var(--pad) 60px;
+  padding: 36px 20px;
+  text-align: center;
+  border: 1px dashed var(--line-2);
+  background: rgba(5, 5, 5, 0.6);
+  color: var(--muted);
+}
+.empty strong {
+  display: block;
+  margin-bottom: 6px;
+  font: 700 22px/1.2 var(--f);
+  color: #fff;
+}
+
+/* Accès réservé : AUCUNE donnée n'est envoyée au navigateur d'un visiteur. */
+.gate {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: clamp(40px, 6cqi, 80px) var(--pad) clamp(70px, 8cqi, 120px);
+  text-align: center;
+}
+.gate p {
+  margin: 0;
+  color: var(--muted);
+}
+.lock {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border: 1px solid var(--line-2);
+  background: rgba(5, 5, 5, 0.7);
+  transform: rotate(45deg);
+}
+.lock svg {
+  width: 34px;
+  height: 34px;
+  color: var(--brand-hi);
+  transform: rotate(-45deg);
+}
+
+@keyframes crack {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes brickIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+
+@container site (max-width: 560px) {
+  .bricks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .crack {
+    display: none;
+  }
+  .manageAll {
+    margin-left: 0;
+  }
+  .search {
+    flex-basis: 100%;
+    max-width: none;
+  }
+}

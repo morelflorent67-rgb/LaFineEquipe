@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Accueil · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="preload" as="image" href="assets/brand/lfe-emblem.webp">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+/* ================= Hero ================= */
+.hero{--mx:0;--my:0;position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:center;gap:0 3cqi;padding:clamp(28px,4cqi,60px) var(--pad) clamp(30px,3cqi,48px);isolation:isolate;overflow:hidden}
+.hero-glow{position:absolute;inset:-25% -15% -10% 40%;z-index:-3;background:radial-gradient(closest-side at 55% 45%,rgba(255,42,31,.42),rgba(227,8,14,.12) 48%,transparent 76%);animation:fadeIn 1.6s .2s both}
+.shards{position:absolute;inset:0;z-index:-2;pointer-events:none;transform:translate3d(calc(var(--mx) * 18px),calc(var(--my) * 12px),0);transition:transform .8s var(--ease)}
+.shard{position:absolute;right:-12%;transform-origin:right center;animation:shardIn 1.2s var(--ease) both}
+.shard.s1{top:31%;width:78%;height:9px;background:linear-gradient(90deg,transparent,rgba(255,42,31,.0) 10%,var(--brand-hi) 55%,#ff8a7a 72%,transparent);transform:rotate(-21deg);animation-delay:.35s;clip-path:polygon(0 40%,100% 0,100% 100%,0 60%)}
+.shard.s2{top:58%;width:64%;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55) 60%,transparent);transform:rotate(-21deg);animation-delay:.5s}
+.shard.s3{top:8%;right:4%;width:44%;height:84%;background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,0) 60%);clip-path:polygon(30% 0,100% 0,70% 100%,0 100%);border:0;animation-delay:.2s;transform:none}
+@keyframes shardIn{from{opacity:0;translate:-18% 0}to{opacity:1;translate:0 0}}
+.hero-copy{min-width:0;position:relative;z-index:1}
+.hero-title{margin-top:20px;font-size:clamp(54px,9.2cqi,148px)}
+.hero-title .ln{display:block;overflow:hidden;padding:0 .04em .07em 0;margin-bottom:-.07em}
+.hero-title .ln>span{display:inline-block;animation:lineUp 1s var(--ease) both}
+.hero-title .ln:nth-child(2)>span{animation-delay:.12s}
+@keyframes lineUp{from{transform:translateY(108%)}}
+.hero .kicker{animation:rise .6s .05s var(--ease) both}
+.hero .lede{margin-top:24px;animation:rise .7s .35s var(--ease) both}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;animation:rise .7s .45s var(--ease) both}
+.emblem-wrap{position:relative;justify-self:center;width:min(100%,560px);transform:translate3d(calc(var(--mx) * -10px),calc(var(--my) * -8px),0);transition:transform .8s var(--ease)}
+.emblem{position:relative;aspect-ratio:1;display:grid;place-items:center}
+.emblem .ring{position:absolute;inset:-2%;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.24) 0 .5deg,transparent .5deg 7.5deg);-webkit-mask:radial-gradient(circle,transparent 64.5%,#000 65%,#000 67%,transparent 67.5%);mask:radial-gradient(circle,transparent 64.5%,#000 65%,#000 67%,transparent 67.5%);animation:ringIn 2.4s .1s var(--ease) both}
+.emblem .ring.r2{inset:8%;background:conic-gradient(from 200deg,transparent 0 62%,rgba(255,42,31,.9) 70%,transparent 78%);-webkit-mask:radial-gradient(circle,transparent 69%,#000 69.5%,#000 70.5%,transparent 71%);mask:radial-gradient(circle,transparent 69%,#000 69.5%,#000 70.5%,transparent 71%);animation:ringIn2 2.6s .3s var(--ease) both}
+@keyframes ringIn{from{opacity:0;transform:rotate(-50deg) scale(.94)}}
+@keyframes ringIn2{from{opacity:0;transform:rotate(-140deg)}}
+.emblem img{position:relative;width:100%;filter:drop-shadow(0 30px 60px rgba(0,0,0,.8));animation:emblemIn 1.2s .15s var(--ease) both}
+@keyframes emblemIn{from{opacity:0;transform:scale(.86) rotate(-5deg);filter:blur(12px) drop-shadow(0 30px 60px rgba(0,0,0,.8))}}
+.emblem .sweep{position:absolute;inset:0;pointer-events:none;-webkit-mask:url(assets/brand/lfe-emblem.webp) center/contain no-repeat;mask:url(assets/brand/lfe-emblem.webp) center/contain no-repeat;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.6) 50%,transparent 58%) 0 0/300% 100% no-repeat;mix-blend-mode:screen;animation:sweep 1.5s 1.15s var(--ease) both}
+@keyframes sweep{from{background-position:100% 0}to{background-position:0 0}}
+
+/* Accès prioritaires */
+.prio{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:clamp(28px,3cqi,44px)}
+.pt{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 14px;min-height:96px;padding:18px 20px 18px 26px;text-decoration:none;isolation:isolate;transition:transform .3s var(--ease),border-color .25s}
+.pt::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--steel-4);transition:width .35s var(--ease)}
+.pt:hover{transform:translateY(-4px)}
+.pt:hover::before{width:7px}
+.pt .t{display:grid;gap:7px;min-width:0}
+.pt .lbl{font:650 11.5px/1 var(--f);font-stretch:115%;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.pt .main{display:flex;align-items:center;gap:10px;font:800 19px/1.15 var(--f);font-stretch:106%;min-width:0}
+.pt .main span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pt .sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+.pt .go{width:22px;height:10px;fill:var(--brand-hi);transition:transform .3s var(--ease)}
+.pt:hover .go{transform:translateX(5px)}
+.pt-live::before{background:var(--brand-hi)} .pt-elo::before{background:var(--white)} .pt-stuffs::before{background:var(--flash)}
+.pt .swap{animation:rise .45s var(--ease)}
+
+/* ================= En ce moment ================= */
+.now{background:var(--ink)}
+.now-h-state{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mstage{position:relative;min-height:380px;display:grid;overflow:hidden;isolation:isolate;border:1px solid var(--line-2)}
+.mstage .bg{position:absolute;inset:0;z-index:-2;background:url(assets/media/maps/mirage/hero.webp) center 55%/cover no-repeat;transform:scale(1.06);transition:transform 1.4s var(--ease),filter .8s}
+.mstage[data-s="na"] .bg,.mstage[data-s="none"] .bg{filter:grayscale(1) brightness(.45)}
+.mstage[data-s="live"] .bg{transform:scale(1.01)}
+.mstage::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.9),rgba(5,5,5,.35) 50%,rgba(5,5,5,.9)),linear-gradient(0deg,rgba(5,5,5,.92),transparent 55%)}
+.mstage::after{content:"";position:absolute;inset:10px;pointer-events:none;background:
+  linear-gradient(var(--brand-hi),var(--brand-hi)) left top/22px 2px no-repeat,linear-gradient(var(--brand-hi),var(--brand-hi)) left top/2px 22px no-repeat,
+  linear-gradient(var(--brand-hi),var(--brand-hi)) right top/22px 2px no-repeat,linear-gradient(var(--brand-hi),var(--brand-hi)) right top/2px 22px no-repeat,
+  linear-gradient(var(--silver),var(--silver)) left bottom/22px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) left bottom/2px 22px no-repeat,
+  linear-gradient(var(--silver),var(--silver)) right bottom/22px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) right bottom/2px 22px no-repeat}
+.ms-inner{display:grid;grid-template-rows:auto 1fr auto;gap:22px;padding:24px clamp(16px,3cqi,40px)}
+.ms-inner.out{animation:msOut .2s var(--ease-in) forwards}
+@keyframes msOut{to{opacity:0;transform:translateY(-6px)}}
+.ms-top{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;animation:fadeIn .5s both}
+.verif{font:400 11.5px/1.45 var(--mono);color:var(--silver)}
+.verif b{color:#fff;font-weight:600}
+.ms-msg{align-self:center;max-width:62ch;animation:rise .55s .05s var(--ease) both}
+.ms-msg strong{display:block;font:850 clamp(26px,3.2cqi,42px)/1.05 var(--f);font-stretch:112%;margin-bottom:10px}
+.ms-msg p{margin:0;color:var(--muted)}
+.plates{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center}
+.plate{position:relative;padding:22px clamp(18px,3cqi,40px);min-width:0;isolation:isolate}
+.plate::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant))}
+.plate-us{animation:plateL .75s .05s var(--ease) both}
+.plate-them{text-align:right;animation:plateR .75s .12s var(--ease) both}
+@keyframes plateL{from{opacity:0;transform:translateX(-60px)}}
+@keyframes plateR{from{opacity:0;transform:translateX(60px)}}
+.plate-us::before{background:linear-gradient(100deg,rgba(255,42,31,.95),rgba(110,0,0,.92));box-shadow:0 0 50px rgba(255,42,31,.25)}
+.plate-them::before{background:linear-gradient(260deg,rgba(46,46,51,.96),rgba(18,18,20,.94));outline:1px solid var(--line-2)}
+.plate .lbl{font:650 11.5px/1 var(--f);font-stretch:115%;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.8)}
+.plate strong{display:flex;align-items:center;gap:12px;margin-top:8px;font:850 clamp(22px,2.7cqi,38px)/1.05 var(--f);font-stretch:108%;overflow-wrap:anywhere}
+.plate-them strong{justify-content:flex-end}
+.plate .big{font:900 clamp(40px,5cqi,68px)/1 var(--f);font-stretch:100%;font-variant-numeric:tabular-nums}
+.tracked{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tracked span{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 4px;background:rgba(0,0,0,.45);border-radius:20px;font:650 13px/1 var(--f)}
+.tracked .ava{--s:24px;padding:1px;background:none}
+.plate-them .note{margin:12px 0 0;font-size:13px;color:var(--muted)}
+.vs{position:relative;z-index:2;width:84px;height:84px;margin-inline:-18px;display:grid;place-items:center;background:var(--void);border:1px solid var(--line-2);transform:rotate(45deg);box-shadow:0 0 0 6px rgba(5,5,5,.6);animation:vsIn .6s .2s var(--ease) both}
+@keyframes vsIn{from{opacity:0;transform:rotate(45deg) scale(.4)}}
+.vs span{transform:rotate(-45deg);font:900 20px/1 var(--f);font-stretch:125%}
+.ms-foot{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;animation:fadeIn .6s .25s both}
+.ms-foot .map{font:900 clamp(30px,3.4cqi,46px)/1 var(--f);font-stretch:120%;letter-spacing:-.02em}
+.ms-foot .meta{color:var(--silver);font-size:15px}
+.ms-foot .link{margin-left:auto}
+.ms-score-note{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
+
+.results{margin-top:44px}
+.results-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.res-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.res{display:grid;grid-template-columns:44px minmax(110px,170px) 96px minmax(0,1fr) auto;align-items:center;gap:16px;padding:8px 16px 8px 8px;background:linear-gradient(90deg,rgba(255,255,255,.04),transparent 80%);border-left:2px solid transparent;transition:transform .25s var(--ease),border-color .25s,background .25s}
+.res:hover{transform:translateX(6px);border-left-color:var(--brand-hi);background:linear-gradient(90deg,rgba(255,255,255,.07),transparent 80%)}
+.res .mapc{position:relative;height:44px;display:flex;align-items:center;padding-left:14px;font:750 16px/1 var(--f);background:center 55%/cover no-repeat;isolation:isolate;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.res .mapc::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.85),rgba(5,5,5,.3))}
+.res .score{font:750 22px/1 var(--f);font-variant-numeric:tabular-nums}
+.res .score i{font-style:normal;color:var(--dim);margin:0 5px}
+.res .who{font-size:14px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res .who b{color:var(--white);font-weight:600}
+.res .when{font:400 11.5px/1.3 var(--mono);color:var(--dim);text-align:right;white-space:nowrap}
+.res.cancel .mapc,.res.cancel .score{opacity:.55}
+
+/* ================= ELO (aperçu) ================= */
+.run{overflow:hidden;background:url(assets/grain.png) repeat,linear-gradient(180deg,var(--void),#0b0606 60%,var(--void))}
+.run-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(24px,4cqi,64px);align-items:center}
+.run-copy .lede{margin-top:18px}
+.run-meta{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:22px;font-size:14px;color:var(--muted)}
+.run-meta b{color:var(--white);font-weight:650}
+.run-copy .btn{margin-top:28px}
+.mini{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.mini li{position:relative;display:grid;grid-template-columns:34px 46px minmax(0,1fr) auto auto;align-items:center;gap:14px;padding:12px 18px;background:linear-gradient(90deg,#18181c,#101012);border:1px solid var(--line);transition:transform .25s var(--ease),border-color .25s}
+.mini li:hover{transform:translateX(6px);border-color:var(--line-2)}
+.mini li:first-child{background:linear-gradient(90deg,#2a1212,#120a0a);border-color:rgba(255,60,40,.45);padding-block:16px}
+.mini .rk{font:900 24px/1 var(--f);font-stretch:120%;color:var(--dim);font-variant-numeric:tabular-nums}
+.mini li:first-child .rk{color:var(--brand-hi);font-size:30px}
+.mini .nm{font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .elo{font:800 20px/1 var(--f);font-variant-numeric:tabular-nums}
+.mini li:first-child .elo{font-size:26px}
+
+/* ================= Stuffs (maps) ================= */
+.maps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mcard{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;text-decoration:none;isolation:isolate;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,0 100%);background:#111}
+.mcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.02);transition:transform .9s var(--ease),filter .5s}
+.mcard::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,5,5,.92) 8%,rgba(5,5,5,.2) 60%,rgba(5,5,5,.05));transition:background .4s}
+.mcard .cap{position:absolute;left:16px;right:16px;bottom:14px;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.mcard .nm{font:900 clamp(22px,2.2cqi,32px)/.95 var(--f);font-stretch:118%;letter-spacing:-.02em;transition:transform .45s var(--ease)}
+.mcard .ct{font:650 12.5px/1 var(--f);color:var(--silver);white-space:nowrap}
+.mcard .bar{position:absolute;left:0;bottom:0;z-index:2;height:3px;width:100%;background:var(--brand-hi);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.mcard:hover img,.mcard:focus-visible img{transform:scale(1.09)}
+.mcard:hover .nm{transform:translateY(-3px)}
+.mcard:hover .bar,.mcard:focus-visible .bar{transform:scaleX(1)}
+.mcard:focus-visible{outline:none}
+.mcard:focus-visible::after{box-shadow:inset 0 0 0 3px #fff}
+
+/* ================= Clips ================= */
+.clips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.clip{display:grid;gap:12px;text-decoration:none}
+.clip .th{position:relative;aspect-ratio:16/9;overflow:hidden;background:#111}
+.clip .th img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.clip:hover .th img{transform:scale(1.06)}
+.clip .play{position:absolute;left:50%;top:50%;width:58px;height:58px;display:grid;place-items:center;transform:translate(-50%,-50%);background:rgba(5,5,5,.6);border:1.5px solid rgba(255,255,255,.7);border-radius:50%;transition:transform .3s var(--ease),background .3s}
+.clip .play svg{width:20px;height:20px;margin-left:3px}
+.clip:hover .play{transform:translate(-50%,-50%) scale(1.1);background:var(--brand-hi);border-color:var(--brand-hi)}
+.clip .prov{position:absolute;left:10px;top:10px}
+.clip .t{font:750 17px/1.25 var(--f)}
+.clip .m{font-size:13.5px;color:var(--muted)}
+
+/* ================= Responsive ================= */
+@container site (max-width: 1100px){
+  .maps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .run-grid{grid-template-columns:minmax(0,1fr)}
+}
+@container site (max-width: 900px){
+  .hero{grid-template-columns:minmax(0,1fr);padding-top:18px;padding-bottom:22px}
+  .emblem-wrap{position:absolute;right:-14cqi;top:-2cqi;width:62cqi;opacity:.55;z-index:0}
+  .shards{display:none}
+  .hero-title{margin-top:14px;font-size:clamp(46px,15cqi,96px)}
+  .hero .lede{margin-top:16px;font-size:15.5px}
+  .ctas{margin-top:20px}
+  .prio{grid-template-columns:minmax(0,1fr);gap:8px;margin-top:22px}
+  .pt{min-height:72px;padding:12px 16px 12px 20px}
+  .pt .main{font-size:17px}
+  .plates{grid-template-columns:minmax(0,1fr)}
+  .vs{margin:-10px auto;width:56px;height:56px}
+  .plate-them{text-align:left}
+  .plate-them strong{justify-content:flex-start}
+  .res{grid-template-columns:40px minmax(0,1fr) auto;gap:6px 12px;padding-right:10px}
+  .res .mapc{grid-column:2}
+  .res .score{grid-column:3;grid-row:1}
+  .res .who{grid-column:1 / -1;grid-row:2;padding-left:4px}
+  .res .when{grid-column:1 / -1;grid-row:3;text-align:left;padding-left:4px}
+  .clips{grid-template-columns:minmax(0,1fr)}
+  .ctas .btn-steel{display:none}
+}
+@container site (max-width: 560px){
+  .hero .lede{display:none}
+  .maps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin-inline:calc(var(--pad) * -1);padding:0 var(--pad) 8px;scrollbar-width:none}
+  .maps::-webkit-scrollbar{display:none}
+  .mcard{flex:none;width:72cqi;scroll-snap-align:start}
+  .mini li{grid-template-columns:26px 40px minmax(0,1fr) auto;padding:10px 12px;gap:10px}
+  .mini .dl{grid-column:3 / 5;grid-row:2;justify-self:start}
+  .mini .ava{grid-row:span 2}
+  .mini .rk{grid-row:span 2}
+  .ms-foot .link{margin-left:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="visitor" data-live="na">
+  <div class="ribbon">Prototype Forge V2 final · joueurs, matchs et clips fictifs · images de maps : Valve (extraites du jeu) et captures de la team</div>
+  <div id="nav-slot"></div>
+  <main id="main">
+
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="shards" aria-hidden="true"><span class="shard s3"></span><span class="shard s1"></span><span class="shard s2"></span></div>
+      <div class="hero-copy">
+        <p class="kicker">Team CS2 · FACEIT</p>
+        <h1 class="display hero-title" id="hero-title"><span class="ln"><span class="metal">La Fine</span></span><span class="ln"><span class="ember">Equipe</span></span></h1>
+        <p class="lede">Le QG de la team : <strong>classement ELO permanent</strong>, matchs FACEIT, <strong>stuffs map par map</strong> et crosshairs.</p>
+        <div class="ctas">
+          <a class="btn btn-red" href="elo-run.html">Classement ELO <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-steel" href="stuffs.html">Stuffs par map</a>
+        </div>
+      </div>
+      <div class="emblem-wrap" aria-hidden="true">
+        <div class="emblem"><span class="ring"></span><span class="ring r2"></span><img src="assets/brand/lfe-emblem.webp" alt="" width="1024" height="1024"><span class="sweep"></span></div>
+      </div>
+      <nav class="prio" aria-label="Accès prioritaires">
+        <a class="pt pt-live card rv" style="--i:0" href="#now" id="pt-live"></a>
+        <a class="pt pt-elo card rv" style="--i:1" href="elo-run.html" id="pt-elo"></a>
+        <a class="pt pt-stuffs card rv" style="--i:2" href="stuffs.html" id="pt-stuffs"></a>
+      </nav>
+    </section>
+
+    <section class="sec now" id="now" aria-labelledby="now-title">
+      <div class="sec-h">
+        <div><p class="kicker rv">FACEIT</p><h2 class="h2 rv" style="--i:1" id="now-title">En ce moment</h2></div>
+        <div class="now-h-state rv" style="--i:2" id="now-state"></div>
+      </div>
+      <div class="mstage rv" id="mstage" data-s="na" aria-live="polite"><div class="bg" aria-hidden="true"></div></div>
+
+      <div class="results">
+        <div class="results-h"><h3 class="h3">Derniers matchs</h3><span class="mono">Un match = une ligne, même à plusieurs joueurs suivis</span></div>
+        <ul class="res-list" id="res-list"></ul>
+      </div>
+    </section>
+
+    <section class="sec run" aria-labelledby="run-title">
+      <p class="backword" aria-hidden="true">ELO</p>
+      <div class="run-grid">
+        <div class="run-copy">
+          <p class="kicker rv">ELO Run · classement permanent</p>
+          <h2 class="h2 rv" style="--i:1" id="run-title">Qui est devant&nbsp;?</h2>
+          <p class="lede rv" style="--i:2">Pas de saison ni de remise à zéro. Chaque joueur entre au classement à son vrai ELO FACEIT dès que l’admin l’ajoute, avec une progression qui démarre à zéro.</p>
+          <div class="run-meta rv" style="--i:3" id="run-meta"></div>
+          <a class="btn btn-red rv" style="--i:4" href="elo-run.html">Classement complet <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+        <ol class="mini" id="mini" aria-label="Top 5 par ELO actuel"></ol>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="stuffs-title">
+      <div class="sec-h">
+        <div><p class="kicker rv" id="stuffs-kicker">Stuffs</p><h2 class="h2 rv" style="--i:1" id="stuffs-title">Stuffs par map</h2></div>
+        <a class="link rv" style="--i:2" href="stuffs.html">Toutes les maps <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="maps" id="maps"></div>
+      <p class="note-demo">Images : écrans de chargement officiels de CS2 (Valve). Compteurs calculés à partir des fiches publiées.</p>
+    </section>
+
+    <section class="sec" id="clips" aria-labelledby="clips-title" style="background:var(--ink-2)">
+      <div class="sec-h">
+        <div><p class="kicker rv">Clips</p><h2 class="h2 rv" style="--i:1" id="clips-title">Derniers clips</h2></div>
+        <span class="chip fict rv" style="--i:2">Exemples fictifs</span>
+      </div>
+      <div class="clips" id="clip-list"></div>
+      <p class="note-demo">V1 : liens ajoutés par l’admin (YouTube, Twitch, Allstar). Miniatures d’exemple : captures de la team.</p>
+    </section>
+  </main>
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script>
+(function () {
+  var D = window.LFE_DATA, L = window.LFE, I = L.icon;
+  var site = document.getElementById('site');
+  var mapName = function (s) { return D.mapBy(s).name; };
+
+  /* ---------- Accès prioritaires ---------- */
+  function liveTile(s) {
+    var t = {
+      na: ['Statut indisponible', '<span>Source FACEIT non validée</span>'],
+      none: ['Aucun match en cours', '<span>Vérifié il y a 40 s</span>'],
+      live: ['<span class="live" style="padding:4px 9px"><span class="dot" aria-hidden="true"></span>Live</span><span>1 match en cours</span>', '<span>Mirage · 3 joueurs suivis</span>'],
+      done: ['Match terminé', D.badge('V') + '<span>13 – 9 sur Mirage</span>']
+    }[s];
+    return '<span class="t swap"><span class="lbl">Matchs en cours</span><span class="main">' + (s === 'live' ? t[0] : '<span>' + t[0] + '</span>') + '</span><span class="sub">' + t[1] + '</span></span>' + I('i-arrow', 'go');
+  }
+  var ranked = D.players.slice().sort(function (a, b) { return b.elo - a.elo; });
+  var lastSync = new Date(Date.now() - 2 * 60e3);
+  document.getElementById('pt-elo').innerHTML = '<span class="t"><span class="lbl">ELO Run · n°1</span><span class="main">' + D.ava(ranked[0], 30) + '<span>' + D.esc(ranked[0].nick) + '</span></span>'
+    + '<span class="sub"><b class="num" style="color:#fff">' + D.fmt(ranked[0].elo) + ' ELO</b>' + D.deltaHtml(D.delta(ranked[0])) + '<span>· synchro ' + D.ago(lastSync) + '</span></span></span>' + I('i-arrow', 'go');
+  var total = D.stuffs.length;
+  document.getElementById('pt-stuffs').innerHTML = '<span class="t"><span class="lbl">Stuffs</span><span class="main"><span>' + total + ' lineups · ' + D.maps.length + ' maps</span></span>'
+    + '<span class="sub">Smoke, flash, molotov, HE · carte tactique</span></span>' + I('i-arrow', 'go');
+  document.getElementById('stuffs-kicker').textContent = total + ' fiches publiées';
+
+  /* ---------- Scène « En ce moment » ---------- */
+  var tracked = ['demo_nova', 'demo_ombre', 'demo_kestrel'].map(function (n) { return D.players.filter(function (p) { return p.nick === n; })[0]; });
+  var trackedHtml = '<div class="tracked">' + tracked.map(function (p) { return '<span>' + D.ava(p, 24) + D.esc(p.nick) + '</span>'; }).join('') + '</div>';
+  var STATES = {
+    na: function () {
+      return '<div class="ms-top"><span class="chip">Statut indisponible</span><span class="verif">Source : aucune validée</span></div>'
+        + '<div class="ms-msg"><strong>Statut indisponible</strong><p>Aucune source FACEIT fiable n’est encore validée pour détecter un match en cours. Rien n’est affiché « en direct » par supposition ; les derniers matchs terminés restent juste en dessous.</p></div>'
+        + '<div class="ms-foot"><a class="link" href="#res-list">Derniers matchs <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>';
+    },
+    none: function () {
+      return '<div class="ms-top"><span class="chip ok">' + I('i-check') + 'Statut vérifié</span><span class="verif">Webhook FACEIT (simulé) · dernier contrôle <b>il y a 40 s</b></span></div>'
+        + '<div class="ms-msg"><strong>Aucun match en cours</strong><p>Aucun des 10 joueurs suivis n’est en partie d’après la dernière vérification.</p></div><div></div>';
+    },
+    live: function () {
+      return '<div class="ms-top"><span class="live"><span class="dot" aria-hidden="true"></span>En cours</span><span class="verif">Europe 5v5 Queue · détecté par <b>webhook FACEIT (simulé)</b> à 14:07 · dernier contrôle il y a 20 s</span></div>'
+        + '<div class="plates"><div class="plate plate-us"><span class="lbl">Joueurs suivis</span><strong>LaFineEquipe</strong>' + trackedHtml + '</div>'
+        + '<div class="vs" aria-hidden="true"><span>VS</span></div>'
+        + '<div class="plate plate-them"><span class="lbl">Adversaires</span><strong>Équipe adverse</strong><p class="note">Joueurs non suivis par le site</p></div></div>'
+        + '<div class="ms-foot"><span class="map">Mirage</span><span class="meta">Commencé il y a 18 min</span><span class="ms-score-note">' + I('i-lock') + 'Pas de score en direct : FACEIT le publie à la fin</span><a class="link" href="#">Salle FACEIT ' + I('i-ext', 'arrow') + '</a></div>';
+    },
+    done: function () {
+      return '<div class="ms-top"><span class="chip">Terminé il y a 1 min</span><span class="verif">Résultat officiel FACEIT · webhook (simulé)</span></div>'
+        + '<div class="plates"><div class="plate plate-us"><span class="lbl">Joueurs suivis</span><strong>' + D.badge('V', 'lg') + '<span class="big">13</span></strong>' + trackedHtml + '</div>'
+        + '<div class="vs" aria-hidden="true"><span>–</span></div>'
+        + '<div class="plate plate-them"><span class="lbl">Adversaires</span><strong><span class="big">9</span></strong><p class="note">Victoire de LaFineEquipe</p></div></div>'
+        + '<div class="ms-foot"><span class="map">Mirage</span><span class="meta">Durée 41 min</span><a class="link" href="#">Salle FACEIT ' + I('i-ext', 'arrow') + '</a></div>';
+    }
+  };
+  var STATE_LABEL = {
+    na: '<span class="chip">Statut indisponible</span>',
+    none: '<span class="chip ok">' + I('i-check') + 'Aucun match en cours</span>',
+    live: '<span class="live"><span class="dot" aria-hidden="true"></span>1 match en cours</span>',
+    done: '<span class="chip">Dernier match terminé</span>'
+  };
+  var stage = document.getElementById('mstage');
+  function renderStage(s, animate) {
+    var put = function () {
+      var old = stage.querySelector('.ms-inner'); if (old) old.remove();
+      var div = document.createElement('div'); div.className = 'ms-inner'; div.innerHTML = STATES[s]();
+      stage.appendChild(div); stage.setAttribute('data-s', s);
+      document.getElementById('now-state').innerHTML = STATE_LABEL[s];
+      document.getElementById('pt-live').innerHTML = liveTile(s);
+      if (s === 'live' || s === 'done') { stage.classList.remove('pulse'); void stage.offsetWidth; }
+    };
+    var cur = stage.querySelector('.ms-inner');
+    if (animate && cur && !L.reduced()) { cur.classList.add('out'); setTimeout(put, 200); } else put();
+  }
+  renderStage(site.getAttribute('data-live'), false);
+  document.addEventListener('lfe:state', function (e) { if (e.detail.key === 'live') renderStage(e.detail.value, true); });
+
+  /* ---------- Derniers matchs ---------- */
+  document.getElementById('res-list').innerHTML = D.matches.map(function (m, i) {
+    var m2 = D.mapBy(m.map);
+    var when = m.ago < 60 ? 'il y a ' + m.ago + ' min' : m.ago < 1440 ? 'il y a ' + Math.round(m.ago / 60) + ' h' : 'hier';
+    return '<li class="res rv' + (m.res === 'C' ? ' cancel' : '') + '" style="--i:' + i + '">' + D.badge(m.res, 'lg')
+      + '<span class="mapc" style="background-image:url(' + m2.cover + ')">' + m2.name + '</span>'
+      + '<span class="score">' + (m.score ? m.score[0] + '<i>–</i>' + m.score[1] : '<span class="small muted">Annulé</span>') + '</span>'
+      + '<span class="who">' + m.who.map(function (w) { return '<b>' + D.esc(w) + '</b>'; }).join(', ') + '</span>'
+      + '<span class="when">' + when + '<br>FACEIT</span></li>';
+  }).join('');
+
+  /* ---------- Aperçu ELO ---------- */
+  document.getElementById('run-meta').innerHTML = '<span>Dernière synchro : <b>' + D.ago(lastSync) + '</b></span><span>Actualisation auto toutes les 5 min</span><span>' + D.players.length + ' joueurs classés</span>';
+  document.getElementById('mini').innerHTML = ranked.slice(0, 5).map(function (p, i) {
+    return '<li class="rv' + (i === 0 ? ' glow-border' : '') + '" style="--i:' + i + '"><span class="rk">' + (i + 1) + '</span>' + D.ava(p, i === 0 ? 46 : 40)
+      + '<span class="nm">' + D.esc(p.nick) + '</span><span class="elo num">' + D.fmt(p.elo) + '</span>' + D.deltaHtml(D.delta(p)) + '</li>';
+  }).join('');
+
+  /* ---------- Maps ---------- */
+  document.getElementById('maps').innerHTML = D.maps.map(function (m, i) {
+    var c = D.counts(m.slug);
+    return '<a class="mcard rv" style="--i:' + (i % 4) + '" href="map.html?m=' + m.slug + '"><img src="' + m.cover + '" alt="" loading="lazy" decoding="async" style="view-transition-name:map-' + m.slug + '">'
+      + '<span class="cap"><span class="nm">' + m.name + '</span><span class="ct">' + (c.total ? c.total + ' stuff' + (c.total > 1 ? 's' : '') : 'Aucun stuff') + '</span></span><span class="bar"></span></a>';
+  }).join('');
+
+  /* ---------- Clips (fictifs) ---------- */
+  var CLIPS = [
+    { t: 'Clutch 1v3 au palais', who: 'demo_nova', map: 'mirage', prov: 'YouTube', img: 'assets/media/team/mirage-team-2.webp', d: 'il y a 2 jours' },
+    { t: 'Ace en retake B', who: 'demo_kestrel', map: 'dust2', prov: 'Allstar', img: 'assets/media/team/dust2-team-2.webp', d: 'il y a 5 jours' },
+    { t: 'Flick AWP depuis la banane', who: 'demo_ombre', map: 'inferno', prov: 'Twitch', img: 'assets/media/team/inferno-team-1.webp', d: 'il y a 9 jours' }
+  ];
+  document.getElementById('clip-list').innerHTML = CLIPS.map(function (c, i) {
+    return '<a class="clip rv" style="--i:' + i + '" href="#" onclick="LFE.toast(\'Clip fictif : aucun lecteur dans le prototype\');return false"><span class="th"><img src="' + c.img + '" alt="" loading="lazy"><span class="chip src prov">' + c.prov + '</span><span class="play">' + I('i-play') + '</span></span>'
+      + '<span class="t">' + c.t + '</span><span class="m">' + c.who + ' · ' + mapName(c.map) + ' · ' + c.d + '</span></a>';
+  }).join('');
+
+  /* ---------- Parallaxe discrète du hero (souris uniquement) ---------- */
+  var hero = document.getElementById('hero'), raf = 0;
+  if (window.matchMedia('(pointer:fine)').matches) {
+    hero.addEventListener('pointermove', function (e) {
+      if (L.reduced()) return;
+      var r = hero.getBoundingClientRect();
+      var x = ((e.clientX - r.left) / r.width - .5) * 2, y = ((e.clientY - r.top) / r.height - .5) * 2;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function () { hero.style.setProperty('--mx', x.toFixed(3)); hero.style.setProperty('--my', y.toFixed(3)); });
+    });
+    hero.addEventListener('pointerleave', function () { hero.style.setProperty('--mx', 0); hero.style.setProperty('--my', 0); });
+  }
+
+  L.mount({
+    active: 'home',
+    demo: ['view', 'role', 'live', 'motion'],
+    groups: { live: ['Match', [['na', 'Indispo'], ['none', 'Aucun'], ['live', 'En cours'], ['done', 'Terminé']]] },
+    actions: [{ label: 'Rejouer l’intro', run: function () { location.reload(); } }]
+  });
+})();
+</script>
+</body>
+</html>

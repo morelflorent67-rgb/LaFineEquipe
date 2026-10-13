@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ELO Run · Forge V2 · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/v2.css">
+<style>
+.head{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 40px;align-items:end;padding:clamp(28px,4cqi,60px) var(--pad) 26px;overflow:hidden;isolation:isolate}
+.head::before{content:"";position:absolute;inset:-40% -10% 0 45%;z-index:-1;background:radial-gradient(closest-side,rgba(255,42,31,.22),transparent 75%)}
+.backword{position:absolute;right:-2cqi;top:-4cqi;z-index:-1;margin:0;font:900 26cqi/.8 var(--f);font-stretch:125%;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.07);pointer-events:none;user-select:none}
+.head .h1{margin-top:12px}
+.head .title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;color:var(--muted);font-size:15px}
+.runsel{display:inline-flex;align-items:center;gap:10px;margin-top:18px;font:600 13px/1 var(--f);color:var(--muted)}
+.runsel select{min-height:42px;padding:8px 36px 8px 12px;background:var(--steel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23C4C4C8' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 12px center/12px;border:1px solid var(--line-2);border-radius:4px;color:var(--white);font:600 14px/1.2 var(--f);appearance:none}
+.ringbox{display:grid;justify-items:center;gap:10px;text-align:center}
+.ring{position:relative;width:170px;height:170px}
+.ring svg{width:100%;height:100%}
+.ring .c{position:absolute;inset:0;display:grid;place-content:center}
+.ring .c b{font:900 52px/.85 var(--f);font-stretch:100%}
+.ring .c span{font:600 11px/1.6 var(--f);font-stretch:112%;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.bar{position:sticky;top:63px;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:12px var(--pad);background:rgba(8,7,7,.95);border-block:1px solid var(--line);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.seg{display:inline-flex;gap:4px}
+.seg button{position:relative;min-height:42px;padding:9px 16px;background:transparent;border:0;cursor:pointer;font:700 14px/1 var(--f);color:var(--muted);isolation:isolate;white-space:nowrap}
+.seg button::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant));border:1px solid var(--line-2);transition:background .2s}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed="true"]{color:#fff}
+.seg button[aria-pressed="true"]::before{background:linear-gradient(100deg,#ff2a1f,#b8060b);border-color:transparent}
+.seg.light button[aria-pressed="true"]::before{background:var(--white)}
+.seg.light button[aria-pressed="true"]{color:#111}
+.seg button:focus-visible{outline:none}
+.seg button:focus-visible::before{box-shadow:inset 0 0 0 2px #fff}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-left:auto;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .rb{width:20px;height:20px;font-size:11px}
+
+.podwrap{padding:clamp(30px,4cqi,56px) var(--pad) 10px}
+.podium{list-style:none;margin:0 auto;padding:0;max-width:980px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:clamp(8px,1.4cqi,20px)}
+.pod{position:relative;display:grid;justify-items:center;align-content:end;gap:7px;text-align:center;padding:26px 12px 22px;isolation:isolate;min-width:0}
+.pod::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant));background:linear-gradient(180deg,#26262b,#0f0f11 85%);border:1px solid var(--line-2)}
+.pod.p1{order:2;min-height:350px}.pod.p2{order:1;min-height:300px}.pod.p3{order:3;min-height:270px}
+.pod.p1::before{background:linear-gradient(180deg,#2a1414,#120b0b 85%);border-color:rgba(255,60,40,.55);box-shadow:0 0 0 1px rgba(255,42,31,.25),0 26px 70px rgba(227,8,14,.28)}
+.pod.p1::after{content:"";position:absolute;top:0;left:10%;right:10%;height:4px;background:var(--brand-hi);transform:skewX(var(--slant))}
+.pod .rk{position:absolute;top:10px;left:18px;font:900 66px/.8 var(--f);font-stretch:125%;color:rgba(255,255,255,.14)}
+.pod.p1 .rk{color:var(--brand-hi)}
+.pod .ava{--s:92px}.pod.p1 .ava{--s:112px}
+.pod .nm{margin-top:8px;font:700 clamp(15px,1.5cqi,20px)/1.15 var(--f);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .val{font:800 clamp(34px,4cqi,58px)/1 var(--f);font-stretch:92%;font-variant-numeric:tabular-nums}
+.pod .sub{font:400 11px/1.4 var(--mono);color:var(--silver)}
+.pod .tag{position:absolute;top:12px;right:14px;padding:5px 8px;font:700 10.5px/1 var(--f);font-stretch:112%;letter-spacing:.1em;text-transform:uppercase;background:var(--void);border:1px solid rgba(255,60,40,.5)}
+.board{transition:opacity .18s ease,transform .18s ease}
+.board.swap{opacity:0;transform:translateY(8px)}
+
+.tblsec{padding:34px var(--pad) 10px}
+.tbl{border:1px solid var(--line);background:rgba(12,10,10,.9);overflow:hidden}
+.trow{display:grid;grid-template-columns:52px minmax(170px,1.4fr) 56px 120px 110px minmax(170px,1fr) 150px;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line);text-align:left;width:100%;background:transparent;border-left:3px solid transparent;color:inherit;font:inherit;cursor:pointer;transition:background .15s}
+.trow:hover{background:rgba(255,255,255,.035)}
+.trow[aria-pressed="true"]{background:rgba(255,255,255,.06);border-left-color:var(--white)}
+.trow.thead{cursor:default;background:var(--ink-2);padding-block:10px;font:600 11px/1.2 var(--f);font-stretch:112%;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.trow.thead:hover{background:var(--ink-2)}
+.tbody .trow:last-child{border-bottom:0}
+.trow .rk{font:800 22px/1 var(--f);font-variant-numeric:tabular-nums;color:var(--dim)}
+.trow.top .rk{color:var(--brand-hi)}
+.who{display:flex;align-items:center;gap:12px;min-width:0}
+.who .ava{--s:40px}
+.who b{display:block;font-weight:600;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who small{font:600 10.5px/1 var(--f);font-stretch:112%;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.n{font-weight:600;font-variant-numeric:tabular-nums;font-size:16px}
+.n small{display:block;font:400 10.5px/1.4 var(--mono);color:var(--amber)}
+.n.cur{font-weight:800;font-size:17px}
+.prog{display:grid;grid-template-columns:62px minmax(0,1fr);align-items:center;gap:10px}
+.prog .dl{text-align:right;font-size:16px}
+.mini{position:relative;height:8px;background:rgba(255,255,255,.05)}
+.mini::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--line-2)}
+.mini i{position:absolute;top:0;bottom:0;border-radius:1px}
+.mini i.up{left:50%;background:var(--win)}
+.mini i.down{right:50%;background:var(--loss)}
+.tbl-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;margin-top:12px}
+
+.chartsec{padding:clamp(40px,5cqi,70px) var(--pad) clamp(50px,6cqi,90px)}
+.chart-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:16px}
+.chart-h .who-sel{font:800 clamp(22px,2.6cqi,32px)/1.1 var(--f);font-stretch:108%}
+.chart-legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;color:var(--muted)}
+.chart-legend span{display:inline-flex;align-items:center;gap:8px}
+.chart-legend i{width:22px;height:0;border-top:2.5px solid var(--white);display:inline-block}
+.chart-legend i.o{border-top:1.5px solid #4a4a52}
+.chart-legend i.z{border-top:1.5px dashed #6b6b74}
+.chartbox{position:relative;background:#0c0b0b;border:1px solid var(--line);padding:10px 4px 4px}
+.chartbox svg{display:block;width:100%}
+.tip{position:absolute;z-index:3;pointer-events:none;min-width:150px;padding:10px 12px;background:#161415;border:1px solid var(--line-2);box-shadow:0 12px 30px rgba(0,0,0,.6);font-size:13px;opacity:0;transition:opacity .12s}
+.tip.show{opacity:1}
+.tip b{display:block;font:700 13px/1.3 var(--f);margin-bottom:4px}
+.tip .r{display:flex;justify-content:space-between;gap:14px;color:var(--muted)}
+.tip .r span:last-child{color:var(--white);font-weight:600;font-variant-numeric:tabular-nums}
+details.tableview{margin-top:14px;border:1px solid var(--line)}
+details.tableview summary{cursor:pointer;padding:12px 16px;font:600 14px/1 var(--f);color:var(--silver)}
+details.tableview table{width:100%;border-collapse:collapse;font-size:14px}
+details.tableview th,details.tableview td{padding:8px 16px;border-top:1px solid var(--line);text-align:left;font-variant-numeric:tabular-nums}
+details.tableview th{font:600 11px/1 var(--f);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:22px;background:var(--line);border:1px solid var(--line)}
+.rules div{padding:16px 18px;background:var(--void);font-size:14.5px;color:var(--muted)}
+.rules b{display:block;margin-bottom:6px;color:var(--white);font-weight:700}
+
+@container site (max-width: 900px){
+  .head{grid-template-columns:minmax(0,1fr) auto;padding-top:20px}
+  .ring{width:112px;height:112px}
+  .ring .c b{font-size:34px}
+  .bar{top:53px}
+  .legend{margin-left:0}
+  .rules{grid-template-columns:minmax(0,1fr)}
+}
+@container site (max-width: 760px){
+  .trow.thead{display:none}
+  .trow{grid-template-columns:34px minmax(0,1fr) auto;grid-template-areas:"rk who prog" "rk elo elo" "rk ser ser";gap:6px 10px;padding:12px 14px}
+  .trow .rk{grid-area:rk;align-self:start;font-size:20px;padding-top:8px}
+  .trow .who{grid-area:who}
+  .trow .c-lvl,.trow .c-start{display:none}
+  .trow .c-elo{grid-area:elo;font-size:13.5px;color:var(--muted);font-weight:500}
+  .trow .c-elo::before{content:attr(data-start) " → "}
+  .trow .prog{grid-area:prog;grid-template-columns:auto}
+  .trow .prog .mini{display:none}
+  .trow .series{grid-area:ser}
+}
+@container site (max-width: 560px){
+  .head{grid-template-columns:minmax(0,1fr);gap:14px}
+  .ringbox{grid-row:1;justify-items:start;grid-template-columns:auto 1fr;align-items:center;text-align:left}
+  .podium{gap:6px}
+  .pod{padding:20px 6px 16px}
+  .pod.p1{min-height:240px}.pod.p2{min-height:210px}.pod.p3{min-height:194px}
+  .pod .ava{--s:56px}.pod.p1 .ava{--s:68px}
+  .pod .rk{font-size:40px;left:10px}
+  .pod .tag,.pod .sub{display:none}
+  .pod .val{font-size:30px}
+  .pod .series{gap:2px}
+  .pod .series .rb{width:16px;height:16px;font-size:10px;border-radius:3px}
+  .seg button{padding:9px 12px;font-size:13px}
+  .legend{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="member" data-live="live" data-fresh="ok">
+  <div id="nav-slot"></div>
+  <div class="ribbon">Prototype Forge V2 · classement et relevés fictifs</div>
+
+  <header class="head">
+    <p class="backword" aria-hidden="true">ELO</p>
+    <div>
+      <p class="kicker"><svg class="spk" aria-hidden="true"><use href="#i-spk"/></svg>ELO Run</p>
+      <div class="title-row"><h1 class="h1">Automne 2026</h1><span class="state-chip ok">Run en cours</span></div>
+      <div class="meta"><span>Du 1er au 31 octobre 2026</span><span>8 participants</span><span>Départ relevé le 01/10 à 00:05</span></div>
+      <label class="runsel">Run<select id="runsel"><option>Automne 2026 · en cours</option><option>Été 2026 · terminé</option></select></label>
+    </div>
+    <div class="ringbox">
+      <div class="ring" role="img" aria-label="Jour 12 sur 31">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/>
+          <circle cx="100" cy="100" r="86" fill="none" stroke="#FF2A1F" stroke-width="10" stroke-dasharray="209 540" transform="rotate(-90 100 100)"/>
+          <path d="M100 2 L104 12 L100 22 L96 12 Z" fill="#C4C4C8"/><path d="M100 178 L104 188 L100 198 L96 188 Z" fill="#C4C4C8"/>
+          <g transform="rotate(139.4 100 100)"><path d="M100 4 L106 14 L100 30 L94 14 Z" fill="#fff"/></g>
+        </svg>
+        <div class="c"><b>J12</b><span>sur 31</span></div>
+      </div>
+      <div><span class="mono only-fresh">Source FACEIT Data API v4<br>relevé 12/10 à 14:32</span><span class="state-chip stale only-stale">Données du 12/10 à 09:14 · FACEIT injoignable</span></div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="seg" id="mode" role="group" aria-label="Critère de classement"><button type="button" data-mode="delta" aria-pressed="true">Progression</button><button type="button" data-mode="elo" aria-pressed="false">ELO total</button></div>
+    <div class="seg light" id="roster" role="group" aria-label="Groupe"><button type="button" data-r="all" aria-pressed="true">Tous</button><button type="button" data-r="Team" aria-pressed="false">Team</button><button type="button" data-r="Guest" aria-pressed="false">Guests</button></div>
+    <div class="legend" aria-label="Légende des résultats"><span><span class="rb v">V</span>Victoire</span><span><span class="rb d">D</span>Défaite</span><span><span class="rb c">–</span>Annulé</span><span><span class="rb u">?</span>Inconnu</span></div>
+  </div>
+
+  <section class="podwrap board" id="podwrap" aria-label="Podium">
+    <ol class="podium" id="podium"></ol>
+  </section>
+
+  <section class="tblsec board" id="tblsec" aria-label="Classement détaillé">
+    <div class="tbl">
+      <div class="trow thead" aria-hidden="true"><span>#</span><span>Joueur</span><span>Niv.</span><span>ELO départ</span><span>ELO actuel</span><span>Progression</span><span>5 derniers</span></div>
+      <div class="tbody" id="tbody"></div>
+    </div>
+    <div class="tbl-foot"><span class="mono">Clique sur un joueur pour afficher sa courbe</span><span class="mono">Valeurs fictives · niveau et ELO fournis par FACEIT en production</span></div>
+  </section>
+
+  <section class="chartsec" aria-labelledby="chart-title">
+    <div class="chart-h">
+      <div><p class="kicker" id="chart-title">Évolution depuis le départ</p><div class="who-sel" id="who-sel"></div></div>
+      <div class="chart-legend"><span><i></i>Joueur sélectionné</span><span><i class="o"></i>Autres participants</span><span><i class="z"></i>ELO de départ</span></div>
+    </div>
+    <div class="chartbox" id="chartbox"><div class="tip" id="tip" role="status"></div></div>
+    <details class="tableview"><summary>Voir les relevés en tableau</summary><div id="tableview"></div></details>
+    <div class="rules">
+      <div><b>Progression</b>ELO actuel moins ELO de départ. Jamais une somme de résultats de matchs.</div>
+      <div><b>Arrivée en cours de run</b>Le départ est le premier relevé du joueur, avec sa date affichée.</div>
+      <div><b>Relevés</b>Un point par jour, uniquement à partir des relevés réellement enregistrés. Ici, courbes fictives.</div>
+    </div>
+  </section>
+
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/v2.js"></script>
+<script>
+(function () {
+  var D = window.LFE_DATA;
+  LFE.mount({ active: 'elo', demo: ['view', 'role', 'live', 'fresh'] });
+  var mode = 'delta', group = 'all';
+  var selected = D.players.slice().sort(function (a, b) { return D.delta(b) - D.delta(a); })[0].id;
+  var days = ['01/10', '02/10', '03/10', '04/10', '05/10', '06/10', '07/10', '08/10', '09/10', '10/10', '11/10', '12/10'];
+
+  function list() {
+    return D.players.filter(function (p) { return group === 'all' || p.roster === group; })
+      .sort(function (a, b) { return mode === 'delta' ? D.delta(b) - D.delta(a) : b.elo - a.elo; });
+  }
+  function renderBoard() {
+    var s = list();
+    document.getElementById('podium').innerHTML = s.slice(0, 3).map(function (p, i) {
+      var main = mode === 'delta' ? D.deltaHtml(D.delta(p)) : D.fmt(p.elo);
+      var sub = mode === 'delta' ? D.fmt(p.start) + ' → ' + D.fmt(p.elo) + ' ELO' : D.deltaHtml(D.delta(p)) + ' sur le run';
+      return '<li class="pod p' + (i + 1) + '"><span class="rk" aria-hidden="true">' + (i + 1) + '</span>'
+        + (i === 0 ? '<span class="tag">' + (mode === 'delta' ? 'Meilleure progression' : 'Meilleur ELO') + '</span>' : '')
+        + D.ava(p) + '<span class="nm">' + D.esc(p.nick) + '</span><span class="val">' + main + '</span><span class="sub">' + sub + '</span>' + D.seriesHtml(p.last) + '</li>';
+    }).join('');
+    var maxAbs = Math.max.apply(null, D.players.map(function (p) { return Math.abs(D.delta(p)); }));
+    document.getElementById('tbody').innerHTML = s.map(function (p, i) {
+      var d = D.delta(p), w = (Math.abs(d) / maxAbs * 50).toFixed(1);
+      var late = p.joined !== '01/10' ? '<small>arrivé le ' + p.joined + '</small>' : '';
+      return '<button type="button" class="trow' + (i === 0 ? ' top' : '') + '" data-id="' + p.id + '" aria-pressed="' + (p.id === selected) + '">'
+        + '<span class="rk">' + (i + 1) + '</span>'
+        + '<span class="who">' + D.ava(p, 40) + '<span style="min-width:0"><b>' + D.esc(p.nick) + '</b><small>' + p.roster + '</small></span></span>'
+        + '<span class="c-lvl">' + D.lvl(p.lvl) + '</span>'
+        + '<span class="n c-start">' + D.fmt(p.start) + late + '</span>'
+        + '<span class="n cur c-elo" data-start="' + D.fmt(p.start) + '">' + D.fmt(p.elo) + '</span>'
+        + '<span class="prog">' + D.deltaHtml(d) + '<span class="mini" aria-hidden="true"><i class="' + (d >= 0 ? 'up' : 'down') + '" style="width:' + w + '%"></i></span></span>'
+        + D.seriesHtml(p.last) + '</button>';
+    }).join('');
+  }
+  function swap(fn) {
+    var els = document.querySelectorAll('.board');
+    els.forEach(function (e) { e.classList.add('swap'); });
+    setTimeout(function () { fn(); els.forEach(function (e) { e.classList.remove('swap'); }); }, 180);
+  }
+  function seg(id, attr, cb) {
+    var box = document.getElementById(id);
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      box.querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      cb(b.getAttribute(attr));
+    });
+  }
+  seg('mode', 'data-mode', function (v) { mode = v; swap(renderBoard); });
+  seg('roster', 'data-r', function (v) { group = v; swap(renderBoard); });
+  document.getElementById('tbody').addEventListener('click', function (e) {
+    var r = e.target.closest('.trow'); if (!r) return;
+    selected = r.dataset.id;
+    document.querySelectorAll('#tbody .trow').forEach(function (o) { o.setAttribute('aria-pressed', String(o === r)); });
+    renderChart();
+    document.getElementById('chart-title').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+  });
+  renderBoard();
+
+  // ---- Graphique : progression depuis le départ (un point par jour) ----
+  var box = document.getElementById('chartbox'), tip = document.getElementById('tip');
+  var svgNS = 'http://www.w3.org/2000/svg';
+  function deltas(p) { var base = null; return p.snapshots.map(function (v) { if (v === null) return null; if (base === null) base = v; return v - base; }); }
+  function renderChart() {
+    var p = D.players.filter(function (x) { return x.id === selected; })[0];
+    document.getElementById('who-sel').innerHTML = D.esc(p.nick) + ' · ' + D.deltaHtml(D.delta(p));
+    var old = box.querySelector('svg'); if (old) old.remove();
+    var W = box.clientWidth - 8, H = Math.max(240, Math.min(380, W * 0.42));
+    var m = { l: 46, r: W < 520 ? 16 : 96, t: 18, b: 34 };
+    var all = D.players.map(deltas), flat = [].concat.apply([], all).filter(function (v) { return v !== null; });
+    var lo = Math.min(-20, Math.min.apply(null, flat)), hi = Math.max(20, Math.max.apply(null, flat));
+    lo = Math.floor(lo / 20) * 20; hi = Math.ceil(hi / 20) * 20;
+    var x = function (i) { return m.l + i * (W - m.l - m.r) / (days.length - 1); };
+    var y = function (v) { return m.t + (hi - v) * (H - m.t - m.b) / (hi - lo); };
+    var s = '<svg xmlns="' + svgNS + '" width="' + W + '" height="' + H + '" role="img" aria-label="Courbe de progression de ' + D.esc(p.nick) + '">';
+    s += '<defs><clipPath id="above"><rect x="0" y="0" width="' + W + '" height="' + y(0) + '"/></clipPath><clipPath id="below"><rect x="0" y="' + y(0) + '" width="' + W + '" height="' + (H - y(0)) + '"/></clipPath></defs>';
+    for (var g = lo; g <= hi; g += 20) {
+      s += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + y(g) + '" y2="' + y(g) + '" stroke="' + (g === 0 ? '#6b6b74' : '#1f1d1e') + '" stroke-width="1"' + (g === 0 ? ' stroke-dasharray="5 4"' : '') + '/>';
+      s += '<text x="' + (m.l - 8) + '" y="' + (y(g) + 4) + '" fill="#7D7D86" font-size="11" text-anchor="end" font-family="Archivo,sans-serif">' + (g > 0 ? '+' + g : g === 0 ? '0' : '−' + Math.abs(g)) + '</text>';
+    }
+    days.forEach(function (d, i) { if (i % (W < 520 ? 3 : 1) === 0 || i === days.length - 1) s += '<text x="' + x(i) + '" y="' + (H - 10) + '" fill="#7D7D86" font-size="11" text-anchor="middle" font-family="Archivo,sans-serif">' + d + '</text>'; });
+    function path(arr) { var d = '', started = false; arr.forEach(function (v, i) { if (v === null) return; d += (started ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1) + ' '; started = true; }); return d; }
+    D.players.forEach(function (q, k) { if (q.id !== selected) s += '<path d="' + path(all[k]) + '" fill="none" stroke="#3d3c42" stroke-width="1.5" stroke-linejoin="round"/>'; });
+    var sel = deltas(p), first = sel.findIndex(function (v) { return v !== null; });
+    var area = path(sel) + 'L' + x(sel.length - 1) + ' ' + y(0) + ' L' + x(first) + ' ' + y(0) + ' Z';
+    s += '<path d="' + area + '" fill="rgba(34,197,94,.14)" clip-path="url(#above)"/><path d="' + area + '" fill="rgba(239,68,68,.16)" clip-path="url(#below)"/>';
+    s += '<path d="' + path(sel) + '" fill="none" stroke="#F4F4F5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+    var last = sel[sel.length - 1];
+    s += '<circle cx="' + x(sel.length - 1) + '" cy="' + y(last) + '" r="5" fill="#F4F4F5" stroke="#0c0b0b" stroke-width="2"/>';
+    if (W >= 520) s += '<text x="' + (x(sel.length - 1) + 12) + '" y="' + (y(last) + 4) + '" fill="#F4F4F5" font-size="13" font-weight="700" font-family="Archivo,sans-serif">' + D.esc(p.nick.replace('demo_', '')) + ' ' + (last >= 0 ? '+' : '−') + Math.abs(last) + '</text>';
+    s += '<line id="cross" x1="0" x2="0" y1="' + m.t + '" y2="' + (H - m.b) + '" stroke="#C4C4C8" stroke-width="1" opacity="0"/><circle id="crossdot" r="5" fill="#F4F4F5" stroke="#0c0b0b" stroke-width="2" opacity="0"/>';
+    s += '<rect x="' + m.l + '" y="0" width="' + (W - m.l - m.r) + '" height="' + H + '" fill="transparent" id="hit"/></svg>';
+    box.insertAdjacentHTML('beforeend', s);
+    var svg = box.querySelector('svg'), cross = svg.querySelector('#cross'), dot = svg.querySelector('#crossdot');
+    function move(ev) {
+      var r = svg.getBoundingClientRect(), px = ev.clientX - r.left;
+      var i = Math.round((px - m.l) / ((W - m.l - m.r) / (days.length - 1)));
+      i = Math.max(0, Math.min(days.length - 1, i));
+      var v = sel[i];
+      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity', '1');
+      if (v === null) { dot.setAttribute('opacity', '0'); tip.innerHTML = '<b>' + days[i] + '/2026</b><div class="r"><span>' + D.esc(p.nick) + '</span><span>pas encore dans le run</span></div>'; }
+      else {
+        dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(v)); dot.setAttribute('opacity', '1');
+        tip.innerHTML = '<b>' + days[i] + '/2026 · relevé fictif</b><div class="r"><span>ELO</span><span>' + D.fmt(p.snapshots[i]) + '</span></div><div class="r"><span>Depuis le départ</span><span>' + (v > 0 ? '+' + v : v < 0 ? '−' + Math.abs(v) : '±0') + '</span></div>';
+      }
+      tip.classList.add('show');
+      var tx = x(i) + 14; if (tx + 170 > W) tx = x(i) - 180;
+      tip.style.left = tx + 'px'; tip.style.top = (m.t + 6) + 'px';
+    }
+    function leave() { cross.setAttribute('opacity', '0'); dot.setAttribute('opacity', '0'); tip.classList.remove('show'); }
+    svg.addEventListener('pointermove', move); svg.addEventListener('pointerdown', move); svg.addEventListener('pointerleave', leave);
+    document.getElementById('tableview').innerHTML = '<table><thead><tr><th>Jour</th><th>ELO</th><th>Depuis le départ</th></tr></thead><tbody>'
+      + days.map(function (d, i) { var v = p.snapshots[i]; return '<tr><td>' + d + '</td><td>' + (v === null ? '–' : D.fmt(v)) + '</td><td>' + (sel[i] === null ? 'pas encore inscrit' : (sel[i] > 0 ? '+' : sel[i] < 0 ? '−' : '±') + Math.abs(sel[i])) + '</td></tr>'; }).join('') + '</tbody></table>';
+  }
+  renderChart();
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(renderChart, 120); });
+  document.addEventListener('lfe:state', function (e) { if (e.detail.key === 'view') setTimeout(renderChart, 60); });
+})();
+</script>
+</body>
+</html>

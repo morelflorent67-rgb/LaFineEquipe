@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · Mur des lamentations · Forge V2</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/v2.css">
+<style>
+/* L'admin reste dans l'univers Forge mais plus calme : c'est un outil. */
+.admin{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh;background:#080707}
+.side{position:sticky;top:0;align-self:start;height:100vh;display:flex;flex-direction:column;gap:4px;padding:18px 12px;background:#0d0b0b;border-right:1px solid var(--line)}
+.side .brand{padding:4px 8px 18px}
+.side .brand > span{display:grid;gap:4px}
+.side .brand small{font:600 10.5px/1 var(--f);font-stretch:112%;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-hi)}
+.side a{display:flex;align-items:center;gap:11px;min-height:42px;padding:8px 12px;border-radius:6px;text-decoration:none;font:600 14.5px/1.2 var(--f);color:var(--muted)}
+.side a svg{width:18px;height:18px;flex:none}
+.side a:hover{background:var(--steel);color:#fff}
+.side a[aria-current="page"]{background:linear-gradient(100deg,rgba(255,42,31,.22),rgba(255,42,31,.04));color:#fff;box-shadow:inset 3px 0 0 var(--brand-hi)}
+.side .sep{margin:10px 8px;border-top:1px solid var(--line)}
+.side .bottom{margin-top:auto}
+.main{min-width:0;display:grid;align-content:start}
+.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;padding:12px clamp(16px,3cqi,40px);background:rgba(8,7,7,.95);border-bottom:1px solid var(--line);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.topbar .crumb{font:600 13.5px/1 var(--f);color:var(--muted)}
+.topbar .crumb b{color:#fff}
+.topbar .me{margin-left:auto;display:flex;align-items:center;gap:10px;font:600 13px/1 var(--f);color:var(--silver)}
+.topbar .me i{width:30px;height:30px;border-radius:50%;background:var(--steel-2);display:grid;place-items:center;font-style:normal;font-weight:800;color:#fff}
+.side-btn{display:none}
+.content{display:grid;gap:22px;padding:clamp(20px,3cqi,40px)}
+.page-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 24px}
+.page-h h1{margin:0;font:800 clamp(28px,3.4cqi,40px)/1 var(--f);font-stretch:108%;letter-spacing:-.02em}
+.page-h .stats{display:flex;gap:16px;margin-top:10px;font-size:14px;color:var(--muted)}
+.page-h .stats b{color:#fff;font-variant-numeric:tabular-nums}
+.panel{background:#0e0c0c;border:1px solid var(--line-2)}
+.panel-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.panel-h h2{margin:0;font:700 18px/1.2 var(--f)}
+.panel-b{padding:20px}
+.stepper{display:flex;gap:6px;list-style:none;margin:0;padding:0}
+.stepper li{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;font:600 12.5px/1 var(--f);color:var(--dim);border:1px solid var(--line);border-radius:20px}
+.stepper li i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;background:var(--steel-2);color:var(--muted)}
+.stepper li.on{color:#fff;border-color:var(--line-2)}
+.stepper li.on i{background:var(--brand);color:#fff}
+.stepper li.done i{background:var(--win);color:var(--win-ink)}
+.field{display:grid;gap:8px}
+.field label,.field .lab{font:700 14px/1.2 var(--f)}
+.field .help{font-size:13px;color:var(--muted)}
+.inrow{display:flex;gap:10px;flex-wrap:wrap}
+.input{flex:1 1 280px;min-height:48px;padding:10px 14px;background:var(--steel);border:1px solid var(--line-2);border-radius:4px;color:#fff;font:400 16px/1.3 var(--f)}
+.input:focus,textarea:focus{outline:none;border-color:var(--brand-hi);box-shadow:0 0 0 1px var(--brand-hi)}
+.input.invalid{border-color:var(--loss)}
+.err{display:none;font-size:13.5px;color:var(--loss)}
+.err.show{display:block}
+.try{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--dim)}
+.try button{padding:6px 10px;background:var(--steel);border:1px solid var(--line);border-radius:20px;cursor:pointer;font:600 12.5px/1 var(--f);color:var(--silver)}
+.try button:hover{border-color:var(--line-2);color:#fff}
+.sim{font:400 11.5px/1.5 var(--mono);color:var(--amber)}
+.preview{display:none;grid-template-columns:auto minmax(0,1fr) auto;gap:16px 20px;align-items:center;margin-top:20px;padding:18px;background:var(--ink-2);border:1px solid var(--line-2)}
+.preview.show{display:grid}
+.preview .ava{--s:76px}
+.preview h3{margin:0;font:800 24px/1.1 var(--f);font-stretch:106%}
+.preview dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:10px 0 0;font-size:14px}
+.preview dt{color:var(--dim)}
+.preview dd{margin:0;font-weight:600}
+.preview .fid{font:400 12px/1.4 var(--mono);color:var(--silver);overflow-wrap:anywhere}
+.preview .acts{display:grid;gap:8px;justify-items:end}
+.found{display:inline-flex;align-items:center;gap:6px;font:600 12.5px/1 var(--f);color:var(--win)}
+.found svg{width:16px;height:16px}
+.dup{display:none;margin-top:20px;padding:16px 18px;border:1px solid rgba(245,165,36,.5);background:rgba(245,165,36,.08);color:var(--white);font-size:14.5px}
+.dup.show{display:block}
+.dup b{color:var(--amber)}
+.step3{display:none;margin-top:22px;padding-top:22px;border-top:1px solid var(--line);gap:18px}
+.step3.show{display:grid}
+textarea{width:100%;min-height:96px;padding:12px 14px;background:var(--steel);border:1px solid var(--line-2);border-radius:4px;color:#fff;font:400 15px/1.5 var(--f);resize:vertical}
+.counter{justify-self:end;font:400 11px/1 var(--mono);color:var(--dim)}
+.private{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--f);color:var(--amber)}
+.private svg{width:13px;height:13px}
+.radios{display:flex;flex-wrap:wrap;gap:10px}
+.radio{display:flex;align-items:flex-start;gap:10px;flex:1 1 220px;padding:12px 14px;border:1px solid var(--line-2);border-radius:6px;cursor:pointer}
+.radio input{margin-top:3px;accent-color:var(--brand-hi)}
+.radio b{display:block;font-size:14.5px}
+.radio span{font-size:13px;color:var(--muted)}
+.radio:has(input:checked){border-color:var(--brand-hi);background:rgba(255,42,31,.06)}
+.formacts{display:flex;flex-wrap:wrap;gap:10px}
+
+.listtools{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.listtools .input{flex:1 1 240px;max-width:360px;min-height:42px;font-size:15px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:4px;overflow:hidden}
+.seg button{min-height:40px;padding:8px 14px;background:transparent;border:0;cursor:pointer;font:600 13px/1 var(--f);color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button[aria-pressed="true"]{background:var(--white);color:#111}
+.entries{display:grid}
+.er{display:grid;grid-template-columns:minmax(200px,1.3fr) 120px 110px minmax(160px,1.3fr) 92px auto;gap:14px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--line)}
+.er.head{padding-block:10px;background:var(--ink-2);font:600 11px/1.2 var(--f);font-stretch:112%;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.er:last-child{border-bottom:0}
+.er.new{animation:flash 2.4s ease}
+@keyframes flash{0%,40%{background:rgba(34,197,94,.12)}100%{background:transparent}}
+.er .who{display:flex;align-items:center;gap:12px;min-width:0}
+.er .who .ava{--s:40px}
+.er .who b{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.er .who span{font:400 11px/1.3 var(--mono);color:var(--dim)}
+.er .lv{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.er .dt{font-size:13.5px;color:var(--silver)}
+.er .dt small{display:block;font:400 11px/1.3 var(--mono);color:var(--dim)}
+.er .reason{display:flex;align-items:flex-start;gap:7px;font-size:13.5px;color:var(--silver);min-width:0}
+.er .reason svg{width:13px;height:13px;flex:none;margin-top:3px;color:var(--amber)}
+.er .reason span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.er .reason.none{color:var(--dim)}
+.st{justify-self:start;padding:5px 9px;border-radius:20px;font:700 11.5px/1 var(--f)}
+.st.active{background:rgba(255,255,255,.08);color:#fff}
+.st.archived{background:rgba(113,113,122,.18);color:var(--muted)}
+.racts{display:flex;gap:4px;justify-content:flex-end}
+.ib{display:grid;place-items:center;width:38px;height:38px;background:transparent;border:1px solid var(--line);border-radius:4px;cursor:pointer;color:var(--silver)}
+.ib svg{width:17px;height:17px}
+.ib:hover{border-color:var(--line-2);color:#fff;background:var(--steel)}
+.ib.danger:hover{border-color:var(--loss);color:var(--loss)}
+.nolist{display:none;padding:28px 20px;text-align:center;color:var(--muted)}
+.entries.is-empty .nolist{display:block}
+
+.modal-bg{position:fixed;inset:0;z-index:150;display:none;place-items:center;padding:16px;background:rgba(0,0,0,.65)}
+.modal-bg.show{display:grid}
+.stage.mobile .modal-bg{position:absolute}
+.modal{width:min(480px,100%);display:grid;gap:16px;padding:22px;background:#121010;border:1px solid var(--line-2);box-shadow:0 30px 80px rgba(0,0,0,.8)}
+.modal h3{margin:0;font:800 21px/1.2 var(--f)}
+.modal p{margin:0;color:var(--muted);font-size:15px}
+.modal .formacts{justify-content:flex-end}
+.btn-danger{background:var(--loss);color:var(--loss-ink)}
+
+@container site (max-width: 980px){
+  .admin{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;left:0;top:0;bottom:0;z-index:30;width:260px;height:auto;transform:translateX(-100%);transition:transform .25s ease;box-shadow:20px 0 60px rgba(0,0,0,.6)}
+  .admin.nav-open .side{transform:none}
+  .stage.mobile .side{position:absolute}
+  .side-btn{display:inline-grid;place-items:center;width:42px;height:42px;background:var(--steel);border:1px solid var(--line-2);border-radius:4px;cursor:pointer}
+  .side-btn svg{width:20px;height:20px}
+  .er.head{display:none}
+  .er{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who st" "lv lv" "dt dt" "reason reason" "racts racts";gap:8px 12px;padding:14px 16px}
+  .er .who{grid-area:who}.er .st{grid-area:st;justify-self:end}.er .lv{grid-area:lv}.er .dt{grid-area:dt}.er .reason{grid-area:reason}.er .racts{grid-area:racts;justify-content:flex-start}
+  .er .dt small{display:inline;margin-left:6px}
+  .preview{grid-template-columns:auto minmax(0,1fr)}
+  .preview .acts{grid-column:1 / -1;justify-items:start;grid-auto-flow:column}
+}
+@container site (max-width: 560px){
+  .topbar .me span{display:none}
+  .topbar .crumb{font-size:12.5px}
+  .stepper li span{display:none}
+  .panel-b{padding:16px}
+  .preview .ava{--s:60px}
+  .formacts .btn{flex:1 1 auto}
+}
+</style>
+</head>
+<body>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="admin" data-live="live" data-fresh="ok">
+  <div class="admin" id="admin">
+    <aside class="side" aria-label="Administration">
+      <a class="brand" href="home.html" style="padding:4px 8px 18px;background:none;box-shadow:none"><img src="assets/brand/lfe-round-temp.webp" alt="" width="40" height="40"><span><span class="brand-word">La<b>Fine</b>Equipe</span><small>Administration</small></span></a>
+      <a href="#"><svg aria-hidden="true"><use href="#i-home"/></svg>Tableau de bord</a>
+      <a href="#"><svg aria-hidden="true"><use href="#i-users"/></svg>Joueurs</a>
+      <a href="#"><svg aria-hidden="true"><use href="#i-trophy"/></svg>ELO Runs</a>
+      <a href="#"><svg aria-hidden="true"><use href="#i-target"/></svg>Synchro FACEIT</a>
+      <a href="#"><svg aria-hidden="true"><use href="#i-play"/></svg>Clips</a>
+      <a href="#"><svg aria-hidden="true"><use href="#i-target"/></svg>Crosshairs</a>
+      <a href="#"><svg aria-hidden="true"><use href="#i-nade"/></svg>Maps et stuffs</a>
+      <a href="admin-mur.html" aria-current="page"><svg aria-hidden="true"><use href="#i-wall"/></svg>Mur des lamentations</a>
+      <div class="sep"></div>
+      <div class="bottom"><a href="mur.html"><svg aria-hidden="true"><use href="#i-ext"/></svg>Voir la page du Mur</a><a href="home.html"><svg aria-hidden="true"><use href="#i-home"/></svg>Retour au site</a></div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <button class="side-btn" type="button" id="side-btn" aria-label="Ouvrir le menu d'administration"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+        <span class="crumb">Admin / <b>Mur des lamentations</b></span>
+        <span class="me"><span>admin_demo</span><i>A</i></span>
+      </div>
+      <div class="ribbon">Prototype · aucune requête FACEIT ni écriture en base · profils fictifs</div>
+
+      <div class="content">
+        <div class="page-h">
+          <div><h1>Mur des lamentations</h1><div class="stats"><span><b id="n-active">0</b> actifs</span><span><b id="n-arch">0</b> archivés</span><span>Page visible : <b>membres connectés</b></span></div></div>
+          <a class="btn btn-steel btn-sm" href="mur.html">Voir la page du Mur</a>
+        </div>
+
+        <section class="panel" aria-labelledby="add-title">
+          <div class="panel-h"><h2 id="add-title">Ajouter un joueur</h2>
+            <ol class="stepper" id="stepper"><li class="on" data-s="1"><i>1</i><span>Rechercher</span></li><li data-s="2"><i>2</i><span>Vérifier</span></li><li data-s="3"><i>3</i><span>Confirmer</span></li></ol></div>
+          <div class="panel-b">
+            <form id="f-search" novalidate>
+              <div class="field">
+                <label for="q">Pseudo ou URL du profil FACEIT</label>
+                <div class="inrow"><input class="input" id="q" autocomplete="off" placeholder="demo_yankee ou https://www.faceit.com/fr/players/demo_yankee"><button class="btn btn-red" type="submit">Rechercher</button></div>
+                <p class="err" id="q-err" role="alert">Saisis un pseudo FACEIT ou l'adresse de son profil.</p>
+                <div class="try"><span>Essayer :</span><button type="button" data-try="demo_yankee">demo_yankee (nouveau)</button><button type="button" data-try="https://www.faceit.com/fr/players/demo_zulu">URL de profil</button><button type="button" data-try="demo_kilo">demo_kilo (déjà sur le mur)</button></div>
+                <p class="sim">Simulation : ce prototype n'interroge pas FACEIT. En production, le serveur résout le pseudo via la Data API officielle et vérifie l'identifiant unique.</p>
+              </div>
+            </form>
+
+            <div class="dup" id="dup" role="alert"></div>
+
+            <div class="preview" id="preview" aria-live="polite">
+              <span class="ava" id="p-ava" style="--lvl:7"><img src="assets/player.svg" alt=""></span>
+              <div>
+                <span class="found"><svg aria-hidden="true"><use href="#i-check"/></svg>Profil trouvé sur FACEIT (simulé)</span>
+                <h3 id="p-nick"></h3>
+                <dl><dt>Identifiant</dt><dd class="fid" id="p-id"></dd><dt>Niveau CS2</dt><dd id="p-lvl"></dd><dt>ELO CS2</dt><dd id="p-elo"></dd><dt>Pays</dt><dd>FR</dd></dl>
+              </div>
+              <div class="acts"><a class="btn btn-ghost btn-sm" href="#" id="p-link">Ouvrir le profil FACEIT ↗</a><button class="btn btn-ghost btn-sm" type="button" id="not-him">Ce n'est pas lui</button></div>
+            </div>
+
+            <form class="step3" id="f-add">
+              <div class="field">
+                <label for="reason">Raison interne <span class="muted">(facultatif)</span></label>
+                <span class="private"><svg aria-hidden="true"><use href="#i-lock"/></svg>Visible uniquement par les administrateurs</span>
+                <textarea id="reason" maxlength="280" placeholder="Reste factuel, sans insulte ni donnée personnelle. Ex. : « abandon constaté le 12/10 »"></textarea>
+                <span class="counter" id="r-count">0 / 280</span>
+              </div>
+              <fieldset class="field" style="border:0;padding:0;margin:0">
+                <legend class="lab" style="margin-bottom:8px">Statut</legend>
+                <div class="radios">
+                  <label class="radio"><input type="radio" name="status" value="active" checked><span><b>Actif</b><span>Affiché sur le Mur pour les membres.</span></span></label>
+                  <label class="radio"><input type="radio" name="status" value="archived"><span><b>Archivé</b><span>Conservé ici, masqué sur le Mur.</span></span></label>
+                </div>
+              </fieldset>
+              <div class="formacts"><button class="btn btn-red" type="submit">Ajouter au mur</button><button class="btn btn-ghost" type="button" id="cancel">Annuler</button></div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="list-title">
+          <div class="panel-h"><h2 id="list-title">Joueurs sur le mur</h2>
+            <div class="listtools"><input class="input" id="lq" type="search" placeholder="Rechercher un pseudo" aria-label="Rechercher un joueur déjà ajouté">
+              <div class="seg" role="group" aria-label="Statut"><button type="button" data-f="active" aria-pressed="true">Actifs</button><button type="button" data-f="archived" aria-pressed="false">Archivés</button><button type="button" data-f="all" aria-pressed="false">Tous</button></div></div></div>
+          <div class="entries" id="entries">
+            <div class="er head" aria-hidden="true"><span>Joueur</span><span>Niveau · ELO</span><span>Ajouté</span><span>Raison interne</span><span>Statut</span><span></span></div>
+            <div id="rows"></div>
+            <p class="nolist">Aucun joueur ne correspond.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal" id="modal-box"></div>
+  </div>
+</div>
+</div></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/v2.js"></script>
+<script>
+(function () {
+  var D = window.LFE_DATA;
+  LFE.mount({ active: 'admin', demo: ['view'] });
+  var entries = D.wall.map(function (e) { return Object.assign({}, e); });
+  var filter = 'active', lq = '', pending = null, lastFocus = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function counts() {
+    $('n-active').textContent = entries.filter(function (e) { return e.status === 'active'; }).length;
+    $('n-arch').textContent = entries.filter(function (e) { return e.status === 'archived'; }).length;
+  }
+  function norm(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function renderRows(highlight) {
+    var l = entries.filter(function (e) { return (filter === 'all' || e.status === filter) && (!lq || norm(e.nick).indexOf(norm(lq)) > -1); })
+      .sort(function (a, b) { return b.added.localeCompare(a.added); });
+    $('entries').classList.toggle('is-empty', !l.length);
+    $('rows').innerHTML = l.map(function (e) {
+      var reason = e.reason ? '<span class="reason"><svg aria-hidden="true"><use href="#i-lock"/></svg><span>' + D.esc(e.reason) + '</span></span>' : '<span class="reason none">Aucune raison renseignée</span>';
+      return '<div class="er' + (e.nick === highlight ? ' new' : '') + '">'
+        + '<span class="who">' + D.ava({ lvl: e.lvl }, 40) + '<span style="min-width:0"><b>' + D.esc(e.nick) + '</b><span>' + e.id + '</span></span></span>'
+        + '<span class="lv">' + D.lvl(e.lvl) + (e.elo ? D.fmt(e.elo) : '–') + '</span>'
+        + '<span class="dt">' + D.frDate(e.added) + '<small>par ' + e.by + '</small></span>' + reason
+        + '<span class="st ' + e.status + '">' + (e.status === 'active' ? 'Actif' : 'Archivé') + '</span>'
+        + '<span class="racts">'
+        + '<button class="ib" type="button" data-act="refresh" data-n="' + e.nick + '" title="Actualiser depuis FACEIT" aria-label="Actualiser ' + e.nick + ' depuis FACEIT"><svg aria-hidden="true"><use href="#i-link"/></svg></button>'
+        + '<button class="ib" type="button" data-act="edit" data-n="' + e.nick + '" title="Modifier" aria-label="Modifier ' + e.nick + '"><svg aria-hidden="true"><use href="#i-edit"/></svg></button>'
+        + '<button class="ib" type="button" data-act="toggle" data-n="' + e.nick + '" title="' + (e.status === 'active' ? 'Archiver' : 'Réactiver') + '" aria-label="' + (e.status === 'active' ? 'Archiver ' : 'Réactiver ') + e.nick + '"><svg aria-hidden="true"><use href="#i-archive"/></svg></button>'
+        + '<button class="ib danger" type="button" data-act="remove" data-n="' + e.nick + '" title="Retirer du mur" aria-label="Retirer ' + e.nick + ' du mur"><svg aria-hidden="true"><use href="#i-trash"/></svg></button>'
+        + '</span></div>';
+    }).join('');
+    counts();
+  }
+  renderRows();
+
+  // ---- Étapes ----
+  function step(n) {
+    document.querySelectorAll('#stepper li').forEach(function (li) {
+      var s = +li.dataset.s; li.classList.toggle('on', s === n); li.classList.toggle('done', s < n);
+    });
+  }
+  function reset() {
+    pending = null; $('q').value = ''; $('reason').value = ''; $('r-count').textContent = '0 / 280';
+    $('preview').classList.remove('show'); $('f-add').classList.remove('show'); $('dup').classList.remove('show');
+    document.querySelector('input[name=status][value=active]').checked = true; step(1);
+  }
+  function parseNick(v) {
+    v = v.trim();
+    var m = v.match(/faceit\.com\/(?:[a-z]{2}\/)?players\/([^/?#\s]+)/i);
+    return m ? decodeURIComponent(m[1]) : v.replace(/^@/, '');
+  }
+  $('f-search').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var raw = $('q').value, nick = parseNick(raw);
+    $('dup').classList.remove('show'); $('preview').classList.remove('show'); $('f-add').classList.remove('show');
+    if (!nick || !/^[A-Za-z0-9_\-.]{2,32}$/.test(nick)) { $('q').classList.add('invalid'); $('q-err').classList.add('show'); $('q').focus(); return; }
+    $('q').classList.remove('invalid'); $('q-err').classList.remove('show');
+    var ex = entries.filter(function (x) { return norm(x.nick) === norm(nick); })[0];
+    if (ex) {
+      $('dup').innerHTML = '<b>' + D.esc(ex.nick) + '</b> est déjà sur le mur depuis le ' + D.frDate(ex.added) + ' (statut : ' + (ex.status === 'active' ? 'actif' : 'archivé') + '). L\'identifiant FACEIT est unique : il ne peut pas être ajouté deux fois. <button class="btn btn-ghost btn-sm" type="button" id="see-dup" style="margin-left:6px">Voir l\'entrée</button>';
+      $('dup').classList.add('show'); step(1);
+      $('see-dup').addEventListener('click', function () { filter = 'all'; lq = ex.nick; $('lq').value = ex.nick; document.querySelectorAll('.seg [data-f]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.f === 'all')); }); renderRows(ex.nick); $('list-title').scrollIntoView({ block: 'start' }); });
+      return;
+    }
+    var seed = nick.split('').reduce(function (a, c) { return a + c.charCodeAt(0); }, 0);
+    pending = { nick: nick, id: ((seed * 7919) % 0xffffff).toString(16).padStart(6, '0') + '-demo-' + ((seed * 104729) % 0xffff).toString(16) + '-fictif', lvl: 3 + seed % 8, elo: 900 + (seed * 37) % 1300 };
+    $('p-nick').textContent = pending.nick; $('p-id').textContent = pending.id;
+    $('p-lvl').innerHTML = D.lvl(pending.lvl); $('p-elo').textContent = D.fmt(pending.elo);
+    $('p-ava').style.setProperty('--lvl', pending.lvl);
+    $('preview').classList.add('show'); $('f-add').classList.add('show'); step(3);
+    $('reason').focus();
+  });
+  document.querySelectorAll('[data-try]').forEach(function (b) { b.addEventListener('click', function () { $('q').value = b.dataset.try; $('f-search').requestSubmit(); }); });
+  $('not-him').addEventListener('click', function () { reset(); $('q').focus(); });
+  $('cancel').addEventListener('click', reset);
+  $('p-link').addEventListener('click', function (e) { e.preventDefault(); LFE.toast('En production : ouvre le profil FACEIT officiel'); });
+  $('reason').addEventListener('input', function () { $('r-count').textContent = this.value.length + ' / 280'; });
+  $('f-add').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!pending) return;
+    var st = document.querySelector('input[name=status]:checked').value;
+    entries.unshift({ nick: pending.nick, id: pending.id.slice(0, 4) + '…' + pending.id.slice(-4), lvl: pending.lvl, elo: pending.elo, added: '2026-10-12', by: 'admin_demo', status: st, reason: $('reason').value.trim() });
+    var n = pending.nick; reset(); filter = st; lq = ''; $('lq').value = '';
+    document.querySelectorAll('.seg [data-f]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.f === st)); });
+    renderRows(n);
+    LFE.toast(n + (st === 'active' ? ' ajouté au mur' : ' ajouté en archive'));
+  });
+
+  // ---- Liste ----
+  $('lq').addEventListener('input', function () { lq = this.value.trim(); renderRows(); });
+  document.querySelectorAll('.seg [data-f]').forEach(function (b) { b.addEventListener('click', function () { filter = b.dataset.f; document.querySelectorAll('.seg [data-f]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); }); renderRows(); }); });
+  function find(n) { return entries.filter(function (e) { return e.nick === n; })[0]; }
+  function openModal(html, trigger) {
+    lastFocus = trigger; $('modal-box').innerHTML = html; $('modal').classList.add('show');
+    var f = $('modal-box').querySelector('textarea, button'); if (f) f.focus();
+  }
+  function closeModal() { $('modal').classList.remove('show'); if (lastFocus) lastFocus.focus(); }
+  $('modal').addEventListener('click', function (e) { if (e.target === this || e.target.closest('[data-close]')) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('modal').classList.contains('show')) closeModal(); });
+  $('rows').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var en = find(b.dataset.n); if (!en) return;
+    if (b.dataset.act === 'refresh') { LFE.toast('Profil de ' + en.nick + ' actualisé (simulé)'); return; }
+    if (b.dataset.act === 'toggle') { en.status = en.status === 'active' ? 'archived' : 'active'; renderRows(); LFE.toast(en.nick + (en.status === 'active' ? ' réactivé' : ' archivé')); return; }
+    if (b.dataset.act === 'edit') {
+      openModal('<h3 id="m-title">Modifier ' + D.esc(en.nick) + '</h3><div class="field"><label for="m-reason">Raison interne</label><span class="private"><svg aria-hidden="true"><use href="#i-lock"/></svg>Visible uniquement par les administrateurs</span><textarea id="m-reason" maxlength="280">' + D.esc(en.reason) + '</textarea></div>'
+        + '<div class="formacts"><button class="btn btn-ghost" type="button" data-close>Annuler</button><button class="btn btn-red" type="button" id="m-save">Enregistrer</button></div>', b);
+      $('m-save').addEventListener('click', function () { en.reason = $('m-reason').value.trim(); closeModal(); renderRows(en.nick); LFE.toast('Modifications enregistrées'); });
+      return;
+    }
+    if (b.dataset.act === 'remove') {
+      openModal('<h3 id="m-title">Retirer ' + D.esc(en.nick) + ' du mur ?</h3><p>L\'entrée et sa raison interne seront supprimées. Pour la garder sans l\'afficher, archive-la plutôt.</p>'
+        + '<div class="formacts"><button class="btn btn-ghost" type="button" data-close>Annuler</button><button class="btn btn-danger" type="button" id="m-del">Retirer définitivement</button></div>', b);
+      $('m-del').addEventListener('click', function () { entries = entries.filter(function (x) { return x !== en; }); closeModal(); renderRows(); LFE.toast(en.nick + ' retiré du mur', true); });
+    }
+  });
+
+  // Menu admin sur petit écran
+  $('side-btn').addEventListener('click', function () { $('admin').classList.toggle('nav-open'); });
+  document.querySelector('.side').addEventListener('click', function (e) { if (e.target.closest('a')) $('admin').classList.remove('nav-open'); });
+})();
+</script>
+</body>
+</html>

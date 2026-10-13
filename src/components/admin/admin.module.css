@@ -1,0 +1,162 @@
+/* L'admin reste dans l'univers Forge, en plus calme : c'est un outil. */
+.shell {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  min-height: 70vh;
+  background: #080707;
+}
+.side {
+  position: sticky;
+  top: var(--nav-h);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 12px;
+  border-right: 1px solid var(--line);
+  min-height: calc(100vh - var(--nav-h));
+}
+.side h2 {
+  margin: 0 8px 12px;
+  font: 600 11px/1 var(--f);
+  font-stretch: 112%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brand-hi);
+}
+.side ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+.side a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font: 600 14.5px/1.2 var(--f);
+  color: var(--muted);
+}
+.side a:hover {
+  background: var(--steel);
+  color: #fff;
+}
+.side a[aria-current='page'] {
+  background: linear-gradient(100deg, rgba(255, 42, 31, 0.22), rgba(255, 42, 31, 0.04));
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--brand-hi);
+}
+.side small {
+  font: 500 11px/1 var(--f);
+  color: var(--dim);
+}
+.content {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 22px;
+  padding: clamp(18px, 3cqi, 40px);
+}
+.pageH {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 24px;
+}
+.pageH h1 {
+  margin: 0;
+  font: 800 clamp(28px, 3.4cqi, 40px)/1 var(--f);
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+}
+.pageH p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  max-width: 70ch;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.stats b {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.panel {
+  background: #0e0c0c;
+  border: 1px solid var(--line-2);
+  min-width: 0;
+}
+.panelH {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.panelH h2 {
+  margin: 0;
+  font: 700 18px/1.2 var(--f);
+}
+.panelB {
+  padding: 20px;
+}
+.private {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 12.5px/1.2 var(--f);
+  color: var(--amber);
+}
+.private svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+
+@container site (max-width: 980px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side {
+    position: static;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 10px var(--pad);
+  }
+  .side h2 {
+    display: none;
+  }
+  .side ul {
+    display: flex;
+    overflow-x: auto;
+    gap: 4px;
+    scrollbar-width: thin;
+  }
+  .side a {
+    white-space: nowrap;
+  }
+  .content {
+    padding: 18px var(--pad) 40px;
+  }
+  .panelB {
+    padding: 16px;
+  }
+  .panelH {
+    padding: 14px 16px;
+  }
+}

@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Administration · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<link rel="stylesheet" href="assets/stuffs.css">
+<style>
+.adm{display:grid;grid-template-columns:230px minmax(0,1fr);gap:clamp(18px,3cqi,40px);padding:clamp(28px,3cqi,48px) var(--pad) clamp(56px,6cqi,96px);align-items:start}
+.anav{position:sticky;top:80px;display:grid;gap:4px}
+.anav .kicker{margin-bottom:10px}
+.anav a{position:relative;display:flex;align-items:center;gap:10px;padding:11px 12px;font:650 15px/1 var(--f);color:var(--muted);text-decoration:none;isolation:isolate;transition:color .2s}
+.anav a::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant)) scaleX(.9);opacity:0;background:var(--steel-2);transition:opacity .2s,transform .3s var(--ease)}
+.anav a:hover{color:#fff}
+.anav a:hover::before{opacity:1;transform:skewX(var(--slant))}
+.anav a[aria-current="true"]{color:#fff}
+.anav a[aria-current="true"]::before{opacity:1;transform:skewX(var(--slant));background:linear-gradient(100deg,#ff2a1f,#b8060b)}
+.anav svg{width:16px;height:16px}
+.anav .soon{margin-left:auto;font:600 10px/1 var(--f);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.asec{scroll-margin-top:80px;padding:22px;margin-bottom:22px}
+.asec>header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 20px;margin-bottom:18px}
+.asec h2{margin:6px 0 0;font:850 clamp(24px,2.4cqi,32px)/1 var(--f);font-stretch:112%}
+.asec .desc{margin:8px 0 0;color:var(--muted);font-size:14.5px;max-width:70ch}
+.flow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.preview{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;padding:14px;border:1px solid var(--line-2);background:#141214;animation:rise .35s var(--ease)}
+.preview .nm{font:800 20px/1.1 var(--f)}
+.preview dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px 12px;margin:8px 0 0;font-size:13.5px}
+.preview dt{color:var(--dim)} .preview dd{margin:0;overflow-wrap:anywhere}
+.preview .fid{font:500 11.5px/1.3 var(--mono);color:var(--silver)}
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.loading .spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--brand-hi);animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.err{padding:12px 14px;border:1px solid rgba(239,68,68,.45);background:var(--loss-soft);color:#fecaca;font-size:14px}
+.ok-msg{padding:12px 14px;border-left:3px solid var(--win);background:var(--win-soft);color:var(--silver);font-size:14px}
+.radios{display:flex;gap:8px;flex-wrap:wrap;border:0;margin:0;padding:0}
+.radios legend{margin-bottom:8px;font:650 13px/1.2 var(--f);color:var(--silver)}
+.radios label{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line-2);cursor:pointer;font-size:14px}
+.radios label:has(input:checked){border-color:var(--brand-hi);background:rgba(255,42,31,.08)}
+.private{display:inline-flex;align-items:center;gap:6px;font:650 12px/1 var(--f);color:var(--amber)}
+.private svg{width:13px;height:13px}
+.alist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.alist li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);background:#121214;animation:rise .3s var(--ease) both}
+.alist .nm{font:700 15px/1.2 var(--f)}
+.alist .sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+.alist .note{margin-top:6px;padding:6px 8px;border-left:2px solid var(--amber);background:rgba(245,165,36,.06);font-size:12.5px;color:var(--silver)}
+.alist .acts{display:flex;gap:6px}
+.alist li.arch{opacity:.55}
+.maprows{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.maprow{display:grid;grid-template-columns:36px 120px minmax(0,1fr) 64px auto;gap:14px;align-items:center;padding:8px 12px 8px 8px;border:1px solid var(--line);background:#121214}
+.maprow .ord{display:grid;gap:2px}
+.maprow .ord button{width:32px;height:22px;padding:0;background:var(--steel-2);border:1px solid var(--line-2);color:var(--silver);font-size:11px}
+.maprow .ord button:disabled{opacity:.3}
+.maprow .cov{width:120px;aspect-ratio:16/9;object-fit:cover}
+.maprow .rad{width:56px;height:56px;object-fit:contain;background:#0b0b0c;border:1px solid var(--line)}
+.maprow .nm{font:800 17px/1.1 var(--f)}
+.maprow .sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+.maprow .acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.maprow.off{opacity:.55}
+.file-btn{position:relative;overflow:hidden}
+.file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--silver);cursor:pointer}
+.switch input{appearance:none;width:38px;height:22px;border-radius:11px;background:var(--steel-3);position:relative;cursor:pointer;transition:background .2s}
+.switch input::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s var(--ease)}
+.switch input:checked{background:var(--win)}
+.switch input:checked::after{transform:translateX(16px)}
+.switch input:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.pos-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.85fr);gap:18px;align-items:start}
+.editor{position:relative;aspect-ratio:1;background:#0b0b0c;border:1px solid var(--line-2);overflow:hidden;touch-action:none;user-select:none}
+.editor.placing{cursor:crosshair;box-shadow:0 0 0 2px var(--amber)}
+.editor img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.editor .p{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;display:grid;place-items:center;background:var(--brand-hi);border:2px solid #fff;transform:rotate(45deg);cursor:grab;box-shadow:0 4px 12px rgba(0,0,0,.6);padding:0}
+.editor .p span{transform:rotate(-45deg);font:800 11px/1 var(--f);color:#fff}
+.editor .p:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.editor .p[aria-pressed="true"]{background:#fff}
+.editor .p[aria-pressed="true"] span{color:#111}
+.editor .l{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px dashed #fff;pointer-events:none}
+.editor .tag{position:absolute;transform:translate(-50%,18px);padding:2px 5px;background:rgba(0,0,0,.8);font:650 10.5px/1 var(--f);white-space:nowrap;pointer-events:none;border:0;letter-spacing:0;text-transform:none;color:#fff}
+.mode-note{min-height:20px;font:500 12px/1.4 var(--mono);color:var(--amber)}
+.plist2{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.plist2 li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);background:#121214}
+.plist2 .n{display:grid;place-items:center;width:24px;height:24px;background:var(--brand-hi);font:800 11px/1 var(--f);transform:rotate(45deg)}
+.plist2 .n span{transform:rotate(-45deg)}
+.links-tbl{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+.links-tbl th{text-align:left;font:650 10.5px/1 var(--f);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:8px 6px;border-bottom:1px solid var(--line-2)}
+.links-tbl td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.links-tbl .select{min-height:36px;padding:6px 8px;font-size:13.5px}
+.denied{display:grid;justify-items:center;gap:14px;text-align:center;padding:80px var(--pad)}
+.site:not([data-role="admin"]) .adm{display:none}
+.site[data-role="admin"] .denied{display:none}
+@container site (max-width: 1100px){ .pos-grid,.flow{grid-template-columns:minmax(0,1fr)} }
+@container site (max-width: 900px){
+  .adm{grid-template-columns:minmax(0,1fr)}
+  .anav{position:relative;top:0;display:flex;overflow-x:auto;gap:4px;scrollbar-width:none}
+  .anav .kicker{display:none}
+  .anav a{flex:none}
+  .maprow{grid-template-columns:30px 88px minmax(0,1fr);grid-template-areas:"o c n" "o c r" "a a a"}
+  .maprow .ord{grid-area:o} .maprow .cov{grid-area:c;width:88px} .maprow>div:nth-of-type(2){grid-area:n} .maprow .rad{display:none} .maprow .acts{grid-area:a;justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="admin">
+  <div class="ribbon">Aperçu de l’administration · actions simulées dans le navigateur · en vrai : rôle admin vérifié côté serveur à chaque action</div>
+  <div id="nav-slot"></div>
+  <main id="main">
+    <section class="denied" aria-labelledby="den"><h1 class="h2" id="den">Accès réservé aux administrateurs</h1><p class="muted" style="margin:0">Le rôle est vérifié côté serveur : sans rôle admin, aucune donnée d’administration n’est envoyée.</p></section>
+    <div class="adm">
+      <nav class="anav" aria-label="Sections d’administration">
+        <p class="kicker">Administration</p>
+        <a href="#joueurs" aria-current="true"><svg aria-hidden="true"><use href="#i-trophy"/></svg>Joueurs</a>
+        <a href="#mur"><svg aria-hidden="true"><use href="#i-wall"/></svg>Mur</a>
+        <a href="#maps"><svg aria-hidden="true"><use href="#i-map"/></svg>Maps</a>
+        <a href="#positions"><svg aria-hidden="true"><use href="#i-pin"/></svg>Positions</a>
+        <a href="#stuffs"><svg aria-hidden="true"><use href="#i-nade"/></svg>Stuffs<span class="soon">aperçu</span></a>
+      </nav>
+      <div>
+        <!-- Joueurs -->
+        <section class="asec card" id="joueurs" aria-labelledby="h-j">
+          <header><div><p class="kicker">ELO Run permanent</p><h2 id="h-j">Ajouter un joueur</h2><p class="desc">Pseudo ou lien FACEIT → identifiant résolu → aperçu → confirmation. Le joueur entre immédiatement au classement avec son ELO actuel ; aucune session à créer.</p></div></header>
+          <div class="flow">
+            <form class="field" id="pf"><label for="pq">Pseudo FACEIT ou lien de profil</label><div style="display:flex;gap:8px"><div class="search" style="flex:1"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="input" id="pq" autocomplete="off" placeholder="ex. demo_zephyr" required></div><button class="btn btn-red btn-sm" type="submit">Rechercher</button></div><span class="hint">Simulation : demo_juliet, demo_zephyr, demo_mistral, demo_onyx, ou un joueur déjà classé.</span><div id="pres"></div></form>
+            <div><h3 class="h3" style="font-size:16px;margin-bottom:10px">Classés (<span id="pcount"></span>)</h3><ul class="alist" id="plist"></ul></div>
+          </div>
+        </section>
+
+        <!-- Mur -->
+        <section class="asec card" id="mur" aria-labelledby="h-m">
+          <header><div><p class="kicker">Accès membres · notes admins</p><h2 id="h-m">Mur des lamentations</h2><p class="desc">Vérifier le profil avant d’ajouter, doublons refusés par identifiant FACEIT. L’ajout au Mur ne touche ni au classement ni aux accès.</p></div></header>
+          <div class="flow">
+            <form class="field" id="mf"><label for="mq">Pseudo FACEIT ou lien de profil</label><div style="display:flex;gap:8px"><div class="search" style="flex:1"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="input" id="mq" autocomplete="off" placeholder="ex. demo_onyx" required></div><button class="btn btn-red btn-sm" type="submit">Rechercher</button></div><div id="mres"></div></form>
+            <div><h3 class="h3" style="font-size:16px;margin-bottom:10px">Entrées</h3><ul class="alist" id="mlist"></ul></div>
+          </div>
+        </section>
+
+        <!-- Maps -->
+        <section class="asec card" id="maps" aria-labelledby="h-maps">
+          <header><div><p class="kicker">Stuffs</p><h2 id="h-maps">Maps</h2><p class="desc">Ordre d’affichage, visibilité, vignette (vraie capture) et vue aérienne pour la carte tactique. Formats acceptés : PNG, JPEG, WebP, 5 Mo maximum. Une map qui a des stuffs ne peut pas être supprimée : on la masque.</p></div>
+          <button class="btn btn-steel btn-sm" type="button" id="add-map"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter une map</button></header>
+          <ul class="maprows" id="maprows"></ul>
+        </section>
+
+        <!-- Positions -->
+        <section class="asec card" id="positions" aria-labelledby="h-pos">
+          <header><div><p class="kicker">Carte tactique</p><h2 id="h-pos">Positions et rattachements</h2><p class="desc">Place les points de lancer sur la vue aérienne, déplace-les en les faisant glisser, puis rattache chaque stuff à sa position et place son point d’impact. Le résultat apparaît sur la carte tactique (gardé pour cette session du navigateur).</p></div>
+          <div class="field" style="min-width:200px"><label for="pmap">Map</label><select class="select" id="pmap"></select></div></header>
+          <div class="pos-grid">
+            <div><div class="editor" id="editor" tabindex="-1"><img id="pradar" alt=""><div id="pmarks"></div></div><p class="mode-note" id="mode-note" aria-live="polite"></p>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px"><button class="btn btn-red btn-sm" type="button" id="place">Placer une position</button><button class="btn btn-ghost btn-sm" type="button" id="reset-edits">Revenir aux exemples</button><a class="btn btn-ghost btn-sm" id="see-tac" href="map.html?m=mirage#carte">Voir la carte tactique</a></div></div>
+            <div><h3 class="h3" style="font-size:16px;margin-bottom:10px">Positions</h3><ul class="plist2" id="plist2"></ul>
+              <h3 class="h3" style="font-size:16px;margin:20px 0 0">Rattacher les stuffs</h3><table class="links-tbl"><thead><tr><th>Stuff</th><th>Position de lancer</th><th>Impact</th></tr></thead><tbody id="links"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="asec card" id="stuffs" aria-labelledby="h-st">
+          <header><div><p class="kicker">Éditorial</p><h2 id="h-st">Stuffs</h2><p class="desc">Formulaire complet (titre, camp, type, position, visée, technique, étapes, captures, vidéo YouTube, date de vérification, brouillon/publié) : déjà fonctionnel dans l’application actuelle, il recevra les champs « position » et « impact » de la carte tactique.</p></div><a class="btn btn-steel btn-sm" href="map.html?m=mirage">Voir la bibliothèque</a></header>
+        </section>
+      </div>
+    </div>
+  </main>
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+<dialog class="dlg" id="confirm" aria-labelledby="cf-t"><div class="dlg-h"><h2 id="cf-t">Confirmer</h2></div><div class="dlg-b" id="cf-b"></div><div class="dlg-f"><button class="btn btn-ghost btn-sm" type="button" value="no" id="cf-no">Annuler</button><button class="btn btn-red btn-sm" type="button" id="cf-yes">Confirmer</button></div></dialog>
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.LFE_DATA, L = window.LFE, I = L.icon;
+  var esc = D.esc;
+
+  /* Confirmation (boîte native : Échap ferme, le focus revient au déclencheur) */
+  var cf = document.getElementById('confirm'), cfCb = null, cfFrom = null;
+  function confirmBox(title, html, cb) { cfFrom = document.activeElement; document.getElementById('cf-t').textContent = title; document.getElementById('cf-b').innerHTML = html; cfCb = cb; cf.showModal(); document.getElementById('cf-no').focus(); }
+  document.getElementById('cf-no').addEventListener('click', function () { cf.close(); });
+  document.getElementById('cf-yes').addEventListener('click', function () { cf.close(); if (cfCb) cfCb(); });
+  cf.addEventListener('close', function () { if (cfFrom && document.contains(cfFrom)) cfFrom.focus(); });
+  function ask(title, label, placeholder, cb) {
+    confirmBox(title, '<div class="field"><label for="ask-in">' + label + '</label><input class="input" id="ask-in" maxlength="40" placeholder="' + placeholder + '" autocomplete="off"></div>', function () { var v = document.getElementById('ask-in').value.trim(); if (v) cb(v); });
+    var inp = document.getElementById('ask-in'); inp.focus();
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('cf-yes').click(); } });
+  }
+
+  /* Résolution FACEIT simulée */
+  function resolve(raw, cb) {
+    var m = String(raw).trim().match(/faceit\.com\/(?:[a-z]{2}\/)?players\/([^/?#]+)/i);
+    var nick = m ? decodeURIComponent(m[1]) : String(raw).trim();
+    setTimeout(function () { cb(nick, D.pool.filter(function (p) { return p.nick.toLowerCase() === nick.toLowerCase(); })[0] || null); }, 650);
+  }
+  function previewHtml(p) {
+    return '<div class="preview">' + D.ava(p, 64) + '<div><span class="chip ok">' + I('i-check') + 'Profil trouvé (simulation)</span><div class="nm" style="margin-top:6px">' + esc(p.nick) + '</div><dl><dt>Identifiant</dt><dd class="fid">' + p.id + '</dd><dt>Niveau / ELO</dt><dd>' + D.lvl(p.lvl) + ' <b class="num">' + D.fmt(p.elo) + '</b></dd><dt>Avatar</dt><dd>FACEIT, automatique</dd></dl></div></div>';
+  }
+
+  /* ---------- Joueurs ---------- */
+  function renderPlayers() {
+    var arr = D.players.slice().sort(function (a, b) { return b.elo - a.elo; });
+    document.getElementById('pcount').textContent = arr.length;
+    document.getElementById('plist').innerHTML = arr.map(function (p, i) {
+      return '<li>' + D.ava(p, 36) + '<div><div class="nm">' + (i + 1) + '. ' + esc(p.nick) + '</div><div class="sub">' + (p.group === 'guest' ? 'Guest' : 'Team') + ' · ' + D.fmt(p.elo) + ' ELO · ajouté le ' + D.dateShort(p.addedAt) + ' à ' + D.fmt(p.addedElo) + '</div></div>'
+        + '<div class="acts"><button class="icon-btn" type="button" data-rm="' + p.id + '" aria-label="Retirer ' + esc(p.nick) + ' du classement">' + I('i-trash') + '</button></div></li>';
+    }).join('');
+  }
+  document.getElementById('pf').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var out = document.getElementById('pres'), q = document.getElementById('pq').value;
+    out.innerHTML = '<div class="loading" role="status"><span class="spin"></span>Résolution de l’identifiant FACEIT…</div>';
+    resolve(q, function (nick, p) {
+      var dup = D.players.filter(function (x) { return x.nick.toLowerCase() === nick.toLowerCase(); })[0];
+      if (dup) { out.innerHTML = '<div class="err" role="alert"><b>Déjà au classement</b> : même identifiant FACEIT que ' + esc(dup.nick) + '.</div>'; return; }
+      if (!p) { out.innerHTML = '<div class="err" role="alert">Aucun profil FACEIT « ' + esc(nick) + ' ».</div>'; return; }
+      var rank = D.players.filter(function (x) { return x.elo > p.elo; }).length + 1;
+      out.innerHTML = previewHtml(p) + '<fieldset class="radios" style="margin-top:12px"><legend>Groupe</legend><label><input type="radio" name="pg" value="team" checked> Team</label><label><input type="radio" name="pg" value="guest"> Guest</label></fieldset>'
+        + '<p class="ok-msg" style="margin:12px 0">Entrée immédiate au classement : <b>' + D.fmt(p.elo) + ' ELO</b>, rang ' + rank + ', progression <b>±0</b>.</p><button class="btn btn-red btn-sm" type="button" id="padd">' + I('i-plus') + 'Ajouter au classement</button>';
+      document.getElementById('padd').addEventListener('click', function () {
+        var now = new Date();
+        D.players.push({ id: 'n' + Date.now(), nick: p.nick, group: out.querySelector('input[name=pg]:checked').value, lvl: p.lvl, elo: p.elo, addedElo: p.elo, addedAt: now, ava: p.ava, last: p.last, snaps: [{ at: now, elo: p.elo }] });
+        D.pool.splice(D.pool.indexOf(p), 1);
+        out.innerHTML = '<p class="ok-msg">' + esc(p.nick) + ' ajouté au rang ' + rank + '. <a class="link" href="elo-run.html">Voir le classement</a></p>';
+        document.getElementById('pq').value = ''; renderPlayers();
+        L.toast(p.nick + ' ajouté au classement (rang ' + rank + ')');
+      });
+      document.getElementById('padd').focus();
+    });
+  });
+  document.getElementById('plist').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-rm]'); if (!b) return;
+    var p = D.players.filter(function (x) { return x.id === b.getAttribute('data-rm'); })[0];
+    confirmBox('Retirer ' + p.nick + ' ?', '<p style="margin:0">Il disparaît du classement. Ses relevés ELO sont conservés : s’il est ajouté à nouveau, son ELO de départ sera repris à ce moment-là.</p>', function () {
+      D.players.splice(D.players.indexOf(p), 1); renderPlayers(); L.toast(p.nick + ' retiré du classement');
+    });
+  });
+
+  /* ---------- Mur ---------- */
+  var wall = D.wall.map(function (w, i) { return { nick: w.nick, ava: w.ava, lvl: w.lvl, elo: w.elo, addedAt: w.addedAt, status: 'active', note: i % 3 === 0 ? 'Exemple de note interne : visible des seuls admins.' : '' }; });
+  function renderWall() {
+    document.getElementById('mlist').innerHTML = wall.map(function (w, i) {
+      return '<li class="' + (w.status === 'archived' ? 'arch' : '') + '">' + D.ava(w, 36) + '<div><div class="nm">' + esc(w.nick) + (w.status === 'archived' ? ' <span class="tag">Archivé</span>' : '') + '</div><div class="sub">Ajouté le ' + D.dateFr(w.addedAt) + '</div>' + (w.note ? '<div class="note"><span class="private">' + I('i-lock') + 'Note interne · admins</span><br>' + esc(w.note) + '</div>' : '') + '</div>'
+        + '<div class="acts"><button class="icon-btn" type="button" data-arch="' + i + '" aria-label="' + (w.status === 'archived' ? 'Réactiver ' : 'Archiver ') + esc(w.nick) + '">' + I('i-archive') + '</button><button class="icon-btn" type="button" data-del="' + i + '" aria-label="Retirer ' + esc(w.nick) + ' du Mur">' + I('i-trash') + '</button></div></li>';
+    }).join('');
+  }
+  document.getElementById('mf').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var out = document.getElementById('mres'), q = document.getElementById('mq').value;
+    out.innerHTML = '<div class="loading" role="status"><span class="spin"></span>Résolution de l’identifiant FACEIT…</div>';
+    resolve(q, function (nick, p) {
+      if (wall.some(function (w) { return w.nick.toLowerCase() === nick.toLowerCase(); })) { out.innerHTML = '<div class="err" role="alert"><b>Déjà sur le Mur</b> : même identifiant FACEIT.</div>'; return; }
+      if (!p) { out.innerHTML = '<div class="err" role="alert">Aucun profil FACEIT « ' + esc(nick) + ' ».</div>'; return; }
+      out.innerHTML = previewHtml(p) + '<div class="field" style="margin-top:12px"><label for="mnote">Note interne (facultative)</label><textarea class="textarea" id="mnote" maxlength="280" placeholder="Reste factuel, sans insulte."></textarea><span class="private">' + I('i-lock') + 'Visible uniquement par les administrateurs, jamais publiée</span></div>'
+        + '<p class="hint">L’ajout au Mur ne donne aucun accès, n’ajoute pas au classement et ne présente pas ce joueur comme sanctionné par FACEIT.</p><button class="btn btn-red btn-sm" type="button" id="madd">' + I('i-plus') + 'Ajouter au Mur</button>';
+      document.getElementById('madd').addEventListener('click', function () {
+        wall.unshift({ nick: p.nick, ava: p.ava, lvl: p.lvl, elo: p.elo, addedAt: new Date(), status: 'active', note: document.getElementById('mnote').value.trim() });
+        out.innerHTML = '<p class="ok-msg">' + esc(p.nick) + ' ajouté au Mur.</p>'; document.getElementById('mq').value = ''; renderWall(); L.toast(p.nick + ' ajouté au Mur');
+      });
+    });
+  });
+  document.getElementById('mlist').addEventListener('click', function (e) {
+    var a = e.target.closest('[data-arch]'), d = e.target.closest('[data-del]');
+    if (a) { var w = wall[+a.getAttribute('data-arch')]; w.status = w.status === 'archived' ? 'active' : 'archived'; renderWall(); L.toast(w.nick + (w.status === 'archived' ? ' archivé' : ' réactivé')); }
+    if (d) { var w2 = wall[+d.getAttribute('data-del')]; confirmBox('Retirer ' + w2.nick + ' du Mur ?', '<p style="margin:0">Suppression définitive de l’entrée et de sa note interne. Pour garder une trace, archive plutôt.</p>', function () { wall.splice(wall.indexOf(w2), 1); renderWall(); L.toast(w2.nick + ' retiré du Mur'); }); }
+  });
+
+  /* ---------- Maps ---------- */
+  var maps = D.maps.map(function (m) { return { slug: m.slug, name: m.name, cover: m.cover, radar: m.radar, on: true }; });
+  function renderMaps() {
+    document.getElementById('maprows').innerHTML = maps.map(function (m, i) {
+      var n = D.counts(m.slug).total;
+      return '<li class="maprow' + (m.on ? '' : ' off') + '" data-key="' + m.slug + '"><span class="ord"><button type="button" data-up="' + i + '" aria-label="Monter ' + m.name + '"' + (i ? '' : ' disabled') + '>▲</button><button type="button" data-down="' + i + '" aria-label="Descendre ' + m.name + '"' + (i < maps.length - 1 ? '' : ' disabled') + '>▼</button></span>'
+        + (m.cover ? '<img class="cov" src="' + m.cover + '" alt="">' : '<span class="cov" style="display:grid;place-items:center;background:#0b0b0c;font-size:11px;color:var(--dim)">Vignette à fournir</span>')
+        + '<div><div class="nm">' + esc(m.name) + '</div><div class="sub">' + n + ' stuff' + (n > 1 ? 's' : '') + ' · /stuffs/' + m.slug + '</div></div>'
+        + (m.radar ? '<img class="rad" src="' + m.radar + '" alt="Vue aérienne">' : '<span class="rad"></span>')
+        + '<div class="acts"><label class="switch"><input type="checkbox" data-on="' + i + '"' + (m.on ? ' checked' : '') + '> Visible</label>'
+        + '<span class="btn btn-ghost btn-sm file-btn">' + I('i-upload') + 'Vignette<input type="file" accept="image/png,image/jpeg,image/webp" data-file="cover" data-i="' + i + '" aria-label="Changer la vignette de ' + m.name + '"></span>'
+        + '<span class="btn btn-ghost btn-sm file-btn">' + I('i-upload') + 'Vue aérienne<input type="file" accept="image/png,image/jpeg,image/webp" data-file="radar" data-i="' + i + '" aria-label="Changer la vue aérienne de ' + m.name + '"></span>'
+        + '<button class="icon-btn" type="button" data-mdel="' + i + '" aria-label="Supprimer ' + m.name + '">' + I('i-trash') + '</button></div></li>';
+    }).join('');
+  }
+  var mapRows = document.getElementById('maprows');
+  mapRows.addEventListener('click', function (e) {
+    var up = e.target.closest('[data-up]'), dn = e.target.closest('[data-down]'), del = e.target.closest('[data-mdel]');
+    if (up || dn) {
+      var i = +(up || dn).getAttribute(up ? 'data-up' : 'data-down'), j = up ? i - 1 : i + 1;
+      L.flip(mapRows, function () { var t = maps[i]; maps[i] = maps[j]; maps[j] = t; renderMaps(); });
+      var again = mapRows.querySelector('[data-' + (up ? 'up' : 'down') + '="' + j + '"]'); if (again && !again.disabled) again.focus();
+    }
+    if (del) {
+      var m = maps[+del.getAttribute('data-mdel')], n = D.counts(m.slug).total;
+      if (n) { L.toast('Suppression impossible : ' + n + ' stuffs rattachés à ' + m.name + '. Masque-la plutôt.', true); return; }
+      confirmBox('Supprimer ' + m.name + ' ?', '<p style="margin:0">La map et ses images seront supprimées.</p>', function () { maps.splice(maps.indexOf(m), 1); renderMaps(); });
+    }
+  });
+  mapRows.addEventListener('change', function (e) {
+    var on = e.target.closest('[data-on]'), file = e.target.closest('[data-file]');
+    if (on) { var m = maps[+on.getAttribute('data-on')]; m.on = on.checked; renderMaps(); L.toast(m.name + (m.on ? ' visible' : ' masquée') + ' sur le site'); }
+    if (file && file.files[0]) {
+      var f = file.files[0], m2 = maps[+file.getAttribute('data-i')];
+      if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { L.toast('Format refusé : PNG, JPEG ou WebP uniquement', true); return; }
+      if (f.size > 5e6) { L.toast('Image trop lourde : 5 Mo maximum', true); return; }
+      m2[file.getAttribute('data-file')] = URL.createObjectURL(f); renderMaps(); L.toast('Image remplacée (aperçu local, rien n’est envoyé)');
+    }
+  });
+  document.getElementById('add-map').addEventListener('click', function () {
+    ask('Ajouter une map', 'Nom de la map', 'ex. Vertigo', function (name) {
+    var slug = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (maps.some(function (m) { return m.slug === slug; })) { L.toast('Cette map existe déjà', true); return; }
+    maps.push({ slug: slug, name: name, cover: null, radar: null, on: false }); renderMaps();
+    L.toast(name + ' ajoutée, masquée tant qu’elle n’a pas de vignette');
+    });
+  });
+
+  /* ---------- Positions : placer, déplacer, rattacher ---------- */
+  var pmap = document.getElementById('pmap'), editor = document.getElementById('editor'), placing = false, selPos = null, landFor = null;
+  pmap.innerHTML = D.maps.map(function (m) { return '<option value="' + m.slug + '">' + m.name + '</option>'; }).join('');
+  function cur() { return pmap.value; }
+  function note(t) { document.getElementById('mode-note').textContent = t || ''; }
+  function renderPos() {
+    var slug = cur(), pos = D.positions[slug] = D.positions[slug] || [];
+    document.getElementById('pradar').src = D.mapBy(slug).radar;
+    document.getElementById('see-tac').href = 'map.html?m=' + slug + '#carte';
+    var st = D.stuffsOf(slug);
+    var html = pos.map(function (p, i) {
+      return '<button type="button" class="p" data-pid="' + p.id + '" style="left:' + p.x + '%;top:' + p.y + '%" aria-pressed="' + (selPos === p.id) + '" aria-label="Position ' + esc(p.name) + ' : glisser ou flèches pour déplacer"><span>' + (i + 1) + '</span></button><span class="tag" style="left:' + p.x + '%;top:' + p.y + '%">' + esc(p.name) + '</span>';
+    }).join('');
+    st.forEach(function (s) { if (s.land) html += '<span class="l" style="left:' + s.land[0] + '%;top:' + s.land[1] + '%"></span>'; });
+    document.getElementById('pmarks').innerHTML = html;
+    document.getElementById('plist2').innerHTML = pos.length ? pos.map(function (p, i) {
+      var n = st.filter(function (s) { return s.from === p.id; }).length;
+      return '<li><span class="n"><span>' + (i + 1) + '</span></span><div><b>' + esc(p.name) + '</b><div class="hint">' + n + ' stuff' + (n > 1 ? 's' : '') + ' · x ' + p.x + ' %, y ' + p.y + ' %</div></div><button class="icon-btn" type="button" data-pdel="' + p.id + '" aria-label="Supprimer la position ' + esc(p.name) + '">' + I('i-trash') + '</button></li>';
+    }).join('') : '<li style="grid-template-columns:1fr"><span class="hint">Aucune position sur cette map. Clique « Placer une position ».</span></li>';
+    document.getElementById('links').innerHTML = st.length ? st.map(function (s) {
+      return '<tr><td>' + esc(s.title) + '</td><td><select class="select" data-link="' + s.id + '" aria-label="Position de lancer de ' + esc(s.title) + '"><option value="">Non placée</option>' + pos.map(function (p) { return '<option value="' + p.id + '"' + (s.from === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>'; }).join('') + '</select></td>'
+        + '<td><button class="btn btn-ghost btn-sm" type="button" data-land="' + s.id + '">' + (s.land ? 'Déplacer' : 'Placer') + '</button></td></tr>';
+    }).join('') : '<tr><td colspan="3" class="hint">Aucun stuff sur cette map.</td></tr>';
+  }
+  function pct(e) { var r = editor.getBoundingClientRect(); return [Math.round(Math.min(100, Math.max(0, (e.clientX - r.left) / r.width * 100))), Math.round(Math.min(100, Math.max(0, (e.clientY - r.top) / r.height * 100)))]; }
+  function persist() { if (!D.saveEdits()) L.toast('Stockage du navigateur indisponible : modifications non conservées', true); }
+  document.getElementById('place').addEventListener('click', function () {
+    placing = !placing; landFor = null; editor.classList.toggle('placing', placing);
+    this.textContent = placing ? 'Annuler le placement' : 'Placer une position';
+    note(placing ? 'Clique sur la vue aérienne à l’endroit du lancer.' : '');
+  });
+  var dragP = null;
+  editor.addEventListener('pointerdown', function (e) {
+    var b = e.target.closest('.p');
+    if (b && !placing && !landFor) { dragP = { id: b.getAttribute('data-pid'), moved: false }; editor.setPointerCapture(e.pointerId); return; }
+    var xy = pct(e), slug = cur();
+    if (placing) {
+      ask('Nouvelle position de lancer', 'Nom de la position', 'ex. Départ T, Rampe A', function (name) {
+        D.positions[slug].push({ id: slug + '-' + Date.now(), name: name.slice(0, 40), x: xy[0], y: xy[1] }); persist(); renderPos(); L.toast('Position « ' + name + ' » placée');
+      });
+      placing = false; editor.classList.remove('placing'); document.getElementById('place').textContent = 'Placer une position'; note(''); renderPos();
+    } else if (landFor) {
+      var s = D.stuffs.filter(function (x) { return x.id === landFor; })[0]; s.land = xy; persist();
+      L.toast('Impact de « ' + s.title + ' » placé'); landFor = null; editor.classList.remove('placing'); note(''); renderPos();
+    }
+  });
+  editor.addEventListener('pointermove', function (e) {
+    if (!dragP) return;
+    var p = D.positions[cur()].filter(function (x) { return x.id === dragP.id; })[0], xy = pct(e);
+    p.x = xy[0]; p.y = xy[1]; dragP.moved = true;
+    var b = editor.querySelector('[data-pid="' + p.id + '"]'); b.style.left = p.x + '%'; b.style.top = p.y + '%';
+    var t = b.nextElementSibling; t.style.left = p.x + '%'; t.style.top = p.y + '%';
+  });
+  editor.addEventListener('pointerup', function () {
+    if (!dragP) return;
+    if (dragP.moved) { persist(); renderPos(); L.toast('Position déplacée'); } else { selPos = selPos === dragP.id ? null : dragP.id; renderPos(); var b = editor.querySelector('[data-pid="' + dragP.id + '"]'); if (b) b.focus(); }
+    dragP = null;
+  });
+  editor.addEventListener('keydown', function (e) {
+    var b = e.target.closest('.p'); if (!b) return;
+    var d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key]; if (!d) return;
+    e.preventDefault();
+    var p = D.positions[cur()].filter(function (x) { return x.id === b.getAttribute('data-pid'); })[0];
+    p.x = Math.min(100, Math.max(0, p.x + d[0])); p.y = Math.min(100, Math.max(0, p.y + d[1])); persist(); renderPos();
+    editor.querySelector('[data-pid="' + p.id + '"]').focus();
+  });
+  document.getElementById('positions').addEventListener('click', function (e) {
+    var del = e.target.closest('[data-pdel]'), land = e.target.closest('[data-land]');
+    if (del) {
+      var id = del.getAttribute('data-pdel'), list = D.positions[cur()], p = list.filter(function (x) { return x.id === id; })[0];
+      var n = D.stuffs.filter(function (s) { return s.from === id; }).length;
+      confirmBox('Supprimer « ' + p.name + ' » ?', '<p style="margin:0">' + (n ? n + ' stuff' + (n > 1 ? 's' : '') + ' perdront leur position (ils restent dans la bibliothèque).' : 'Aucun stuff rattaché.') + '</p>', function () {
+        list.splice(list.indexOf(p), 1); D.stuffs.forEach(function (s) { if (s.from === id) s.from = null; }); persist(); renderPos();
+      });
+    }
+    if (land) { landFor = land.getAttribute('data-land'); placing = false; editor.classList.add('placing'); note('Clique sur la vue aérienne au point d’impact de la grenade.'); editor.scrollIntoView({ behavior: L.reduced() ? 'auto' : 'smooth', block: 'center' }); }
+  });
+  document.getElementById('links').addEventListener('change', function (e) {
+    var sel = e.target.closest('[data-link]'); if (!sel) return;
+    var s = D.stuffs.filter(function (x) { return x.id === sel.getAttribute('data-link'); })[0];
+    s.from = sel.value || null; persist(); renderPos(); L.toast('« ' + s.title + ' » ' + (s.from ? 'rattaché' : 'détaché'));
+  });
+  document.getElementById('reset-edits').addEventListener('click', function () { D.resetEdits(); location.reload(); });
+  pmap.addEventListener('change', function () { selPos = null; landFor = null; placing = false; editor.classList.remove('placing'); note(''); renderPos(); });
+
+  /* Sommaire latéral : section courante */
+  var links = document.querySelectorAll('.anav a');
+  var io = new IntersectionObserver(function (en) {
+    en.forEach(function (x) { if (x.isIntersecting) links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + x.target.id)); }); });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  document.querySelectorAll('.asec').forEach(function (s) { io.observe(s); });
+
+  renderPlayers(); renderWall(); renderMaps(); renderPos();
+  L.mount({ active: 'admin' });
+})();
+</script>
+</body>
+</html>

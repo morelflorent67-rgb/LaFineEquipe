@@ -1,0 +1,26 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets et données locales : ne jamais versionner
+.env
+.env.local
+.env.*.local
+.env.*
+!.env.example
+.data/
+.claude/settings.local.json
+.vercel/
+*.log
+
+.DS_Store
+Thumbs.db
+
+# Prototype Forge V2 final : images Valve extraites du jeu et captures Steam de la team (usage local uniquement)
+design/forge-v2-final/assets/media/

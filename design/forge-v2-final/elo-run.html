@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ELO Run · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+/* ---------- En-tête : fraîcheur et actualisation ---------- */
+.sync{display:grid;gap:10px;justify-items:start;min-width:min(100%,340px);padding:16px 18px;background:rgba(10,9,9,.8);border:1px solid var(--line-2)}
+.sync-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.sync-row b{color:var(--white);font-weight:650}
+.sync .mono{font-size:11px}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--win);box-shadow:0 0 0 3px var(--win-soft)}
+.site[data-fresh="stale"] .pulse-dot{background:var(--amber);box-shadow:0 0 0 3px rgba(245,165,36,.18)}
+.btn .spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.stale-banner{display:none;align-items:flex-start;gap:12px;margin:0 var(--pad);margin-top:24px;padding:14px 18px;border:1px solid rgba(245,165,36,.4);background:rgba(245,165,36,.07);color:var(--silver);font-size:14.5px}
+.stale-banner b{color:var(--amber)}
+.site[data-fresh="stale"] .stale-banner{display:flex}
+
+/* ---------- Barre de contrôles ---------- */
+.controls{position:sticky;top:62px;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;padding:14px var(--pad);background:rgba(5,5,5,.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.controls .grp{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.controls .lab{font:650 11px/1 var(--f);font-stretch:115%;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
+.controls .add{margin-left:auto}
+
+/* ---------- Podium ---------- */
+.podium-wrap{padding:clamp(40px,5cqi,72px) var(--pad) 8px}
+.podium{list-style:none;margin:0 auto;padding:0;max-width:1100px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:clamp(10px,1.4cqi,20px)}
+.pod{position:relative;display:grid;justify-items:center;align-content:end;gap:8px;text-align:center;padding:30px 14px 24px;isolation:isolate;min-width:0}
+.pod::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant));background:linear-gradient(180deg,#26262b,#0f0f11 85%);border:1px solid var(--line-2)}
+.pod.p1{order:2;min-height:360px}.pod.p2{order:1;min-height:300px}.pod.p3{order:3;min-height:270px}
+.pod.p1::before{background:linear-gradient(180deg,#2c1313,#120b0b 85%);border-color:rgba(255,60,40,.6);box-shadow:0 0 0 1px rgba(255,42,31,.25),0 30px 80px rgba(227,8,14,.3)}
+.pod.p1::after{content:"";position:absolute;top:0;left:12%;right:12%;height:4px;background:var(--brand-hi);transform:skewX(var(--slant));animation:clipIn .9s .2s var(--ease) both}
+.pod.p1.pulse::before{animation:podPulse 1.4s var(--ease)}
+@keyframes podPulse{40%{box-shadow:0 0 0 2px var(--brand-hi),0 30px 110px rgba(255,42,31,.55)}}
+.pod .rk{position:absolute;top:12px;left:18px;font:900 64px/.8 var(--f);font-stretch:125%;color:rgba(255,255,255,.13)}
+.pod.p1 .rk{color:var(--brand-hi)}
+.pod .ava{--s:86px}
+.pod.p1 .ava{--s:112px}
+.pod .nm{margin-top:6px;font:750 clamp(15px,1.4cqi,20px)/1.15 var(--f);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .val{font:850 clamp(34px,3.8cqi,58px)/1 var(--f);font-stretch:94%;font-variant-numeric:tabular-nums}
+.pod .unit{font:700 .4em/1 var(--f);color:var(--muted);margin-left:4px;letter-spacing:.06em}
+.pod .sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;font-size:13.5px;color:var(--muted)}
+.pod .tag{position:absolute;top:14px;right:14px}
+
+/* ---------- Classement + graphique ---------- */
+.board-wrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:clamp(18px,2.4cqi,32px);align-items:start;padding:clamp(28px,3cqi,44px) var(--pad) clamp(56px,6cqi,96px)}
+.board{border:1px solid var(--line);background:rgba(12,10,10,.85)}
+.board-head,.row{display:grid;grid-template-columns:44px 46px minmax(0,1fr) 44px 84px 112px 132px 40px;align-items:center;gap:12px;padding:10px 16px}
+.board-head{font:650 11px/1 var(--f);font-stretch:115%;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);background:var(--ink-2);border-bottom:1px solid var(--line-2);padding-block:12px}
+.board-head .r,.row .r{text-align:right}
+.rows{list-style:none;margin:0;padding:0}
+.row{position:relative;border-bottom:1px solid var(--line);cursor:pointer;transition:background .25s}
+.row:last-child{border-bottom:0}
+.row:hover{background:rgba(255,255,255,.035)}
+.row[aria-current="true"]{background:linear-gradient(90deg,rgba(255,42,31,.16),rgba(255,42,31,.02) 70%)}
+.row[aria-current="true"]::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand-hi)}
+.row .rk{position:relative;font:850 20px/1 var(--f);font-stretch:115%;color:var(--dim);font-variant-numeric:tabular-nums}
+.row:nth-child(-n+3) .rk{color:var(--white)}
+.row .mv{position:absolute;left:100%;top:-10px;margin-left:-6px;font:800 10.5px/1 var(--f);white-space:nowrap;animation:rise .4s var(--ease)}
+.row .mv.up{color:var(--win)} .row .mv.down{color:var(--loss)}
+.row .who{display:grid;gap:4px;min-width:0}
+.nm-btn{justify-self:start;max-width:100%;padding:0;background:none;border:0;font:650 16px/1.2 var(--f);color:var(--white);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nm-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.row .meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--dim)}
+.row .meta .tag{padding:3px 6px;font-size:9.5px}
+.row .elo{font:800 19px/1 var(--f);font-variant-numeric:tabular-nums;text-align:right;padding:4px 2px}
+.row .fl{display:inline-grid;place-items:center;width:34px;height:34px;color:var(--silver);border:1px solid var(--line-2);border-radius:4px;text-decoration:none;transition:color .2s,border-color .2s}
+.row .fl:hover{color:#fff;border-color:var(--line-3)}
+.row .fl svg{width:15px;height:15px}
+.row.is-new{background:linear-gradient(90deg,rgba(255,42,31,.12),transparent 60%)}
+.board-foot{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+
+.chart-card{position:sticky;top:132px;padding:20px;display:grid;gap:16px}
+.cc-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:center}
+.cc-head .ava{grid-row:span 2}
+.cc-head .nm{font:800 22px/1.1 var(--f);font-stretch:108%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc-head .line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.cc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.cc-stats div{display:grid;gap:6px;padding:12px;background:#121214}
+.cc-stats span{font:650 10.5px/1 var(--f);font-stretch:115%;letter-spacing:.13em;text-transform:uppercase;color:var(--dim)}
+.cc-stats b{font:800 20px/1 var(--f);font-variant-numeric:tabular-nums}
+.chart{position:relative;outline:none;touch-action:pan-y}
+.chart:focus-visible{box-shadow:0 0 0 2px #fff}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .grid line{stroke:rgba(255,255,255,.07)}
+.chart .axis text{fill:var(--dim);font:500 10px var(--mono)}
+.chart .base{stroke:var(--silver);stroke-dasharray:4 5;opacity:.55}
+.chart .base-l{fill:var(--silver);font:600 10px var(--mono);opacity:.8}
+.chart .ln{fill:none;stroke:var(--brand-hi);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.chart .ln.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.chart .area{fill:url(#ga);opacity:.9}
+.chart .pt{fill:var(--void);stroke:var(--brand-hi);stroke-width:2}
+.chart .pt.last{fill:var(--brand-hi)}
+.chart .cur line{stroke:rgba(255,255,255,.45);stroke-dasharray:3 3}
+.chart .cur circle{fill:#fff;stroke:var(--brand-hi);stroke-width:3}
+.tip{position:absolute;top:0;left:0;z-index:3;padding:8px 10px;background:#0b0a0a;border:1px solid var(--line-3);font:600 13px/1.3 var(--f);white-space:nowrap;pointer-events:none;transform:translate(-50%,calc(-100% - 12px));opacity:0;transition:opacity .15s}
+.tip.on{opacity:1}
+.tip small{display:block;font:400 11px/1.3 var(--mono);color:var(--dim)}
+.cc-note{margin:0;font:400 11.5px/1.5 var(--mono);color:var(--dim)}
+.cc-back{display:none}
+
+/* ---------- Dialogue d'ajout ---------- */
+.res-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;padding:16px;border:1px solid var(--line-2);background:#141214;animation:rise .35s var(--ease)}
+.res-card .nm{font:800 22px/1.1 var(--f)}
+.res-card dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:10px 0 0;font-size:14px}
+.res-card dt{color:var(--dim)} .res-card dd{margin:0;overflow-wrap:anywhere}
+.res-card .fid{font:500 12px/1.3 var(--mono);color:var(--silver)}
+.loading{display:flex;align-items:center;gap:12px;color:var(--muted)}
+.loading .spin{width:18px;height:18px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--brand-hi);animation:rot .8s linear infinite}
+.err{padding:12px 14px;border:1px solid rgba(239,68,68,.45);background:var(--loss-soft);color:#fecaca;font-size:14px}
+.steps{display:flex;gap:8px;margin:0;padding:0;list-style:none;font:650 12px/1 var(--f);color:var(--dim)}
+.steps li{display:flex;align-items:center;gap:6px}
+.steps li::before{content:attr(data-n);display:inline-grid;place-items:center;width:20px;height:20px;border:1px solid var(--line-2);border-radius:50%}
+.steps li[aria-current="step"]{color:#fff}
+.steps li[aria-current="step"]::before{background:var(--brand-hi);border-color:var(--brand-hi)}
+.steps li.done::before{content:"✓";background:var(--win);border-color:var(--win);color:var(--win-ink)}
+.radios{display:flex;gap:10px;flex-wrap:wrap;border:0;margin:0;padding:0}
+.radios legend{margin-bottom:8px;font:650 13px/1.2 var(--f);color:var(--silver)}
+.radios label{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--line-2);cursor:pointer}
+.radios label:has(input:checked){border-color:var(--brand-hi);background:rgba(255,42,31,.08)}
+.after{padding:12px 14px;border-left:3px solid var(--win);background:var(--win-soft);font-size:14px;color:var(--silver)}
+
+/* ---------- Responsive ---------- */
+@container site (max-width: 1100px){
+  .board-wrap{grid-template-columns:minmax(0,1fr)}
+  .chart-card{position:relative;top:0}
+  .cc-back{display:inline-flex}
+}
+@container site (max-width: 900px){
+  .controls{top:52px;padding-block:10px;gap:10px 16px}
+  .controls .lab{display:none}
+  .board-head{display:none}
+  .row{grid-template-columns:28px 42px minmax(0,1fr) auto;grid-template-areas:"rk av who elo" "rk av s d";gap:6px 12px;padding:12px 14px}
+  .row .rk{grid-area:rk;align-self:start;padding-top:6px}
+  .row .ava{grid-area:av;align-self:start}
+  .row .who{grid-area:who}
+  .row .elo{grid-area:elo}
+  .row .lvl{display:none}
+  .row .dlc{grid-area:d}
+  .row .sr5{grid-area:s}
+  .row .fl{display:none}
+  .row .dlc{justify-self:end}
+  .row .meta span:last-child{display:none}
+  .podium{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);gap:6px}
+  .pod{padding:22px 6px 16px}
+  .pod.p1{min-height:250px}.pod.p2{min-height:210px}.pod.p3{min-height:196px}
+  .pod .ava{--s:56px} .pod.p1 .ava{--s:72px}
+  .pod .rk{font-size:38px;left:10px}
+  .pod .val{font-size:24px}
+  .pod .tag{display:none}
+  .pod .sub{font-size:12px}
+}
+@container site (max-width: 560px){
+  .controls .add{margin-left:0;width:100%}
+  .controls .add .btn{width:100%}
+  .pod .nm{font-size:13px}
+  .pod .sub .series,.pod .sub .muted{display:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="visitor" data-fresh="ok">
+  <div class="ribbon">Prototype · joueurs fictifs « demo_* » · synchronisations et ajouts simulés dans le navigateur</div>
+  <div id="nav-slot"></div>
+  <main id="main">
+    <header class="phead">
+      <p class="backword" aria-hidden="true">ELO</p>
+      <div class="phead-row">
+        <div>
+          <p class="kicker rv">Classement permanent · FACEIT CS2</p>
+          <h1 class="h1 rv" style="--i:1">ELO Run</h1>
+          <p class="lede rv" style="--i:2">Trié par <strong>ELO FACEIT actuel</strong>. Pas de saison, pas de remise à zéro : un joueur ajouté entre immédiatement à son vrai ELO, et sa progression se mesure depuis son ajout.</p>
+        </div>
+        <div class="sync rv" style="--i:3" aria-live="polite">
+          <div class="sync-row"><span class="pulse-dot" aria-hidden="true"></span><span>Dernière synchro : <b id="sync-ago">—</b> <span class="dim" id="sync-at"></span></span></div>
+          <div class="sync-row mono" id="sync-next">Synchro automatique toutes les 5 min · source FACEIT Data API</div>
+          <button class="btn btn-steel btn-sm" type="button" id="refresh">Actualiser</button>
+          <span class="hint" id="refresh-hint">Actualisation manuelle limitée à une fois toutes les 2 minutes pour tout le site.</span>
+        </div>
+      </div>
+    </header>
+    <div class="stale-banner" role="status"><svg width="18" height="18" aria-hidden="true"><use href="#i-refresh"/></svg><span><b>FACEIT ne répond pas</b> depuis 14:12 (simulation). Les valeurs affichées sont celles du dernier relevé réussi, <span id="stale-ago">il y a 23 min</span>. Rien n’est effacé ni estimé.</span></div>
+
+    <div class="controls" role="group" aria-label="Tri et filtre du classement">
+      <div class="grp"><span class="lab" id="sort-l">Trier par</span><div class="seg" id="sort" aria-labelledby="sort-l">
+        <button type="button" data-v="elo" aria-pressed="true">ELO actuel</button><button type="button" data-v="delta" aria-pressed="false">Progression</button></div></div>
+      <div class="grp"><span class="lab" id="filter-l">Afficher</span><div class="seg" id="filter" aria-labelledby="filter-l"></div></div>
+      <div class="add only-admin"><button class="btn btn-red btn-sm" type="button" id="open-add"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter un joueur</button></div>
+    </div>
+
+    <section class="podium-wrap" aria-label="Podium"><ol class="podium" id="podium"></ol></section>
+
+    <div class="board-wrap">
+      <section class="board" aria-labelledby="board-title">
+        <h2 class="sr" id="board-title">Classement détaillé</h2>
+        <div class="board-head" aria-hidden="true"><span>Rang</span><span></span><span>Joueur</span><span>Niv.</span><span class="r">ELO</span><span class="r" id="h-delta">Progression</span><span>5 derniers</span><span></span></div>
+        <ol class="rows" id="rows"></ol>
+        <div class="board-foot"><span id="board-count"></span><span>Progression = ELO actuel − ELO relevé à l’ajout</span></div>
+      </section>
+      <section class="chart-card card" id="chart-card" aria-labelledby="cc-title"></section>
+    </div>
+  </main>
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+
+<dialog class="dlg" id="add-dlg" aria-labelledby="add-title">
+  <div class="dlg-h"><h2 id="add-title">Ajouter un joueur au classement</h2><button class="icon-btn" type="button" data-close aria-label="Fermer"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="dlg-b" id="add-body"></div>
+</dialog>
+
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.LFE_DATA, L = window.LFE, I = L.icon;
+  var site = document.getElementById('site');
+  var players = D.players;
+  var state = { sort: 'elo', group: 'all', sel: null, lastSync: new Date(Date.now() - 2 * 60e3), cooldownUntil: 0, moves: {}, newId: null };
+
+  /* ---------- Classement : tri ELO décroissant, ou progression depuis l'ajout ---------- */
+  function list() {
+    var arr = players.filter(function (p) { return state.group === 'all' || p.group === state.group; });
+    arr.sort(function (a, b) {
+      var k = state.sort === 'elo' ? b.elo - a.elo : D.delta(b) - D.delta(a);
+      return k || b.elo - a.elo || a.nick.localeCompare(b.nick);
+    });
+    return arr;
+  }
+  function globalRanks() {
+    var r = {};
+    players.slice().sort(function (a, b) { return (state.sort === 'elo' ? b.elo - a.elo : D.delta(b) - D.delta(a)) || b.elo - a.elo; })
+      .forEach(function (p, i) { r[p.id] = i + 1; });
+    return r;
+  }
+
+  function podHtml(p, i) {
+    var main = state.sort === 'elo'
+      ? '<span class="val num">' + D.fmt(p.elo) + '<span class="unit">ELO</span></span><span class="sub">' + D.deltaHtml(D.delta(p)) + '<span class="muted">depuis l’ajout</span></span>'
+      : '<span class="val">' + D.deltaHtml(D.delta(p)) + '</span><span class="sub"><b class="num">' + D.fmt(p.elo) + ' ELO</b><span class="muted">· ajouté à ' + D.fmt(p.addedElo) + '</span></span>';
+    return '<li class="pod p' + (i + 1) + '" data-key="' + p.id + '"><span class="rk">' + (i + 1) + '</span>'
+      + (p.group === 'guest' ? '<span class="tag">Guest</span>' : '') + D.ava(p, i === 0 ? 112 : 86)
+      + '<span class="nm">' + D.esc(p.nick) + '</span>' + main + '<span class="sub">' + D.seriesHtml(p.last, 5) + '</span></li>';
+  }
+
+  function rowHtml(p, i) {
+    var mv = state.moves[p.id];
+    var mvHtml = mv ? '<span class="mv ' + (mv > 0 ? 'up' : 'down') + '" aria-label="' + (mv > 0 ? 'gagne ' + mv + ' place' : 'perd ' + (-mv) + ' place') + (Math.abs(mv) > 1 ? 's' : '') + '">' + (mv > 0 ? '▲' + mv : '▼' + (-mv)) + '</span>' : '';
+    var since = p.id === state.newId ? '<span class="tag new">Nouveau</span>' : '';
+    return '<li class="row' + (p.id === state.newId ? ' is-new' : '') + '" data-key="' + p.id + '" data-id="' + p.id + '"' + (state.sel === p.id ? ' aria-current="true"' : '') + '>'
+      + '<span class="rk">' + (i + 1) + mvHtml + '</span>' + D.ava(p, 42)
+      + '<span class="who"><button class="nm-btn" type="button" data-sel="' + p.id + '">' + D.esc(p.nick) + '</button>'
+      + '<span class="meta">' + since + (p.group === 'guest' ? '<span class="tag">Guest</span>' : '<span class="tag">Team</span>') + '<span>ajouté le ' + D.dateShort(p.addedAt) + ' à ' + D.fmt(p.addedElo) + '</span></span></span>'
+      + D.lvl(p.lvl) + '<span class="elo num" data-elo="' + p.id + '">' + D.fmt(p.elo) + '</span>'
+      + '<span class="r dlc">' + D.deltaHtml(D.delta(p)) + '</span><span class="sr5">' + D.seriesHtml(p.last, 5) + '</span>'
+      + '<a class="fl" href="#" data-fict aria-label="Profil FACEIT de ' + D.esc(p.nick) + ' (lien fictif)">' + I('i-ext') + '</a></li>';
+  }
+
+  var podiumEl = document.getElementById('podium'), rowsEl = document.getElementById('rows');
+  function render(opts) {
+    opts = opts || {};
+    var arr = list();
+    if (!arr.some(function (p) { return p.id === state.sel; })) state.sel = arr[0] ? arr[0].id : null;
+    var paint = function () {
+      podiumEl.innerHTML = arr.slice(0, 3).map(podHtml).join('');
+      rowsEl.innerHTML = arr.map(rowHtml).join('') || '<li class="state-note"><strong>Aucun joueur dans ce groupe</strong></li>';
+    };
+    if (opts.flip) { L.flip(rowsEl, function () { L.flip(podiumEl, paint); }, { stagger: opts.stagger }); }
+    else paint();
+    (opts.changed || []).forEach(function (id) { var el = rowsEl.querySelector('[data-elo="' + id + '"]'); if (el) el.classList.add('bump'); });
+    if (opts.pulse) { var p1 = podiumEl.querySelector('.p1'); if (p1) p1.classList.add('pulse'); }
+    document.getElementById('board-count').textContent = arr.length + ' joueur' + (arr.length > 1 ? 's' : '') + ' classé' + (arr.length > 1 ? 's' : '');
+    renderFilter();
+    renderChart(opts.drawChart !== false);
+  }
+
+  function renderFilter() {
+    var n = { all: players.length, team: 0, guest: 0 };
+    players.forEach(function (p) { n[p.group]++; });
+    document.getElementById('filter').innerHTML = [['all', 'Tous'], ['team', 'Team'], ['guest', 'Guests']].map(function (g) {
+      return '<button type="button" data-v="' + g[0] + '" aria-pressed="' + (state.group === g[0]) + '">' + g[1] + '<span class="n">' + n[g[0]] + '</span></button>';
+    }).join('');
+  }
+
+  /* ---------- Graphique : uniquement les relevés enregistrés depuis l'ajout ---------- */
+  function renderChart(draw) {
+    var card = document.getElementById('chart-card');
+    var p = players.filter(function (x) { return x.id === state.sel; })[0];
+    if (!p) { card.innerHTML = '<p class="state-note">Aucun joueur sélectionné.</p>'; return; }
+    var s = p.snaps, n = s.length;
+    var W = 600, H = 250, pl = 46, pr = 14, pt = 16, pb = 30;
+    var vals = s.map(function (x) { return x.elo; }).concat([p.addedElo]);
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    var padv = Math.max(20, (hi - lo) * 0.15); lo = Math.floor((lo - padv) / 10) * 10; hi = Math.ceil((hi + padv) / 10) * 10;
+    var t0 = s[0].at.getTime(), t1 = Math.max(s[n - 1].at.getTime(), t0 + 1);
+    var X = function (t) { return n === 1 ? (pl + W - pr) / 2 : pl + (t - t0) / (t1 - t0) * (W - pl - pr); };
+    var Y = function (v) { return pt + (hi - v) / (hi - lo) * (H - pt - pb); };
+    var pts = s.map(function (x) { return [X(x.at.getTime()), Y(x.elo)]; });
+    var path = pts.map(function (q, i) { return (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join('');
+    var area = n > 1 ? path + 'L' + pts[n - 1][0].toFixed(1) + ' ' + (H - pb) + 'L' + pts[0][0].toFixed(1) + ' ' + (H - pb) + 'Z' : '';
+    var ticks = []; for (var k = 0; k <= 4; k++) ticks.push(lo + (hi - lo) * k / 4);
+    var xl = n > 1 ? [s[0], s[Math.floor((n - 1) / 2)], s[n - 1]] : [s[0]];
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Évolution de l’ELO de ' + D.esc(p.nick) + ' depuis son ajout : de ' + p.addedElo + ' à ' + p.elo + ', ' + n + ' relevé' + (n > 1 ? 's' : '') + '">'
+      + '<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff2a1f" stop-opacity=".28"/><stop offset="1" stop-color="#ff2a1f" stop-opacity="0"/></linearGradient></defs>'
+      + '<g class="grid">' + ticks.map(function (v) { return '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '"/>'; }).join('') + '</g>'
+      + '<g class="axis">' + ticks.map(function (v) { return '<text x="' + (pl - 8) + '" y="' + (Y(v) + 3).toFixed(1) + '" text-anchor="end">' + Math.round(v) + '</text>'; }).join('')
+      + xl.map(function (x, i) { return '<text x="' + X(x.at.getTime()).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="' + (n === 1 ? 'middle' : i === 0 ? 'start' : i === xl.length - 1 ? 'end' : 'middle') + '">' + D.dateShort(x.at) + '</text>'; }).join('') + '</g>'
+      + '<line class="base" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + Y(p.addedElo).toFixed(1) + '" y2="' + Y(p.addedElo).toFixed(1) + '"/>'
+      + '<text class="base-l" x="' + (W - pr) + '" y="' + (Y(p.addedElo) - 6).toFixed(1) + '" text-anchor="end">ELO à l’ajout · ' + p.addedElo + '</text>'
+      + (area ? '<path class="area" d="' + area + '"/>' : '')
+      + (n > 1 ? '<path class="ln' + (draw && !L.reduced() ? ' draw' : '') + '" pathLength="1" d="' + path + '"/>' : '')
+      + pts.map(function (q, i) { return (n <= 16 || i === n - 1 || i === 0) ? '<circle class="pt' + (i === n - 1 ? ' last' : '') + '" cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="' + (i === n - 1 ? 5 : 3) + '"/>' : ''; }).join('')
+      + '<g class="cur" style="display:none"><line y1="' + pt + '" y2="' + (H - pb) + '"/><circle r="6"/></g></svg>';
+    var d = D.delta(p);
+    card.innerHTML = '<div class="cc-head">' + D.ava(p, 56) + '<span class="nm" id="cc-title">' + D.esc(p.nick) + '</span><span class="line">' + D.lvl(p.lvl) + '<b class="num">' + D.fmt(p.elo) + ' ELO</b>' + D.deltaHtml(d) + '<a class="link" href="#" data-fict style="font-size:13px">Profil FACEIT ' + I('i-ext', 'arrow') + '</a></span></div>'
+      + '<div class="cc-stats"><div><span>Ajouté le</span><b>' + D.dateShort(p.addedAt) + '</b></div><div><span>ELO à l’ajout</span><b class="num">' + D.fmt(p.addedElo) + '</b></div><div><span>Relevés</span><b class="num">' + n + '</b></div></div>'
+      + '<div class="chart" tabindex="0" aria-describedby="cc-note">' + svg + '<div class="tip" role="status"></div></div>'
+      + '<p class="cc-note" id="cc-note">' + (n === 1 ? 'Premier relevé : ' + D.ago(s[0].at) + '. La courbe se remplit à chaque synchronisation.' : 'Relevés FACEIT enregistrés depuis l’ajout le ' + D.dateFr(p.addedAt) + '. Aucun historique antérieur n’est reconstitué. Survole, touche ou utilise ← → pour lire un point.') + '</p>'
+      + '<a class="link cc-back" href="#rows">Retour au classement <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>';
+    wireChart(card.querySelector('.chart'), pts, s, W);
+  }
+
+  function wireChart(el, pts, s, W) {
+    var svg = el.querySelector('svg'), cur = svg.querySelector('.cur'), tip = el.querySelector('.tip'), idx = -1;
+    function show(i) {
+      if (i < 0 || i >= pts.length) return;
+      idx = i;
+      var q = pts[i];
+      cur.style.display = '';
+      cur.querySelector('line').setAttribute('x1', q[0]); cur.querySelector('line').setAttribute('x2', q[0]);
+      cur.querySelector('circle').setAttribute('cx', q[0]); cur.querySelector('circle').setAttribute('cy', q[1]);
+      var r = svg.getBoundingClientRect(), k = r.width / W;
+      tip.style.left = (q[0] * k) + 'px'; tip.style.top = (q[1] * k) + 'px';
+      var prev = i > 0 ? s[i].elo - s[i - 1].elo : null;
+      tip.innerHTML = '<b class="num">' + D.fmt(s[i].elo) + ' ELO</b>' + (prev !== null ? ' ' + D.deltaHtml(prev) : ' <span class="dim">(ajout)</span>') + '<small>' + D.dateFr(s[i].at) + ' · ' + D.timeFr(s[i].at) + '</small>';
+      tip.classList.add('on');
+    }
+    function hide() { cur.style.display = 'none'; tip.classList.remove('on'); }
+    function nearest(clientX) {
+      var r = svg.getBoundingClientRect(), x = (clientX - r.left) / r.width * W, best = 0, bd = Infinity;
+      pts.forEach(function (q, i) { var dd = Math.abs(q[0] - x); if (dd < bd) { bd = dd; best = i; } });
+      return best;
+    }
+    el.addEventListener('pointermove', function (e) { show(nearest(e.clientX)); });
+    el.addEventListener('pointerdown', function (e) { show(nearest(e.clientX)); });
+    el.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') hide(); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(Math.min(pts.length - 1, idx + 1)); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); show(Math.max(0, idx < 0 ? pts.length - 1 : idx - 1)); }
+      else if (e.key === 'Escape') hide();
+    });
+    el.addEventListener('focus', function () { if (idx < 0) show(pts.length - 1); });
+    el.addEventListener('blur', hide);
+  }
+
+  /* ---------- Interactions ---------- */
+  document.getElementById('sort').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b || b.getAttribute('data-v') === state.sort) return;
+    state.sort = b.getAttribute('data-v'); state.moves = {};
+    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    document.getElementById('h-delta').textContent = 'Progression';
+    render({ flip: true, drawChart: false });
+  });
+  document.getElementById('filter').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    state.group = b.getAttribute('data-v'); state.moves = {};
+    render({ flip: true, drawChart: true });
+  });
+  rowsEl.addEventListener('click', function (e) {
+    if (e.target.closest('[data-fict]')) { e.preventDefault(); L.toast('Joueur fictif : pas de profil FACEIT réel'); return; }
+    var row = e.target.closest('.row'); if (!row) return;
+    select(row.getAttribute('data-id'), e.target.closest('.nm-btn') !== null);
+  });
+  document.getElementById('chart-card').addEventListener('click', function (e) { if (e.target.closest('[data-fict]')) { e.preventDefault(); L.toast('Joueur fictif : pas de profil FACEIT réel'); } });
+  podiumEl.addEventListener('click', function (e) { var li = e.target.closest('.pod'); if (li) select(li.getAttribute('data-key'), false); });
+  function select(id, fromKeyboard) {
+    state.sel = id;
+    rowsEl.querySelectorAll('.row').forEach(function (r) { if (r.getAttribute('data-id') === id) r.setAttribute('aria-current', 'true'); else r.removeAttribute('aria-current'); });
+    renderChart(true);
+    var card = document.getElementById('chart-card');
+    if (getComputedStyle(card).position !== 'sticky') card.scrollIntoView({ behavior: L.reduced() ? 'auto' : 'smooth', block: 'start' });
+    if (fromKeyboard) card.querySelector('.chart').focus({ preventScroll: true });
+  }
+
+  /* ---------- Synchronisation simulée : les valeurs changent d'un coup, seules les places glissent ---------- */
+  var tick = 0;
+  function simulateSync(label) {
+    tick++;
+    var before = globalRanks();
+    var changed = [];
+    var now = new Date();
+    // Réaliste : en 5 min, au plus un match par joueur, soit environ ±15 à ±32 ELO.
+    // Les deux premières synchros sont scénarisées pour montrer des dépassements.
+    var SCRIPT = {
+      1: { demo_brasier: 24, demo_nova: -21, demo_ombre: 26, demo_rafale: 23, demo_kestrel: -22, demo_titan: 19 },
+      2: { demo_axel: 31, demo_ombre: -18, demo_vandal: -27, demo_nova: 25, demo_silex: 22 }
+    }[tick];
+    players.forEach(function (p, i) {
+      var amount;
+      if (SCRIPT) { amount = SCRIPT[p.nick]; if (!amount) return; }
+      else {
+        var seed = (i * 37 + tick * 53) % 100;
+        if (seed < 45) return;
+        amount = (14 + (seed % 17)) * ((seed + tick) % 3 !== 0 ? 1 : -1);
+      }
+      p.elo += amount;
+      p.last = (amount > 0 ? 'V' : 'D') + p.last.slice(0, 4);
+      p.snaps.push({ at: now, elo: p.elo });
+      changed.push(p.id);
+    });
+    var after = globalRanks();
+    state.moves = {};
+    Object.keys(after).forEach(function (id) { var dlt = before[id] - after[id]; if (dlt) state.moves[id] = dlt; });
+    state.lastSync = now;
+    if (site.getAttribute('data-fresh') === 'stale') L.setState('fresh', 'ok');
+    render({ flip: true, changed: changed, pulse: true, drawChart: false });
+    updateSync();
+    var nMoves = Object.keys(state.moves).length;
+    L.toast((label || 'Synchro') + ' : ' + changed.length + ' ELO mis à jour, ' + nMoves + ' changement' + (nMoves > 1 ? 's' : '') + ' de rang');
+    setTimeout(function () { state.moves = {}; rowsEl.querySelectorAll('.mv').forEach(function (m) { m.remove(); }); }, 6000);
+  }
+
+  function updateSync() {
+    document.getElementById('sync-ago').textContent = D.ago(state.lastSync);
+    document.getElementById('sync-at').textContent = '(' + D.timeFr(state.lastSync) + ')';
+    var left = Math.max(0, Math.ceil((state.cooldownUntil - Date.now()) / 1000));
+    var btn = document.getElementById('refresh');
+    if (!btn.classList.contains('busy')) {
+      btn.disabled = left > 0;
+      btn.innerHTML = I('i-refresh') + (left > 0 ? 'Actualiser dans 0:' + (left < 10 ? '0' : '') + left : 'Actualiser');
+    }
+  }
+  setInterval(updateSync, 1000);
+  document.getElementById('refresh').addEventListener('click', function () {
+    var btn = this;
+    if (Date.now() < state.cooldownUntil) return;
+    btn.classList.add('busy'); btn.disabled = true; btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Actualisation…';
+    setTimeout(function () {
+      btn.classList.remove('busy');
+      state.cooldownUntil = Date.now() + 30e3;
+      simulateSync('Actualisation');
+      document.getElementById('refresh-hint').textContent = 'Prototype : 30 s d’attente. En vrai : une actualisation manuelle toutes les 2 minutes pour tout le site.';
+    }, 900);
+  });
+
+  /* ---------- Ajout immédiat (flux admin simulé) ---------- */
+  var dlg = document.getElementById('add-dlg'), body = document.getElementById('add-body'), found = null;
+  function stepper(n) {
+    return '<ol class="steps">' + ['Rechercher', 'Vérifier', 'Ajouter'].map(function (s, i) {
+      return '<li data-n="' + (i + 1) + '"' + (i + 1 === n ? ' aria-current="step"' : '') + (i + 1 < n ? ' class="done"' : '') + '>' + s + '</li>';
+    }).join('') + '</ol>';
+  }
+  function step1(msg) {
+    body.innerHTML = stepper(1) + '<form class="field" id="add-form"><label for="add-q">Pseudo FACEIT ou lien de profil</label>'
+      + '<div style="display:flex;gap:8px"><div class="search" style="flex:1">' + I('i-search') + '<input class="input" id="add-q" autocomplete="off" placeholder="ex. faceit.com/fr/players/pseudo" required></div><button class="btn btn-red btn-sm" type="submit">Rechercher</button></div>'
+      + '<span class="hint">Simulation : essaie <b>demo_juliet</b>, <b>demo_zephyr</b>, <b>demo_mistral</b>, un lien <b>faceit.com/fr/players/demo_onyx</b>, ou un joueur déjà classé.</span></form>'
+      + (msg ? '<div class="err" role="alert">' + msg + '</div>' : '');
+    body.querySelector('#add-form').addEventListener('submit', function (e) { e.preventDefault(); lookup(body.querySelector('#add-q').value); });
+    setTimeout(function () { var q = body.querySelector('#add-q'); if (q) q.focus(); }, 30);
+  }
+  function lookup(raw) {
+    var q = String(raw || '').trim();
+    var m = q.match(/faceit\.com\/(?:[a-z]{2}\/)?players\/([^/?#]+)/i);
+    var nick = m ? decodeURIComponent(m[1]) : q;
+    body.innerHTML = stepper(1) + '<div class="loading" role="status"><span class="spin" aria-hidden="true"></span>Résolution de l’identifiant FACEIT de « ' + D.esc(nick) + ' »…</div>';
+    setTimeout(function () {
+      var dup = players.filter(function (p) { return p.nick.toLowerCase() === nick.toLowerCase(); })[0];
+      if (dup) { var rk = list().indexOf(dup) + 1; step1('<b>Déjà au classement</b> : ' + D.esc(dup.nick) + ', même identifiant FACEIT' + (rk ? ' (rang ' + rk + ')' : '') + '. Aucun doublon possible.'); return; }
+      found = D.pool.filter(function (p) { return p.nick.toLowerCase() === nick.toLowerCase(); })[0];
+      if (!found) { step1('Aucun profil FACEIT « ' + D.esc(nick) + ' ». (Simulation : seuls les profils proposés existent.)'); return; }
+      var at = new Date();
+      body.innerHTML = stepper(2)
+        + '<div class="res-card">' + D.ava(found, 76) + '<div><span class="chip ok">' + I('i-check') + 'Profil trouvé (simulation)</span><div class="nm" style="margin-top:8px">' + D.esc(found.nick) + '</div>'
+        + '<dl><dt>Identifiant</dt><dd class="fid">' + found.id + '</dd><dt>Niveau</dt><dd>' + D.lvl(found.lvl) + '</dd><dt>ELO CS2</dt><dd><b class="num">' + D.fmt(found.elo) + '</b> · relevé à ' + D.timeFr(at) + '</dd><dt>Pays</dt><dd>' + found.country + '</dd><dt>Avatar</dt><dd>Avatar FACEIT, utilisé automatiquement</dd></dl></div></div>'
+        + '<fieldset class="radios"><legend>Groupe</legend><label><input type="radio" name="g" value="team" checked> Team</label><label><input type="radio" name="g" value="guest"> Guest</label></fieldset>'
+        + '<p class="after">Il entrera <b>immédiatement</b> au classement à <b>' + D.fmt(found.elo) + ' ELO</b>, rang ' + previewRank(found.elo) + ', avec une progression de <b>±0</b>. Ce relevé devient son ELO de départ.</p>'
+        + '<div class="dlg-f" style="padding:0;border:0"><button class="btn btn-ghost btn-sm" type="button" id="add-back">Nouvelle recherche</button><button class="btn btn-red btn-sm" type="button" id="add-ok">' + I('i-plus') + 'Ajouter au classement</button></div>';
+      body.querySelector('#add-back').addEventListener('click', function () { step1(); });
+      body.querySelector('#add-ok').addEventListener('click', function () { confirmAdd(body.querySelector('input[name=g]:checked').value, at); });
+      body.querySelector('#add-ok').focus();
+    }, 750);
+  }
+  function previewRank(elo) { return players.filter(function (p) { return p.elo > elo; }).length + 1; }
+  function confirmAdd(group, at) {
+    var p = { id: 'n' + Date.now(), nick: found.nick, group: group, lvl: found.lvl, elo: found.elo, addedElo: found.elo, addedAt: at, ava: found.ava, last: found.last, snaps: [{ at: at, elo: found.elo }] };
+    D.pool.splice(D.pool.indexOf(found), 1);
+    players.push(p);
+    state.newId = p.id; state.sel = p.id; state.moves = {};
+    if (state.group !== 'all' && state.group !== group) state.group = 'all';
+    dlg.close();
+    render({ flip: true, drawChart: true });
+    var rk = list().indexOf(p) + 1;
+    L.toast(p.nick + ' ajouté : ' + D.fmt(p.elo) + ' ELO, rang ' + rk + ', progression ±0');
+    var row = rowsEl.querySelector('[data-id="' + p.id + '"]');
+    if (row) row.scrollIntoView({ behavior: L.reduced() ? 'auto' : 'smooth', block: 'center' });
+  }
+  function openAdd() { step1(); dlg.showModal(); }
+  document.getElementById('open-add').addEventListener('click', openAdd);
+  dlg.addEventListener('click', function (e) { if (e.target.closest('[data-close]') || e.target === dlg) dlg.close(); });
+
+  render({ drawChart: true });
+  updateSync();
+  L.mount({
+    active: 'elo',
+    demo: ['view', 'role', 'fresh', 'motion'],
+    groups: { fresh: ['Données', [['ok', 'À jour'], ['stale', 'FACEIT en panne']]] },
+    actions: [
+      { label: 'Simuler une synchro', run: function () { simulateSync('Synchro auto'); } },
+      { label: 'Simuler un ajout (admin)', run: function () { L.setState('role', 'admin'); openAdd(); } }
+    ]
+  });
+})();
+</script>
+</body>
+</html>

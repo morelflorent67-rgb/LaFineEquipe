@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crosshairs · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+.compat{display:flex;gap:12px;align-items:flex-start;margin:0 var(--pad);margin-top:28px;padding:14px 18px;border:1px solid rgba(245,165,36,.4);background:rgba(245,165,36,.07);font-size:14.5px;color:var(--silver)}
+.compat b{color:var(--amber)}
+.xgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.xcard{min-width:0;display:grid;grid-template-rows:auto 1fr;background:linear-gradient(180deg,#19191c,#111113);border:1px solid var(--line);transition:transform .3s var(--ease),border-color .25s}
+.xcard:hover{transform:translateY(-4px);border-color:var(--line-3)}
+.xprev{position:relative;aspect-ratio:16/9;overflow:hidden;background:#0b0b0c}
+.xprev img{width:100%;height:100%;object-fit:cover;transform:scale(1.4);transition:transform .8s var(--ease)}
+.xcard:hover .xprev img{transform:scale(1.5)}
+.xprev svg{position:absolute;left:50%;top:50%;width:120px;height:120px;transform:translate(-50%,-50%)}
+.xprev .ind{position:absolute;right:8px;bottom:8px;font:500 10px/1 var(--mono);color:rgba(255,255,255,.75);background:rgba(0,0,0,.55);padding:4px 6px}
+.xb{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:14px 16px 16px;min-width:0}
+.xb .chip{white-space:normal;line-height:1.3;justify-self:start}
+.xb .t{display:flex;align-items:center;gap:10px}
+.xb .t b{font:800 18px/1.15 var(--f)}
+.xb .own{font-size:13px;color:var(--muted)}
+.params{display:flex;flex-wrap:wrap;gap:6px}
+.params span{padding:4px 7px;font:600 11.5px/1 var(--mono);background:var(--steel-2);color:var(--silver)}
+.code{display:flex;align-items:stretch;border:1px solid var(--line-2)}
+.code code{flex:1;min-width:0;padding:10px 12px;font:600 12px/1.3 var(--mono);color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#0b0b0c}
+.code button{display:inline-flex;align-items:center;gap:6px;padding:0 14px;border:0;border-left:1px solid var(--line-2);background:var(--steel-2);font:700 13px/1 var(--f);color:#fff;transition:background .2s}
+.code button:hover{background:var(--brand-hi)}
+.code button svg{width:15px;height:15px}
+.code button.done{background:var(--win);color:var(--win-ink)}
+.howto{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.howto li{list-style:none;padding:16px;border:1px solid var(--line);background:#121214;font-size:14.5px;color:var(--muted)}
+.howto li b{display:block;margin-bottom:6px;font:800 15px/1.2 var(--f);color:#fff}
+.howto{padding:0;counter-reset:h}
+.howto li::before{counter-increment:h;content:counter(h);display:inline-grid;place-items:center;width:28px;height:28px;margin-bottom:10px;background:var(--brand-hi);font:900 14px/1 var(--f);color:#fff;transform:skewX(var(--slant))}
+.lab{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:20px;align-items:start}
+.lab-stage{position:relative;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line-2);background:#0b0b0c}
+.lab-stage img{width:100%;height:100%;object-fit:cover;transition:opacity .3s}
+.lab-stage svg{position:absolute;left:50%;top:50%;width:200px;height:200px;transform:translate(-50%,-50%)}
+.lab-stage .ind{position:absolute;left:10px;top:10px}
+.ctrls{display:grid;gap:14px;padding:18px}
+.rng{display:grid;grid-template-columns:110px minmax(0,1fr) 40px;gap:10px;align-items:center;font-size:14px;color:var(--silver)}
+.rng input[type=range]{width:100%;accent-color:var(--brand-hi)}
+.rng output{font:700 13px/1 var(--mono);color:#fff;text-align:right}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatches button{width:32px;height:32px;border:2px solid transparent;border-radius:4px;padding:0}
+.swatches button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px var(--brand-hi)}
+.v2tag{display:inline-flex;align-items:center;gap:8px}
+@container site (max-width: 900px){ .lab{grid-template-columns:minmax(0,1fr)} .howto{grid-template-columns:minmax(0,1fr)} }
+@container site (max-width: 560px){ .xgrid{grid-template-columns:minmax(0,1fr)} .rng{grid-template-columns:90px minmax(0,1fr) 34px} }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="visitor">
+  <div class="ribbon">Prototype · presets et codes d’exemple, NON valides · aperçu indicatif, différent du rendu exact du moteur CS2</div>
+  <div id="nav-slot"></div>
+  <main id="main">
+    <header class="phead">
+      <p class="backword" aria-hidden="true">+</p>
+      <p class="kicker rv">Réglages de la team</p>
+      <h1 class="h1 rv" style="--i:1">Crosshairs</h1>
+      <p class="lede rv" style="--i:2">Le réticule de chaque joueur, avec son code de partage à copier en un clic. L’aperçu est <strong>indicatif</strong> : il ne remplace pas le rendu du jeu.</p>
+    </header>
+    <p class="compat" role="note"><svg width="18" height="18" aria-hidden="true" style="flex:none;fill:var(--amber)"><use href="#i-refresh"/></svg><span><b>Mise à jour CS2 du 22–30/09/2026</b> : réglages et codes de partage modifiés. Chaque preset affiche sa date de validation ; ceux validés avant la mise à jour sont <b>à revérifier</b>.</span></p>
+
+    <section class="sec" aria-labelledby="v1-title" style="padding-top:clamp(32px,4cqi,56px)">
+      <div class="sec-h"><div><p class="kicker">V1 · disponible au lancement</p><h2 class="h2" id="v1-title">Presets de la team</h2></div><a class="btn btn-steel btn-sm only-admin" href="admin.html"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter un crosshair</a></div>
+      <div class="xgrid" id="xgrid"></div>
+      <ol class="howto"><li><b>Copier</b>Clique « Copier » sous le preset choisi.</li><li><b>Importer dans CS2</b>Paramètres › Jeu › Réticule › importer, puis colle le code. Chemin exact à revérifier sur la version actuelle du jeu.</li><li><b>Vérifier</b>Contrôle le rendu en jeu : l’aperçu du site est indicatif.</li></ol>
+    </section>
+
+    <section class="sec" aria-labelledby="v2-title" style="background:var(--ink-2)">
+      <div class="sec-h"><div><p class="kicker">V2 · après validation du format actuel</p><h2 class="h2" id="v2-title"><span class="v2tag">Atelier <span class="chip fict">à venir</span></span></h2></div></div>
+      <div class="lab">
+        <div><div class="lab-stage"><img id="lab-bg" src="assets/media/maps/mirage/shot-1.webp" alt=""><span class="chip src ind">Aperçu indicatif</span><svg id="lab-x" viewBox="0 0 200 200" aria-label="Aperçu du réticule personnalisé"></svg></div>
+          <p class="note-demo">L’atelier ne génère aucun code de partage : l’encodage ne sera développé qu’après validation réelle du format actuel, avec des tests de non-régression.</p></div>
+        <div class="ctrls card" id="ctrls">
+          <div class="rng"><label for="r-len">Longueur</label><input type="range" id="r-len" min="1" max="12" value="4"><output for="r-len">4</output></div>
+          <div class="rng"><label for="r-gap">Écart</label><input type="range" id="r-gap" min="-3" max="8" value="1"><output for="r-gap">1</output></div>
+          <div class="rng"><label for="r-th">Épaisseur</label><input type="range" id="r-th" min="1" max="4" value="1"><output for="r-th">1</output></div>
+          <div class="rng"><label for="r-ol">Contour</label><input type="range" id="r-ol" min="0" max="2" value="1"><output for="r-ol">1</output></div>
+          <label class="switch" style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--silver)"><input type="checkbox" id="r-dot"> Point central</label>
+          <div><span style="display:block;margin-bottom:8px;font:650 13px var(--f);color:var(--silver)">Couleur</span><div class="swatches" id="sw"></div></div>
+          <div><span style="display:block;margin-bottom:8px;font:650 13px var(--f);color:var(--silver)">Fond de test</span><div class="seg" id="bg"></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script>
+(function () {
+  var D = window.LFE_DATA, L = window.LFE, I = L.icon;
+  /* Codes de partage : format d'affichage seulement, valeurs inventées et non valides. */
+  var X = [
+    { who: 'demo_kestrel', name: 'Classique fin', p: { len: 3, gap: -1, th: 1, ol: 1, dot: false, c: '#3CFF6E' }, bg: 'dust2', v: 'ok', code: 'CSGO-EXMPL-00001-NONVA-LIDE0-00001' },
+    { who: 'demo_nova', name: 'Point cyan', p: { len: 0, gap: 0, th: 2, ol: 1, dot: true, c: '#41E5FF' }, bg: 'mirage', v: 'ok', code: 'CSGO-EXMPL-00002-NONVA-LIDE0-00002' },
+    { who: 'demo_vandal', name: 'Gros contraste', p: { len: 5, gap: 2, th: 2, ol: 2, dot: false, c: '#FFE04A' }, bg: 'nuke', v: 'stale', code: 'CSGO-EXMPL-00003-NONVA-LIDE0-00003' },
+    { who: 'demo_ombre', name: 'AWP compact', p: { len: 2, gap: 0, th: 1, ol: 0, dot: true, c: '#FF3EDB' }, bg: 'inferno', v: 'ok', code: 'CSGO-EXMPL-00004-NONVA-LIDE0-00004' },
+    { who: 'demo_brasier', name: 'Croix rouge LFE', p: { len: 4, gap: 1, th: 2, ol: 1, dot: false, c: '#FF2A1F' }, bg: 'ancient', v: 'stale', code: 'CSGO-EXMPL-00005-NONVA-LIDE0-00005' },
+    { who: 'demo_silex', name: 'Blanc pur', p: { len: 3, gap: 1, th: 1, ol: 1, dot: false, c: '#FFFFFF' }, bg: 'train', v: 'ok', code: 'CSGO-EXMPL-00006-NONVA-LIDE0-00006' }
+  ];
+  /* Dessin indicatif (SVG) : unité = 1 « pixel » du jeu × 3. */
+  function svg(p, size) {
+    var c = size / 2, u = size / 40, len = p.len * u * 1.6, gap = (p.gap + 2) * u, th = Math.max(1, p.th * u * .7), ol = p.ol * u * .5;
+    var bars = len ? [[c - th / 2, c - gap - len, th, len], [c - th / 2, c + gap, th, len], [c - gap - len, c - th / 2, len, th], [c + gap, c - th / 2, len, th]] : [];
+    var out = '';
+    if (ol) bars.concat(p.dot ? [[c - th / 2, c - th / 2, th, th]] : []).forEach(function (b) { out += '<rect x="' + (b[0] - ol) + '" y="' + (b[1] - ol) + '" width="' + (b[2] + 2 * ol) + '" height="' + (b[3] + 2 * ol) + '" fill="#000"/>'; });
+    bars.forEach(function (b) { out += '<rect x="' + b[0] + '" y="' + b[1] + '" width="' + b[2] + '" height="' + b[3] + '" fill="' + p.c + '"/>'; });
+    if (p.dot) out += '<rect x="' + (c - th / 2) + '" y="' + (c - th / 2) + '" width="' + th + '" height="' + th + '" fill="' + p.c + '"/>';
+    return out;
+  }
+  var players = {}; D.players.forEach(function (p) { players[p.nick] = p; });
+  document.getElementById('xgrid').innerHTML = X.map(function (x, i) {
+    var pl = players[x.who];
+    return '<article class="xcard rv" style="--i:' + i + '"><div class="xprev"><img src="assets/media/maps/' + x.bg + '/cover.webp" alt="" loading="lazy"><svg viewBox="0 0 120 120" aria-label="Aperçu indicatif du réticule ' + x.name + '">' + svg(x.p, 120) + '</svg><span class="ind">Aperçu indicatif</span></div>'
+      + '<div class="xb"><div class="t">' + D.ava(pl, 34) + '<div><b>' + x.name + '</b><div class="own">' + x.who + '</div></div></div>'
+      + '<div class="params"><span>long. ' + x.p.len + '</span><span>écart ' + x.p.gap + '</span><span>ép. ' + x.p.th + '</span><span>contour ' + x.p.ol + '</span>' + (x.p.dot ? '<span>point</span>' : '') + '<span style="color:' + x.p.c + '">■ ' + x.p.c + '</span></div>'
+      + (x.v === 'ok' ? '<span class="chip ok">' + I('i-check') + 'Validé le 04/10/2026, après la MAJ</span>' : '<span class="chip stale">À revérifier · validé le 12/09/2026, avant la MAJ</span>')
+      + '<div class="code"><code title="Code d’exemple, non valide">' + x.code + '</code><button type="button" data-copy="' + i + '">' + I('i-copy') + 'Copier</button></div>'
+      + '<span class="hint">Code d’exemple, non valide dans le jeu.</span></div></article>';
+  }).join('');
+  document.getElementById('xgrid').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]'); if (!b) return;
+    L.copy(X[+b.getAttribute('data-copy')].code, 'Code copié (exemple non valide)');
+    b.classList.add('done'); b.innerHTML = I('i-check') + 'Copié';
+    setTimeout(function () { b.classList.remove('done'); b.innerHTML = I('i-copy') + 'Copier'; }, 1800);
+  });
+  /* Atelier V2 (aperçu) */
+  var st = { len: 4, gap: 1, th: 1, ol: 1, dot: false, c: '#3CFF6E' };
+  var colors = ['#3CFF6E', '#41E5FF', '#FFE04A', '#FF3EDB', '#FF2A1F', '#FFFFFF'];
+  document.getElementById('sw').innerHTML = colors.map(function (c) { return '<button type="button" style="background:' + c + '" data-c="' + c + '" aria-pressed="' + (c === st.c) + '" aria-label="Couleur ' + c + '"></button>'; }).join('');
+  var bgs = [['mirage', 'Mirage'], ['dust2', 'Dust II'], ['nuke', 'Nuke'], ['ancient', 'Ancient']];
+  document.getElementById('bg').innerHTML = bgs.map(function (b, i) { return '<button type="button" data-bg="' + b[0] + '" aria-pressed="' + (i === 0) + '">' + b[1] + '</button>'; }).join('');
+  function draw() { document.getElementById('lab-x').innerHTML = svg(st, 200); }
+  document.getElementById('ctrls').addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.type === 'range') { st[{ 'r-len': 'len', 'r-gap': 'gap', 'r-th': 'th', 'r-ol': 'ol' }[t.id]] = +t.value; t.nextElementSibling.textContent = t.value; }
+    if (t.id === 'r-dot') st.dot = t.checked;
+    draw();
+  });
+  document.getElementById('ctrls').addEventListener('click', function (e) {
+    var c = e.target.closest('[data-c]'), b = e.target.closest('[data-bg]');
+    if (c) { st.c = c.getAttribute('data-c'); this.querySelectorAll('[data-c]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === c)); }); draw(); }
+    if (b) { var img = document.getElementById('lab-bg'); img.style.opacity = 0; setTimeout(function () { img.src = 'assets/media/maps/' + b.getAttribute('data-bg') + '/shot-1.webp'; img.onload = function () { img.style.opacity = 1; }; }, 150); this.querySelectorAll('[data-bg]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); }
+  });
+  draw();
+  L.mount({ active: 'xh' });
+})();
+</script>
+</body>
+</html>

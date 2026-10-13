@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+<title>Anubis (illustration provisoire LaFineEquipe)</title>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#060505"/><stop offset=".42" stop-color="#1c0404"/><stop offset=".64" stop-color="#5e0707"/><stop offset=".718" stop-color="#b30e0c"/><stop offset=".72" stop-color="#0c0606"/><stop offset="1" stop-color="#050505"/>
+</linearGradient>
+<radialGradient id="sun" cx=".7" cy=".72" r=".42"><stop offset="0" stop-color="#ff3b22" stop-opacity=".8"/><stop offset=".5" stop-color="#d0120e" stop-opacity=".25"/><stop offset="1" stop-color="#d0120e" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#sky)"/>
+<rect width="1600" height="900" fill="url(#sun)"/>
+<g fill="#2b0707"><path d="M820 650 L1140 330 L1460 650 Z"/><path d="M1340 650 L1500 470 L1600 580 V650 Z"/></g>
+<g fill="#130404"><path d="M420 660 V330 L445 300 L470 330 V660 Z"/><rect x="130" y="430" width="44" height="230"/><path d="M116 430 Q152.0 384 188 430 Z"/><rect x="118" y="648" width="68" height="12"/><rect x="230" y="430" width="44" height="230"/><path d="M216 430 Q252.0 384 288 430 Z"/><rect x="218" y="648" width="68" height="12"/><rect x="330" y="430" width="44" height="230"/><path d="M316 430 Q352.0 384 388 430 Z"/><rect x="318" y="648" width="68" height="12"/><rect x="110" y="410" width="290" height="20"/><path d="M612 660 Q624 550.0 638 440 L646 444 Q636 550.0 630 660 Z"/><path d="M638 440 Q593.0 440 548 470 Q597.5 452.0 638 446 Z"/><path d="M638 440 Q608.0 390 578 420 Q611.0 432.0 638 446 Z"/><path d="M638 440 Q638.0 370 638 400 Q638.0 424.0 638 446 Z"/><path d="M638 440 Q668.0 392 698 422 Q665.0 432.8 638 446 Z"/><path d="M638 440 Q685.5 444 733 474 Q680.75 453.6 638 446 Z"/><path d="M638 440 Q658.0 460 678 490 Q656.0 460.0 638 446 Z"/><path d="M638 440 Q618.0 458 598 488 Q620.0 459.2 638 446 Z"/></g>
+<g fill="#070505"><rect y="700" width="1600" height="200"/><rect y="730" width="1600" height="36" fill="#3a0808" opacity=".8"/><rect y="745" width="1600" height="4" fill="#ff3b22" opacity=".35"/><rect x="1180" y="420" width="60" height="300"/><path d="M1166 420 Q1210.0 374 1254 420 Z"/><rect x="1168" y="708" width="84" height="12"/><rect x="1330" y="420" width="60" height="300"/><path d="M1316 420 Q1360.0 374 1404 420 Z"/><rect x="1318" y="708" width="84" height="12"/><rect x="1160" y="400" width="250" height="24"/></g>
+<rect y="648" width="1600" height="2" fill="#ff3b22" opacity=".35"/>
+</svg>

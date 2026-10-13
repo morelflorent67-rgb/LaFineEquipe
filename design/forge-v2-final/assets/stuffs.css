@@ -1,0 +1,52 @@
+/* Forge V2 final · styles partagés des pages Stuffs (maps, bibliothèque, carte tactique, fiche). */
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;padding:0;list-style:none;font:600 13px/1 var(--f);color:var(--dim)}
+.crumbs a{color:var(--silver);text-decoration:none}
+.crumbs a:hover{color:#fff}
+.crumbs li+li::before{content:"/";margin-right:8px;color:var(--steel-4)}
+
+/* Carte de stuff */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.scard{position:relative;display:grid;grid-template-rows:auto 1fr;text-decoration:none;background:linear-gradient(180deg,#19191c,#111113);border:1px solid var(--line);transition:transform .3s var(--ease),border-color .25s,box-shadow .3s;isolation:isolate}
+.scard:hover{transform:translateY(-4px);border-color:var(--line-3);box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.scard:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.scard .im{position:relative;aspect-ratio:16/9;overflow:hidden;background:#0d0d0e}
+.scard .im img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.scard:hover .im img{transform:scale(1.07)}
+.scard .im::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,5,5,.75),transparent 45%)}
+.scard .chips{position:absolute;left:10px;top:10px;z-index:1;display:flex;gap:6px}
+.scard .srcl{position:absolute;right:10px;bottom:9px;z-index:1;font:500 10px/1 var(--mono);color:rgba(255,255,255,.7)}
+.scard .bd{display:grid;gap:8px;padding:14px 16px 16px;align-content:start}
+.scard .t{font:800 18px/1.15 var(--f);font-stretch:106%}
+.scard .path{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.scard .path svg{width:16px;height:8px;fill:var(--brand-hi);flex:none}
+.scard .ft{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.diff{display:inline-flex;align-items:center;gap:3px;font:650 12px/1 var(--f);color:var(--muted)}
+.diff i{width:7px;height:12px;background:var(--steel-4);transform:skewX(var(--slant))}
+.diff i.on{background:var(--silver)}
+.scard .bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--brand-hi);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease)}
+.scard:hover .bar{transform:scaleX(1)}
+
+/* Barre de filtres */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.filters .search{flex:1 1 260px;max-width:420px}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:8px 12px;background:transparent;border:1px solid var(--line-2);color:var(--silver);font:700 13.5px/1 var(--f);transition:border-color .2s,background .2s,color .2s,transform .15s}
+.tchip svg{width:15px;height:15px}
+.tchip .n{font-weight:600;opacity:.65;font-variant-numeric:tabular-nums}
+.tchip:hover{border-color:var(--line-3);color:#fff}
+.tchip:active{transform:scale(.96)}
+.tchip[aria-pressed="true"]{color:#111;border-color:transparent;background:var(--white)}
+.tchip.smoke[aria-pressed="true"]{background:var(--smoke)} .tchip.flash[aria-pressed="true"]{background:var(--flash)}
+.tchip.molo[aria-pressed="true"]{background:var(--molo)} .tchip.he[aria-pressed="true"]{background:var(--he)}
+.tchip.smoke svg{color:var(--smoke)} .tchip.flash svg{color:var(--flash)} .tchip.molo svg{color:var(--molo)} .tchip.he svg{color:var(--he)}
+.tchip[aria-pressed="true"] svg{color:#111}
+.count-line{font:500 12px/1.4 var(--mono);color:var(--dim)}
+.empty{display:grid;gap:10px;justify-items:start;padding:28px;border:1px dashed var(--line-2);color:var(--muted)}
+.empty strong{font:800 20px/1.2 var(--f);color:var(--white)}
+@container site (max-width: 560px){
+  .sgrid{grid-template-columns:minmax(0,1fr)}
+  .filters .search{max-width:none}
+  .tchips{flex-wrap:nowrap;overflow-x:auto;margin-inline:calc(var(--pad) * -1);padding:2px var(--pad);scrollbar-width:none}
+  .tchips::-webkit-scrollbar{display:none}
+  .tchip{flex:none}
+}

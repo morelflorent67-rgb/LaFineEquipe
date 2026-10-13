@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fiche · Stuffs · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<link rel="stylesheet" href="assets/stuffs.css">
+<style>
+.fhead{padding:clamp(28px,3.5cqi,56px) var(--pad) clamp(20px,2.4cqi,32px)}
+.fhead .h1{font-size:clamp(38px,5.4cqi,80px)}
+.fchips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:18px}
+.factions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.fbody{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.9fr);gap:clamp(18px,2.6cqi,36px);padding:0 var(--pad) clamp(56px,6cqi,96px);align-items:start}
+.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.shot{position:relative;margin:0;background:#0d0d0e;border:1px solid var(--line-2);overflow:hidden}
+.shot button{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+.shot img{width:100%;aspect-ratio:16/9;object-fit:cover;transition:transform .7s var(--ease)}
+.shot button:hover img{transform:scale(1.04)}
+.shot .n{position:absolute;left:0;top:0;z-index:1;display:flex;align-items:center;gap:8px;padding:8px 12px 8px 10px;background:var(--brand-hi);font:800 13px/1 var(--f);font-stretch:110%;letter-spacing:.04em;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.shot .n b{font:900 18px/1 var(--f)}
+.shot figcaption{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;font-size:13.5px;color:var(--muted)}
+.shot figcaption .mono{font-size:10.5px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:16px;background:var(--line);border:1px solid var(--line)}
+.facts div{display:grid;gap:7px;padding:14px;background:#121214}
+.facts span{font:650 10.5px/1 var(--f);font-stretch:115%;letter-spacing:.13em;text-transform:uppercase;color:var(--dim)}
+.facts b{font:750 16px/1.25 var(--f)}
+.steps-list{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:10px;counter-reset:st}
+.steps-list li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:start;padding:14px 16px;border:1px solid var(--line);background:linear-gradient(90deg,#17171a,#111113);counter-increment:st}
+.steps-list li::before{content:counter(st);display:grid;place-items:center;width:44px;height:44px;font:900 22px/1 var(--f);font-stretch:120%;background:var(--steel-2);border:1px solid var(--line-2);transform:skewX(var(--slant))}
+.steps-list b{display:block;margin-bottom:4px;font:750 16px/1.2 var(--f)}
+.steps-list span{color:var(--muted);font-size:14.5px}
+.video{position:relative;margin-top:22px;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line-2);background:#0a0a0b}
+.video img{width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.8)}
+.video button{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:12px;background:none;border:0;color:#fff;font:700 15px/1.3 var(--f)}
+.video .pl{display:grid;place-items:center;width:74px;height:74px;border-radius:50%;background:rgba(255,42,31,.92);transition:transform .3s var(--ease)}
+.video .pl svg{width:26px;height:26px;margin-left:4px}
+.video button:hover .pl{transform:scale(1.08)}
+.video small{font:500 11.5px/1.4 var(--mono);color:var(--silver);max-width:42ch;text-align:center}
+.fside{display:grid;gap:16px;position:sticky;top:76px}
+.box{padding:18px}
+.box h2{margin:0 0 12px;font:800 17px/1.2 var(--f);font-stretch:108%}
+.mini-radar{position:relative;aspect-ratio:1;background:#0b0b0c;border:1px solid var(--line);overflow:hidden}
+.mini-radar img{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
+.mini-radar svg{position:absolute;inset:0;width:100%;height:100%}
+.mini-radar .from{fill:var(--brand-hi);stroke:#fff;stroke-width:.6}
+.mini-radar .to{fill:none;stroke:#fff;stroke-width:.7;stroke-dasharray:1.4 1}
+.mini-radar .ln{stroke:rgba(255,255,255,.75);stroke-width:.5;stroke-dasharray:1.5 1.5}
+.mini-radar text{font:700 3.2px var(--f);fill:#fff;paint-order:stroke;stroke:#000;stroke-width:.8}
+.legend-mini{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.legend-mini i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.related{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.related a{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;align-items:center;padding:6px;border:1px solid var(--line);text-decoration:none;transition:border-color .2s,transform .25s var(--ease)}
+.related a:hover{border-color:var(--line-3);transform:translateX(4px)}
+.related img{width:84px;aspect-ratio:16/9;object-fit:cover}
+.related b{display:block;font:750 14.5px/1.2 var(--f)}
+.related span{font-size:12.5px;color:var(--muted)}
+.report{display:grid;gap:8px;justify-items:start}
+/* Visionneuse et mode entraînement */
+dialog.viewer{width:min(1400px,calc(100vw - 24px));padding:0;background:#000;border:1px solid var(--line-2)}
+dialog.viewer::backdrop{background:rgba(0,0,0,.88)}
+dialog.viewer img{width:100%;height:auto;max-height:calc(100dvh - 120px);object-fit:contain}
+dialog.train{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;padding:0;background:#050505;color:#fff;border:0}
+dialog.train[open]{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.tr-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;padding:14px clamp(14px,2.4vw,32px);border-bottom:1px solid var(--line)}
+.tr-h .t{font:900 clamp(24px,3vw,40px)/1 var(--f);font-stretch:115%}
+.tr-h .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tr-b{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px clamp(14px,2.4vw,32px);min-height:0}
+.tr-b figure{position:relative;margin:0;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:8px}
+.tr-b img{width:100%;height:100%;object-fit:contain;background:#0b0b0c;min-height:0}
+.tr-b figcaption{font:750 clamp(15px,1.4vw,20px)/1.25 var(--f)}
+.tr-b figcaption span{display:block;font:500 13px/1.3 var(--f);color:var(--muted)}
+.tr-f{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;padding:12px clamp(14px,2.4vw,32px);border-top:1px solid var(--line)}
+.tr-f .tech{font:800 clamp(18px,2vw,26px)/1.1 var(--f)}
+.tr-f .nav{display:flex;gap:8px}
+.tr-anim{animation:fadeIn .3s var(--ease)}
+@container site (max-width: 1100px){ .fbody{grid-template-columns:minmax(0,1fr)} .fside{position:relative;top:0} }
+@container site (max-width: 560px){ .shots{grid-template-columns:minmax(0,1fr)} .facts{grid-template-columns:repeat(2,minmax(0,1fr))} .factions .btn{flex:1} }
+@media (max-width: 700px){ .tr-b{grid-template-columns:1fr;overflow:auto} .tr-b img{height:auto} }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="visitor">
+  <div class="ribbon">Prototype · fiche d’exemple, instructions non vérifiées · images : captures de la team et images du jeu (Valve)</div>
+  <div id="nav-slot"></div>
+  <main id="main"><div id="fiche"></div></main>
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+<dialog class="viewer" id="viewer" aria-label="Capture en grand"><form method="dialog" style="position:absolute;right:10px;top:10px"><button class="icon-btn" aria-label="Fermer"><svg aria-hidden="true"><use href="#i-close"/></svg></button></form><img id="viewer-img" alt=""></dialog>
+<dialog class="train" id="train" aria-labelledby="tr-title"></dialog>
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script src="assets/stuffs.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.LFE_DATA, L = window.LFE, S = window.LFE_STUFF, I = S.icon;
+  var id = new URLSearchParams(location.search).get('id');
+  var s = D.stuffs.filter(function (x) { return x.id === id; })[0];
+  var root = document.getElementById('fiche');
+  if (!s) {
+    root.innerHTML = '<section class="sec"><div class="empty"><strong>Fiche introuvable</strong><span>Ce lien ne correspond à aucun stuff publié.</span><a class="btn btn-steel btn-sm" href="stuffs.html">Toutes les maps</a></div></section>';
+    L.mount({ active: 'fiche' }); return;
+  }
+  var map = D.mapBy(s.map), pos = D.position(s.map, s.from);
+  document.title = s.title + ' · ' + map.name + ' · LaFineEquipe';
+  var steps = [
+    ['Se placer', (pos ? pos.name : 'Position de départ') + ' : reproduis exactement le cadrage de la capture 1.'],
+    ['Viser', 'Aligne le viseur sur le repère visible sur la capture 2 (point de visée).'],
+    ['Lancer', s.tech + (s.tech === 'Jumpthrow' ? ' : utilise ton bind jumpthrow pour un résultat constant.' : '.')],
+    ['Vérifier', 'Impact attendu : ' + s.to + '. En cas d’écart, signale la fiche.']
+  ];
+  var related = D.stuffs.filter(function (x) { return x.map === s.map && x.id !== s.id && (x.from === s.from || x.to === s.to || x.type === s.type); }).slice(0, 4);
+  var ordered = D.stuffsOf(s.map);
+  var share = location.origin + location.pathname + '?id=' + s.id;
+
+  root.innerHTML = '<header class="fhead">'
+    + '<ol class="crumbs"><li><a href="stuffs.html">Stuffs</a></li><li><a href="map.html?m=' + map.slug + '">' + map.name + '</a></li><li aria-current="page">' + D.esc(s.title) + '</li></ol>'
+    + '<p class="kicker rv">' + map.name + ' · ' + (s.side === 'T' ? 'Terroriste' : 'Anti-terroriste') + '</p>'
+    + '<h1 class="h1 rv" style="--i:1">' + D.esc(s.title) + '</h1>'
+    + '<div class="fchips rv" style="--i:2">' + S.nade(s.type) + S.side(s.side) + '<span class="chip">' + s.tech + '</span>' + S.diff(s.diff) + S.verified(s) + '<span class="chip fict">Exemple fictif</span></div>'
+    + '<div class="factions rv" style="--i:3"><button class="btn btn-red" type="button" id="train-btn">' + I('i-target') + 'Mode entraînement</button><button class="btn btn-steel" type="button" id="share-btn">' + I('i-share') + 'Partager</button><a class="btn btn-ghost" href="map.html?m=' + map.slug + (s.from ? '#carte' : '') + '">' + I('i-map') + (s.from ? 'Voir sur la carte' : 'Retour à ' + map.name) + '</a></div>'
+    + '</header>'
+    + '<div class="fbody"><div>'
+    + '<div class="shots">' + [0, 1].map(function (i) {
+      return '<figure class="shot rv" style="--i:' + i + '"><span class="n"><b>' + (i + 1) + '</b>' + (i ? 'Point de visée' : 'Position de départ') + '</span><button type="button" data-view="' + i + '" aria-label="Agrandir la capture ' + (i + 1) + '"><img src="' + s.img[i] + '" alt="' + (i ? 'Point de visée' : 'Position de départ') + ' (capture d’illustration)"' + (i ? '' : ' style="view-transition-name:st-' + s.id + '"') + '></button>'
+        + '<figcaption><span>' + (i ? 'Repère de visée' : (pos ? pos.name : 'Position de départ')) + '</span><span class="mono">' + S.srcLabel(s.src[i]) + ' · illustration</span></figcaption></figure>';
+    }).join('') + '</div>'
+    + '<div class="facts rv"><div><span>Départ</span><b>' + D.esc(pos ? pos.name : 'À préciser') + '</b></div><div><span>Destination</span><b>' + D.esc(s.to) + '</b></div><div><span>Technique</span><b>' + s.tech + '</b></div></div>'
+    + '<ol class="steps-list">' + steps.map(function (st, i) { return '<li class="rv" style="--i:' + i + '"><div><b>' + st[0] + '</b><span>' + D.esc(st[1]) + '</span></div></li>'; }).join('') + '</ol>'
+    + '<div class="video rv"><img src="' + map.hero + '" alt=""><button type="button" id="video-btn"><span class="pl">' + I('i-play') + '</span>Vidéo du lineup<small>Exemple : aucune vidéo réelle rattachée. En vrai, lien YouTube de la team lu sans cookies (youtube-nocookie).</small></button></div>'
+    + '</div><aside class="fside">'
+    + (pos && s.land ? '<div class="box card rv"><h2>Sur le radar</h2><div class="mini-radar"><img src="' + map.radar + '" alt=""><svg viewBox="0 0 100 100" aria-label="Départ ' + D.esc(pos.name) + ', impact ' + D.esc(s.to) + '"><line class="ln" x1="' + pos.x + '" y1="' + pos.y + '" x2="' + s.land[0] + '" y2="' + s.land[1] + '"/><circle class="to" cx="' + s.land[0] + '" cy="' + s.land[1] + '" r="2.6"/><rect class="from" x="' + (pos.x - 1.8) + '" y="' + (pos.y - 1.8) + '" width="3.6" height="3.6" transform="rotate(45 ' + pos.x + ' ' + pos.y + ')"/><text x="' + pos.x + '" y="' + (pos.y + 6) + '" text-anchor="middle">' + D.esc(pos.name) + '</text><text x="' + s.land[0] + '" y="' + (s.land[1] - 4) + '" text-anchor="middle">' + D.esc(s.to) + '</text></svg></div><p class="legend-mini"><span><i style="background:var(--brand-hi);transform:rotate(45deg)"></i>Lancer</span><span><i style="border:1.5px dashed #fff;border-radius:50%"></i>Impact</span><span>Positions d’exemple</span></p></div>' : '')
+    + '<div class="box card rv"><h2>Vérification</h2><p class="muted" style="margin:0 0 12px;font-size:14px">Dernière vérification le <b style="color:#fff">' + D.dateFr(s.verifiedAt) + '</b>. ' + (s.stale ? 'Plus de 60 jours : à revérifier après le dernier patch.' : 'Encore récente.') + '</p>'
+    + '<div class="report"><button class="btn btn-ghost btn-sm only-member" type="button" id="report">Signaler « à revérifier »</button><span class="hint only-visitor">Connecte-toi (membre) pour signaler une fiche.</span><button class="btn btn-ghost btn-sm only-admin" type="button" id="verify">' + I('i-check') + 'Marquer vérifiée aujourd’hui</button></div></div>'
+    + (related.length ? '<div class="box card rv"><h2>Sur la même map</h2><ul class="related">' + related.map(function (r) { return '<li><a href="fiche.html?id=' + r.id + '"><img src="' + r.img[0] + '" alt="" loading="lazy"><span><b>' + D.esc(r.title) + '</b><span>' + D.types[r.type].label + ' · ' + r.side + ' · ' + D.esc(r.to) + '</span></span></a></li>'; }).join('') + '</ul></div>' : '')
+    + '</aside></div>';
+
+  /* Agrandissement */
+  var viewer = document.getElementById('viewer');
+  root.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-view]');
+    if (b) { document.getElementById('viewer-img').src = s.img[+b.getAttribute('data-view')]; viewer.showModal(); }
+  });
+  viewer.addEventListener('click', function (e) { if (e.target === viewer) viewer.close(); });
+
+  /* Partage : lien canonique de la fiche */
+  document.getElementById('share-btn').addEventListener('click', function () {
+    if (navigator.share && matchMedia('(pointer:coarse)').matches) navigator.share({ title: s.title + ' · ' + map.name, url: share }).catch(function () {});
+    else L.copy(share, 'Lien de la fiche copié');
+  });
+  document.getElementById('video-btn').addEventListener('click', function () { L.toast('Exemple : aucune vidéo réelle rattachée à cette fiche'); });
+  document.getElementById('report').addEventListener('click', function () { this.disabled = true; this.textContent = 'Signalée · merci'; L.toast('Signalement envoyé aux admins (simulation)'); });
+  document.getElementById('verify').addEventListener('click', function () { L.toast('Fiche marquée vérifiée aujourd’hui (simulation)'); });
+
+  /* Mode entraînement : plein écran, grandes images, ← → pour changer de lineup, Échap pour quitter */
+  var train = document.getElementById('train'), ti = ordered.indexOf(s);
+  function renderTrain() {
+    var x = ordered[ti], p = D.position(x.map, x.from);
+    train.innerHTML = '<div class="tr-h"><div><span class="kicker">' + map.name + ' · ' + (ti + 1) + ' / ' + ordered.length + '</span><div class="t" id="tr-title">' + D.esc(x.title) + '</div></div><div class="meta">' + S.nade(x.type) + S.side(x.side) + '<button class="icon-btn" type="button" data-close aria-label="Quitter le mode entraînement">' + I('i-close') + '</button></div></div>'
+      + '<div class="tr-b tr-anim"><figure><img src="' + x.img[0] + '" alt="Position de départ"><figcaption>1 · ' + D.esc(p ? p.name : 'Position de départ') + '<span>Reproduis le cadrage</span></figcaption></figure><figure><img src="' + x.img[1] + '" alt="Point de visée"><figcaption>2 · Point de visée<span>Impact : ' + D.esc(x.to) + '</span></figcaption></figure></div>'
+      + '<div class="tr-f"><span class="tech">' + x.tech + ' <span class="muted" style="font-size:.7em">· ' + x.diff + '</span></span><div class="nav"><button class="btn btn-steel btn-sm" type="button" data-step="-1">← Précédent</button><button class="btn btn-red btn-sm" type="button" data-step="1">Suivant →</button></div></div>';
+  }
+  document.getElementById('train-btn').addEventListener('click', function () { renderTrain(); train.showModal(); });
+  train.addEventListener('click', function (e) {
+    if (e.target.closest('[data-close]')) { train.close(); return; }
+    var st = e.target.closest('[data-step]');
+    if (st) { ti = (ti + +st.getAttribute('data-step') + ordered.length) % ordered.length; renderTrain(); train.querySelector('[data-step="' + st.getAttribute('data-step') + '"]').focus(); }
+  });
+  train.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); ti = (ti + (e.key === 'ArrowRight' ? 1 : -1) + ordered.length) % ordered.length; renderTrain(); train.querySelector('[data-close]').focus(); }
+  });
+
+  L.mount({ active: 'fiche' });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+<title>Nuke (illustration provisoire LaFineEquipe)</title>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#060505"/><stop offset=".42" stop-color="#1c0404"/><stop offset=".64" stop-color="#5e0707"/><stop offset=".718" stop-color="#b30e0c"/><stop offset=".72" stop-color="#0c0606"/><stop offset="1" stop-color="#050505"/>
+</linearGradient>
+<radialGradient id="sun" cx=".72" cy=".72" r=".42"><stop offset="0" stop-color="#ff3b22" stop-opacity=".8"/><stop offset=".5" stop-color="#d0120e" stop-opacity=".25"/><stop offset="1" stop-color="#d0120e" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#sky)"/>
+<rect width="1600" height="900" fill="url(#sun)"/>
+<g fill="#2b0707"><rect x="0" y="590" width="1600" height="60"/><path d="M80 650 L120 440 H220 L260 650 Z"/><path d="M1300 650 L1335 470 H1425 L1460 650 Z"/></g>
+<g fill="#130404"><path d="M330 660 V520 L410 470 V520 L490 470 V520 L570 470 V520 L650 470 V520 L730 470 V520 L810 470 V660 Z"/><rect x="900" y="480" width="110" height="180"/><ellipse cx="955" cy="480" rx="55" ry="16"/><rect x="1030" y="510" width="110" height="150"/><ellipse cx="1085" cy="510" rx="55" ry="16"/><rect x="1190" y="250" width="34" height="410"/><rect x="1186" y="300" width="42" height="14" fill="#3a0a0a"/><rect x="1186" y="380" width="42" height="14" fill="#3a0a0a"/><path d="M600 300 H1000 V312 H612 V470 H600 Z"/><rect x="980" y="312" width="6" height="90"/></g>
+<g fill="#070505"><rect x="0" y="700" width="1600" height="200"/><rect x="20" y="600" width="6" height="100"/><rect x="90" y="600" width="6" height="100"/><rect x="160" y="600" width="6" height="100"/><rect x="230" y="600" width="6" height="100"/><rect x="300" y="600" width="6" height="100"/><rect x="370" y="600" width="6" height="100"/><rect x="440" y="600" width="6" height="100"/><rect x="510" y="600" width="6" height="100"/><rect x="580" y="600" width="6" height="100"/><rect x="650" y="600" width="6" height="100"/><rect x="720" y="600" width="6" height="100"/><rect x="790" y="600" width="6" height="100"/><rect x="860" y="600" width="6" height="100"/><rect x="930" y="600" width="6" height="100"/><rect x="1000" y="600" width="6" height="100"/><rect x="1070" y="600" width="6" height="100"/><rect x="1140" y="600" width="6" height="100"/><rect x="1210" y="600" width="6" height="100"/><rect x="1280" y="600" width="6" height="100"/><rect x="1350" y="600" width="6" height="100"/><rect x="1420" y="600" width="6" height="100"/><rect x="1490" y="600" width="6" height="100"/><rect x="1560" y="600" width="6" height="100"/><path d="M0 640 H1600 M0 670 H1600" stroke="#070505" stroke-width="4"/><rect x="200" y="760" width="420" height="22" fill="#160404"/><rect x="1000" y="740" width="380" height="22" fill="#160404"/></g>
+<rect y="648" width="1600" height="2" fill="#ff3b22" opacity=".35"/>
+</svg>

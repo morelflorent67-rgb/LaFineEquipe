@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Map · Stuffs · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<link rel="stylesheet" href="assets/stuffs.css">
+<style>
+/* ---------- Bandeau de la map ---------- */
+.mhero{position:relative;min-height:clamp(240px,26cqi,380px);display:grid;align-content:end;padding:clamp(24px,3cqi,40px) var(--pad);overflow:hidden;isolation:isolate;border-bottom:1px solid var(--line)}
+.mhero>img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover}
+.mhero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.92),rgba(5,5,5,.45) 60%,rgba(5,5,5,.2)),linear-gradient(0deg,rgba(5,5,5,.95),transparent 60%)}
+.mhero .h1{font-size:clamp(48px,7.6cqi,120px)}
+.mstats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;color:var(--silver);font-size:14.5px}
+.mstats b{color:#fff;font-weight:750}
+.mstats span{display:inline-flex;align-items:center;gap:6px}
+.mstats svg{width:15px;height:15px}
+.modes{display:flex;gap:4px;margin-top:22px}
+.modes [role=tab]{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:11px 20px;background:transparent;border:0;font:750 15px/1 var(--f);color:var(--silver);isolation:isolate}
+.modes [role=tab]::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant));border:1px solid var(--line-3);background:rgba(5,5,5,.55);transition:background .25s}
+.modes [role=tab] svg{width:17px;height:17px}
+.modes [role=tab][aria-selected=true]{color:#fff}
+.modes [role=tab][aria-selected=true]::before{background:linear-gradient(100deg,#ff2a1f,#b8060b);border-color:transparent}
+.modes [role=tab]:focus-visible{outline:none}
+.modes [role=tab]:focus-visible::before{box-shadow:inset 0 0 0 2px #fff}
+
+/* ---------- Barre de filtres collante ---------- */
+.mbar{position:sticky;top:62px;z-index:30;padding:12px var(--pad);background:rgba(5,5,5,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.mbar .seg button{min-height:40px}
+.pane{padding:clamp(24px,3cqi,40px) var(--pad) clamp(56px,6cqi,96px)}
+.pane[hidden]{display:none}
+.pane.enter{animation:rise .45s var(--ease)}
+.lib-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+
+/* ---------- Carte tactique ---------- */
+.tac-wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:clamp(16px,2cqi,28px);align-items:start}
+.tac-note{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;padding:10px 14px;border:1px dashed rgba(245,165,36,.45);color:var(--amber);font:500 12px/1.45 var(--mono)}
+.tac-box{position:relative}
+.tac{position:relative;aspect-ratio:1;overflow:hidden;background:radial-gradient(circle at 50% 45%,#141416,#08080a 70%);border:1px solid var(--line-2);touch-action:none;cursor:grab;outline:none;user-select:none;-webkit-user-select:none}
+.tac:focus-visible{box-shadow:0 0 0 2px #fff}
+.tac.dragging{cursor:grabbing}
+.tac-layer{--k:1;position:absolute;inset:0;transform-origin:0 0;will-change:transform}
+.tac-layer.anim{transition:transform .35s var(--ease)}
+.tac-layer>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none;opacity:.92}
+.links{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.links line{stroke:rgba(255,255,255,.75);stroke-width:1.5;stroke-dasharray:5 5;vector-effect:non-scaling-stroke;animation:dash 1s linear 1}
+@keyframes dash{from{stroke-dashoffset:20}}
+.links line.hl{stroke:#fff;stroke-width:2.2}
+/* Marqueurs : ancrés sur leur point (enveloppe de taille nulle), taille constante à l'écran quel que soit le zoom */
+.mk,.land,.mk-l{position:absolute;transform-origin:0 0}
+.mk{width:34px;height:34px;margin:-17px 0 0 -17px;padding:0;border:0;background:none;transform-origin:50% 50%;transform:scale(calc(1 / var(--k))) translateX(var(--ox,0px))}
+.mk .dia{position:absolute;inset:0;display:grid;place-items:center;border:2px solid currentColor;background:rgba(5,5,5,.88);border-radius:8px;transform:rotate(45deg);transition:box-shadow .2s,background .2s,opacity .2s;animation:mkIn .45s var(--ease) both;animation-delay:calc(var(--d,0) * 60ms)}
+@keyframes mkIn{from{opacity:0;scale:.3}}
+.mk .dia svg{width:17px;height:17px;transform:rotate(-45deg)}
+.mk .c{position:absolute;left:26px;top:-12px;display:grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#fff;color:#111;font:800 11px/1 var(--f)}
+.mk.smoke{color:var(--smoke)} .mk.flash{color:var(--flash)} .mk.molo{color:var(--molo)} .mk.he{color:var(--he)}
+.mk:focus-visible{outline:none}
+.mk:hover .dia,.mk:focus-visible .dia{background:#222;box-shadow:0 0 0 3px rgba(255,255,255,.4)}
+.mk[aria-pressed=true] .dia{background:currentColor;box-shadow:0 0 0 4px rgba(255,255,255,.25),0 0 24px currentColor}
+.mk[aria-pressed=true] .dia svg{color:#111}
+.tac.has-sel .mk:not([aria-pressed=true]) .dia{opacity:.4}
+.mk-l{padding:3px 6px;background:rgba(5,5,5,.8);font:650 11px/1 var(--f);color:var(--silver);white-space:nowrap;pointer-events:none;transform:scale(calc(1 / var(--k))) translate(-50%,24px)}
+.land{width:0;height:0;pointer-events:none;transform:scale(calc(1 / var(--k)))}
+.land .ring{position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:50%;border:2px dashed currentColor;background:rgba(5,5,5,.35);animation:landIn .5s var(--ease) both}
+@keyframes landIn{from{opacity:0;scale:1.8}}
+.land .ring::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:currentColor}
+.land.smoke{color:var(--smoke)} .land.flash{color:var(--flash)} .land.molo{color:var(--molo)} .land.he{color:var(--he)}
+.land.hl .ring{border-style:solid;box-shadow:0 0 0 6px rgba(255,255,255,.14)}
+.land .lb{position:absolute;left:0;top:20px;transform:translateX(-50%);padding:3px 6px;background:rgba(5,5,5,.85);border:1px solid currentColor;font:700 11px/1 var(--f);color:#fff;white-space:nowrap}
+.tac-tools{position:absolute;right:10px;top:10px;z-index:5;display:grid;gap:6px}
+.tac-tools .icon-btn{background:rgba(20,20,22,.92)}
+.tac-zoom{position:absolute;left:10px;bottom:10px;z-index:5;font:500 11px/1 var(--mono);color:var(--silver);background:rgba(5,5,5,.7);padding:5px 8px}
+.tac-help{grid-column:1;margin:-6px 0 0;font:400 12px/1.5 var(--mono);color:var(--dim)}
+
+.tac-panel{grid-column:2;grid-row:1 / span 2;position:sticky;top:132px;display:grid;gap:14px;padding:18px;min-height:200px}
+.tac-panel.flash{animation:bump 1.2s var(--ease)}
+.tp-h{display:grid;gap:6px}
+.tp-h .h3{font-size:22px}
+.legend{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.legend li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--silver)}
+.legend .mkl{display:grid;place-items:center;width:24px;height:24px;border:2px solid currentColor;border-radius:6px;transform:rotate(45deg)}
+.legend .mkl svg{width:13px;height:13px;transform:rotate(-45deg)}
+.legend .ring{width:22px;height:22px;border-radius:50%;border:2px dashed var(--silver)}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pitem{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;padding:8px;border:1px solid var(--line);background:#131315;text-decoration:none;transition:border-color .2s,transform .25s var(--ease);animation:rise .35s var(--ease) both;animation-delay:calc(var(--i,0) * 50ms)}
+.pitem:hover,.pitem:focus-visible{border-color:var(--line-3);transform:translateX(4px);outline:none}
+.pitem img{width:96px;aspect-ratio:16/9;object-fit:cover}
+.pitem .t{font:750 15px/1.2 var(--f)}
+.pitem .s{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px;font-size:12.5px;color:var(--muted)}
+.pitem .s svg{width:14px;height:7px;fill:var(--brand-hi)}
+.unplaced{font-size:13px;color:var(--dim)}
+
+@container site (max-width: 1100px){
+  .tac-wrap{grid-template-columns:minmax(0,1fr)}
+  .tac-panel{position:relative;top:0;grid-column:1;grid-row:auto}
+}
+@container site (max-width: 900px){
+  .mbar{top:52px}
+  .mhero{min-height:220px}
+  .modes [role=tab]{flex:1;justify-content:center;padding-inline:12px}
+}
+@container site (max-width: 560px){
+  .mbar .filters{gap:10px}
+  .tac{margin-inline:calc(var(--pad) * -1);border-inline:0}
+  .tac-note{font-size:11px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="visitor">
+  <div class="ribbon">Prototype · lineups et positions d’exemple, non vérifiés · radar et écrans officiels CS2 (Valve, extraits du jeu)</div>
+  <div id="nav-slot"></div>
+  <main id="main">
+    <header class="mhero">
+      <img id="hero-img" src="" alt="">
+      <ol class="crumbs"><li><a href="stuffs.html">Stuffs</a></li><li aria-current="page" id="crumb-map"></li></ol>
+      <h1 class="h1" id="map-title"></h1>
+      <div class="mstats" id="mstats"></div>
+      <div class="modes" role="tablist" aria-label="Mode d’affichage">
+        <button role="tab" id="tab-lib" aria-controls="lib" aria-selected="true" type="button"><svg aria-hidden="true"><use href="#i-grid"/></svg>Bibliothèque</button>
+        <button role="tab" id="tab-tac" aria-controls="tac-pane" aria-selected="false" tabindex="-1" type="button"><svg aria-hidden="true"><use href="#i-map"/></svg>Carte tactique</button>
+      </div>
+    </header>
+
+    <div class="mbar"><div class="filters" role="group" aria-label="Filtres">
+      <div class="tchips" id="types"></div>
+      <div class="seg" id="side" aria-label="Camp"><button type="button" data-v="all" aria-pressed="true">T + CT</button><button type="button" data-v="T" aria-pressed="false">T</button><button type="button" data-v="CT" aria-pressed="false">CT</button></div>
+      <div class="search"><svg aria-hidden="true"><use href="#i-search"/></svg><label class="sr" for="q">Rechercher une destination ou une position</label><input class="input" id="q" type="search" placeholder="Destination ou position…" autocomplete="off"></div>
+    </div></div>
+
+    <section class="pane" id="lib" role="tabpanel" aria-labelledby="tab-lib">
+      <div class="lib-head"><p class="count-line" id="lib-count" aria-live="polite"></p><a class="btn btn-steel btn-sm only-admin" href="admin.html#stuffs"><svg aria-hidden="true"><use href="#i-plus"/></svg>Ajouter un stuff</a></div>
+      <div class="sgrid" id="lib-grid"></div>
+    </section>
+
+    <section class="pane" id="tac-pane" role="tabpanel" aria-labelledby="tab-tac" hidden>
+      <p class="tac-note"><svg width="16" height="16" aria-hidden="true" style="flex:none;fill:currentColor"><use href="#i-pin"/></svg><span>Positions d’exemple placées à la main sur le radar officiel, non vérifiées. En vrai, l’admin les place depuis l’administration et rattache chaque stuff à sa position. Aucune trajectoire n’est dessinée : le trait relie seulement le point de lancer au point d’impact.</span></p>
+      <div class="tac-wrap">
+        <div class="tac-box">
+          <div class="tac" id="tac" tabindex="0" role="application" aria-roledescription="carte zoomable" aria-label="Vue aérienne. Plus et moins pour zoomer, flèches pour déplacer, 0 pour recentrer.">
+            <div class="tac-layer" id="layer"><img id="radar" alt="" draggable="false"><svg class="links" id="links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg><div id="marks"></div></div>
+          </div>
+          <div class="tac-tools"><button class="icon-btn" type="button" id="zin" aria-label="Zoomer"><svg aria-hidden="true"><use href="#i-plus"/></svg></button><button class="icon-btn" type="button" id="zout" aria-label="Dézoomer"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><button class="icon-btn" type="button" id="zfit" aria-label="Recentrer la carte"><svg aria-hidden="true"><use href="#i-fit"/></svg></button></div>
+          <span class="tac-zoom" id="zlabel" aria-hidden="true">×1,0</span>
+        </div>
+        <p class="tac-help">Molette ou pincement pour zoomer · glisser pour déplacer · double-clic pour zoomer · clavier : + − flèches 0</p>
+        <aside class="tac-panel card" id="panel" aria-live="polite"></aside>
+      </div>
+    </section>
+  </main>
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script src="assets/stuffs.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.LFE_DATA, L = window.LFE, S = window.LFE_STUFF, I = S.icon;
+  var slug = new URLSearchParams(location.search).get('m') || 'mirage';
+  var map = D.mapBy(slug) || D.maps[0]; slug = map.slug;
+  var all = D.stuffsOf(slug), positions = D.positions[slug] || [];
+  var f = S.readFilters();
+
+  document.title = map.name + ' · Stuffs · LaFineEquipe';
+  var hero = document.getElementById('hero-img'); hero.src = map.hero; hero.style.viewTransitionName = 'map-' + slug;
+  document.getElementById('crumb-map').textContent = map.name;
+  document.getElementById('map-title').textContent = map.name;
+  var c = D.counts(slug);
+  document.getElementById('mstats').innerHTML = '<span><b>' + c.total + '</b> lineup' + (c.total > 1 ? 's' : '') + '</span>'
+    + ['smoke', 'flash', 'molo', 'he'].filter(function (t) { return c[t]; }).map(function (t) { return '<span style="color:var(--' + t + ')">' + I(D.types[t].icon) + '<b style="color:inherit">' + c[t] + '</b>' + D.types[t].label + '</span>'; }).join('')
+    + '<span>' + I('i-pin') + positions.length + ' position' + (positions.length > 1 ? 's' : '') + ' placée' + (positions.length > 1 ? 's' : '') + '</span>';
+
+  /* ---------- Filtres (partagés par les deux modes, conservés dans l'URL) ---------- */
+  function renderTypeChips() {
+    document.getElementById('types').innerHTML = [['all', 'Tous', null]].concat(['smoke', 'flash', 'molo', 'he'].map(function (t) { return [t, D.types[t].label, D.types[t].icon]; })).map(function (t) {
+      var n = t[0] === 'all' ? all.length : c[t[0]];
+      return '<button type="button" class="tchip ' + t[0] + '" data-v="' + t[0] + '" aria-pressed="' + (f.type === t[0]) + '">' + (t[2] ? I(t[2]) : '') + t[1] + '<span class="n">' + n + '</span></button>';
+    }).join('');
+  }
+  function syncSide() { document.querySelectorAll('#side button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === f.side)); }); }
+  function filtered() { return all.filter(function (s) { return S.match(s, f); }); }
+  function apply(animate) {
+    S.writeFilters(f);
+    renderTypeChips(); syncSide();
+    var res = filtered(), grid = document.getElementById('lib-grid');
+    document.getElementById('lib-count').textContent = res.length + ' lineup' + (res.length > 1 ? 's' : '') + ' sur ' + all.length + (f.type !== 'all' || f.side !== 'all' || f.q ? ' (filtres actifs)' : '');
+    var paint = function () {
+      grid.innerHTML = res.length ? res.map(function (s, i) { return S.card(s, i); }).join('')
+        : '<div class="empty"><strong>' + (all.length ? 'Aucun lineup avec ces filtres' : 'Aucun lineup sur ' + map.name + ' pour l’instant') + '</strong>' + (all.length ? '<button class="btn btn-ghost btn-sm" type="button" id="reset">Réinitialiser les filtres</button>' : '<span>Les premiers lineups seront ajoutés par l’admin.</span>') + '</div>';
+      grid.querySelectorAll('.rv').forEach(function (el) { el.classList.add('in'); });
+    };
+    if (animate) L.flip(grid, paint); else paint();
+    renderMarks();
+  }
+  document.getElementById('types').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { f.type = b.getAttribute('data-v'); apply(true); } });
+  document.getElementById('side').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { f.side = b.getAttribute('data-v'); apply(true); } });
+  var qEl = document.getElementById('q'); qEl.value = f.q;
+  qEl.addEventListener('input', function () { f.q = qEl.value.trim(); apply(false); });
+  document.getElementById('lib').addEventListener('click', function (e) { if (e.target.id === 'reset') { f = { type: 'all', side: 'all', q: '' }; qEl.value = ''; apply(true); } });
+
+  /* ---------- Onglets Bibliothèque / Carte tactique ---------- */
+  var tabs = [document.getElementById('tab-lib'), document.getElementById('tab-tac')];
+  function setMode(mode, focus) {
+    var tac = mode === 'tac';
+    tabs[0].setAttribute('aria-selected', String(!tac)); tabs[1].setAttribute('aria-selected', String(tac));
+    tabs[0].tabIndex = tac ? -1 : 0; tabs[1].tabIndex = tac ? 0 : -1;
+    var lib = document.getElementById('lib'), tp = document.getElementById('tac-pane');
+    lib.hidden = tac; tp.hidden = !tac;
+    (tac ? tp : lib).classList.remove('enter'); void (tac ? tp : lib).offsetWidth; (tac ? tp : lib).classList.add('enter');
+    history.replaceState(null, '', location.pathname + location.search + (tac ? '#carte' : ''));
+    if (tac) fit(false);
+    if (focus) tabs[tac ? 1 : 0].focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { setMode(i ? 'tac' : 'lib'); });
+    t.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setMode(i ? 'lib' : 'tac', true); } });
+  });
+
+  /* ---------- Carte tactique : zoom / déplacement ---------- */
+  var tac = document.getElementById('tac'), layer = document.getElementById('layer'), radar = document.getElementById('radar');
+  radar.src = map.radar;
+  var view = { k: 1, x: 0, y: 0 };
+  function size() { return tac.clientWidth; }
+  function setView(k, x, y, animate) {
+    var s = size();
+    k = Math.min(5, Math.max(1, k));
+    x = Math.min(0, Math.max(s - s * k, x)); y = Math.min(0, Math.max(s - s * k, y));
+    view = { k: k, x: x, y: y };
+    layer.classList.toggle('anim', !!animate && !L.reduced());
+    layer.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + k + ')';
+    layer.style.setProperty('--k', k);
+    document.getElementById('zlabel').textContent = '×' + k.toFixed(1).replace('.', ',');
+  }
+  function zoomAt(factor, cx, cy, animate) {
+    var k2 = Math.min(5, Math.max(1, view.k * factor)), r = k2 / view.k;
+    setView(k2, cx - (cx - view.x) * r, cy - (cy - view.y) * r, animate);
+  }
+  function fit(animate) { setView(1, 0, 0, animate); }
+  function local(e) { var r = tac.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  tac.addEventListener('wheel', function (e) { e.preventDefault(); var p = local(e); zoomAt(Math.exp(-e.deltaY * 0.0016), p[0], p[1], false); }, { passive: false });
+  tac.addEventListener('dblclick', function (e) { if (e.target.closest('.mk')) return; var p = local(e); zoomAt(1.8, p[0], p[1], true); });
+  var ptrs = new Map(), drag = null, moved = 0;
+  tac.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('.mk')) { moved = 0; return; } // un appui sur un marqueur reste un clic
+    tac.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId, local(e)); moved = 0;
+    if (ptrs.size === 1) drag = { x: view.x, y: view.y, p: local(e) };
+    if (ptrs.size === 2) { var a = Array.from(ptrs.values()); drag = { pinch: true, d: Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]), k: view.k, x: view.x, y: view.y, m: [(a[0][0] + a[1][0]) / 2, (a[0][1] + a[1][1]) / 2] }; }
+  });
+  tac.addEventListener('pointermove', function (e) {
+    if (!ptrs.has(e.pointerId) || !drag) return;
+    ptrs.set(e.pointerId, local(e));
+    if (drag.pinch && ptrs.size === 2) {
+      var a = Array.from(ptrs.values()), d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]), m = [(a[0][0] + a[1][0]) / 2, (a[0][1] + a[1][1]) / 2];
+      var k2 = Math.min(5, Math.max(1, drag.k * d / drag.d)), r = k2 / drag.k;
+      setView(k2, m[0] - (drag.m[0] - drag.x) * r, m[1] - (drag.m[1] - drag.y) * r, false); moved = 99;
+    } else if (!drag.pinch) {
+      var p = local(e), dx = p[0] - drag.p[0], dy = p[1] - drag.p[1];
+      moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+      if (moved > 4) { tac.classList.add('dragging'); setView(view.k, drag.x + dx, drag.y + dy, false); }
+    }
+  });
+  function endPtr(e) { ptrs.delete(e.pointerId); if (ptrs.size === 0) { drag = null; tac.classList.remove('dragging'); } else if (ptrs.size === 1) { var p = Array.from(ptrs.values())[0]; drag = { x: view.x, y: view.y, p: p }; } }
+  tac.addEventListener('pointerup', endPtr); tac.addEventListener('pointercancel', endPtr);
+  tac.addEventListener('keydown', function (e) {
+    var s = size() / 2, step = 50;
+    if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomAt(1.4, s, s, true); }
+    else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomAt(1 / 1.4, s, s, true); }
+    else if (e.key === '0') { e.preventDefault(); fit(true); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); setView(view.k, view.x + step, view.y, true); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); setView(view.k, view.x - step, view.y, true); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setView(view.k, view.x, view.y + step, true); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); setView(view.k, view.x, view.y - step, true); }
+    else if (e.key === 'Escape' && sel) { select(null); }
+  });
+  document.getElementById('zin').addEventListener('click', function () { var s = size() / 2; zoomAt(1.4, s, s, true); });
+  document.getElementById('zout').addEventListener('click', function () { var s = size() / 2; zoomAt(1 / 1.4, s, s, true); });
+  document.getElementById('zfit').addEventListener('click', function () { fit(true); });
+  window.addEventListener('resize', function () { setView(view.k, view.x, view.y, false); });
+
+  /* ---------- Marqueurs : une position de lancer × un type de grenade ---------- */
+  var sel = null;
+  function groups() {
+    var g = {}, order = [];
+    filtered().forEach(function (s) {
+      if (!s.from) return;
+      var key = s.from + '|' + s.type;
+      if (!g[key]) { g[key] = { key: key, pos: D.position(slug, s.from), type: s.type, items: [] }; order.push(key); }
+      g[key].items.push(s);
+    });
+    return order.map(function (k) { return g[k]; });
+  }
+  function renderMarks() {
+    var gs = groups(), marks = document.getElementById('marks');
+    if (sel && !gs.some(function (g) { return g.key === sel; })) sel = null;
+    var byPos = {};
+    gs.forEach(function (g) { (byPos[g.pos.id] = byPos[g.pos.id] || []).push(g); });
+    var html = '';
+    Object.keys(byPos).forEach(function (pid) {
+      var list = byPos[pid], pos = list[0].pos;
+      list.forEach(function (g, i) {
+        var ox = (i - (list.length - 1) / 2) * 40;
+        html += '<button type="button" class="mk ' + g.type + '" data-key="' + g.key + '" style="left:' + pos.x + '%;top:' + pos.y + '%;--ox:' + ox + 'px;--d:' + i + '" aria-pressed="' + (sel === g.key) + '" aria-label="' + D.types[g.type].label + ' depuis ' + D.esc(pos.name) + ' : ' + g.items.length + ' lineup' + (g.items.length > 1 ? 's' : '') + '">'
+          + '<span class="dia">' + I(D.types[g.type].icon) + '</span>' + (g.items.length > 1 ? '<span class="c" aria-hidden="true">' + g.items.length + '</span>' : '') + '</button>';
+      });
+      html += '<span class="mk-l" style="left:' + pos.x + '%;top:' + pos.y + '%">' + D.esc(pos.name) + '</span>';
+    });
+    var cur = gs.filter(function (g) { return g.key === sel; })[0], lines = '';
+    if (cur) {
+      cur.items.forEach(function (s) {
+        if (!s.land) return;
+        html += '<span class="land ' + s.type + '" data-land="' + s.id + '" style="left:' + s.land[0] + '%;top:' + s.land[1] + '%"><span class="ring"></span><span class="lb">' + D.esc(s.to) + '</span></span>';
+        lines += '<line data-line="' + s.id + '" x1="' + cur.pos.x + '" y1="' + cur.pos.y + '" x2="' + s.land[0] + '" y2="' + s.land[1] + '"/>';
+      });
+    }
+    marks.innerHTML = html;
+    document.getElementById('links').innerHTML = lines;
+    tac.classList.toggle('has-sel', !!cur);
+    renderPanel(gs, cur);
+  }
+  function renderPanel(gs, cur) {
+    var panel = document.getElementById('panel');
+    var unplaced = filtered().filter(function (s) { return !s.from; }).length;
+    if (!positions.length) {
+      panel.innerHTML = '<div class="tp-h"><span class="kicker">Carte tactique</span><span class="h3">Aucune position placée</span></div><p class="muted" style="margin:0">Les lineups de ' + map.name + ' n’ont pas encore de position sur le radar. Ils restent consultables dans la bibliothèque.</p><a class="btn btn-steel btn-sm only-admin" href="admin.html#positions">Placer des positions</a>';
+      return;
+    }
+    if (!cur) {
+      var cnt = {}; gs.forEach(function (g) { cnt[g.type] = (cnt[g.type] || 0) + g.items.length; });
+      panel.innerHTML = '<div class="tp-h"><span class="kicker">Carte tactique</span><span class="h3">Choisis un point de lancer</span></div>'
+        + '<p class="muted" style="margin:0;font-size:14.5px">Chaque losange est une position de lancer, de la couleur et du pictogramme de la grenade. Le chiffre indique le nombre de lineups.</p>'
+        + '<ul class="legend">' + ['smoke', 'flash', 'molo', 'he'].map(function (t) { return '<li style="color:var(--' + t + ')"><span class="mkl">' + I(D.types[t].icon) + '</span><span style="color:var(--silver)">' + D.types[t].label + ' · ' + (cnt[t] || 0) + ' visible' + ((cnt[t] || 0) > 1 ? 's' : '') + '</span></li>'; }).join('')
+        + '<li><span class="ring"></span>Point d’impact (affiché après sélection)</li></ul>'
+        + (unplaced ? '<p class="unplaced">' + unplaced + ' lineup' + (unplaced > 1 ? 's' : '') + ' sans position placée : voir la bibliothèque.</p>' : '')
+        + (gs.length ? '' : '<p class="unplaced">Aucun marqueur avec ces filtres.</p>');
+      return;
+    }
+    panel.innerHTML = '<div class="tp-h"><span class="kicker">Depuis</span><span class="h3">' + D.esc(cur.pos.name) + '</span><span>' + S.nade(cur.type) + '</span></div>'
+      + '<ul class="plist">' + cur.items.map(function (s, i) {
+        return '<li><a class="pitem" style="--i:' + i + '" href="fiche.html?id=' + s.id + '" data-hl="' + s.id + '"><img src="' + s.img[0] + '" alt="" loading="lazy"><span><span class="t">' + D.esc(s.title) + '</span><span class="s">' + I('i-arrow') + D.esc(s.to) + ' · ' + s.tech + ' · ' + S.side(s.side) + '</span></span></a></li>';
+      }).join('') + '</ul><button class="btn btn-ghost btn-sm" type="button" id="unsel">Fermer la sélection</button>';
+    panel.classList.remove('flash'); void panel.offsetWidth; panel.classList.add('flash');
+  }
+  function select(key) {
+    sel = sel === key ? null : key;
+    renderMarks();
+    if (sel && getComputedStyle(document.getElementById('panel')).position !== 'sticky') document.getElementById('panel').scrollIntoView({ behavior: L.reduced() ? 'auto' : 'smooth', block: 'nearest' });
+  }
+  document.getElementById('marks').addEventListener('click', function (e) {
+    var b = e.target.closest('.mk'); if (!b || moved > 4) return;
+    select(b.getAttribute('data-key'));
+  });
+  var panelEl = document.getElementById('panel');
+  panelEl.addEventListener('click', function (e) { if (e.target.id === 'unsel') { select(null); tac.focus(); } });
+  function hl(id, on) {
+    var a = document.querySelector('[data-land="' + id + '"]'), l = document.querySelector('[data-line="' + id + '"]');
+    if (a) a.classList.toggle('hl', on); if (l) l.classList.toggle('hl', on);
+  }
+  ['mouseover', 'focusin'].forEach(function (ev) { panelEl.addEventListener(ev, function (e) { var a = e.target.closest('[data-hl]'); if (a) hl(a.getAttribute('data-hl'), true); }); });
+  ['mouseout', 'focusout'].forEach(function (ev) { panelEl.addEventListener(ev, function (e) { var a = e.target.closest('[data-hl]'); if (a) hl(a.getAttribute('data-hl'), false); }); });
+
+  apply(false);
+  if (location.hash === '#carte') setMode('tac');
+  L.mount({ active: 'map' });
+})();
+</script>
+</body>
+</html>

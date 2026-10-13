@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stuffs Mirage · Forge V2 · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/v2.css">
+<style>
+.mhero{position:relative;display:grid;align-content:end;gap:18px;min-height:440px;padding:clamp(30px,5cqi,70px) var(--pad) 34px;isolation:isolate;overflow:hidden}
+.mhero .art{position:absolute;inset:0;z-index:-2;background:url(assets/maps/mirage.svg) center 58%/cover no-repeat}
+.mhero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.9),rgba(5,5,5,.3) 62%,rgba(5,5,5,.6)),linear-gradient(0deg,var(--void),transparent 60%)}
+.crumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:600 13px/1 var(--f);color:var(--muted)}
+.crumb a{text-decoration:none}
+.crumb a:hover{color:#fff}
+.mhero .display{font-size:clamp(68px,13cqi,190px)}
+.mhero-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 30px}
+.counts{display:flex;flex-wrap:wrap;gap:10px 26px;list-style:none;margin:0;padding:0}
+.counts li{display:flex;align-items:center;gap:8px;font:600 15px/1 var(--f)}
+.counts b{font-size:30px;font-variant-numeric:tabular-nums}
+.counts svg{width:21px;height:21px}
+.n-smoke{color:var(--smoke)}.n-flash{color:var(--flash)}.n-molo{color:var(--molo)}.n-he{color:var(--he)}
+/* Grandes cartes de maps */
+.mapstrip{display:flex;gap:8px;overflow-x:auto;padding:16px var(--pad) 18px;background:var(--void);scrollbar-width:thin}
+.mcard{position:relative;flex:0 0 168px;height:96px;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 12px 24px;text-decoration:none;isolation:isolate;clip-path:polygon(18px 0,100% 0,calc(100% - 18px) 100%,0 100%);background:center 60%/cover no-repeat;transition:transform .2s}
+.mcard::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(5,5,5,.92),rgba(5,5,5,.3));transition:background .2s}
+.mcard b{font:800 18px/1 var(--f);font-stretch:108%}
+.mcard span{font:400 11px/1.4 var(--mono);color:var(--silver)}
+.mcard:hover{transform:translateY(-3px)}
+.mcard[aria-current="page"]::before{background:linear-gradient(0deg,rgba(227,8,14,.94),rgba(227,8,14,.3))}
+.mcard:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #fff}
+/* Barre de navigation rapide */
+.tools{position:sticky;top:63px;z-index:20;display:grid;gap:10px;padding:12px var(--pad);background:rgba(8,7,7,.96);border-block:1px solid var(--line);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.tools-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.tools-row .grp{display:flex;align-items:center;gap:4px;flex-wrap:nowrap}
+.tools-row .glbl{font:600 11px/1 var(--f);font-stretch:112%;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-right:6px}
+.chip{position:relative;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:8px 13px;background:transparent;border:0;cursor:pointer;font:700 13.5px/1 var(--f);color:var(--muted);isolation:isolate;white-space:nowrap}
+.chip::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant));border:1px solid var(--line-2);transition:background .2s,border-color .2s}
+.chip:hover{color:#fff}
+.chip[aria-pressed="true"]{color:#fff}
+.chip[aria-pressed="true"]::before{background:rgba(227,8,14,.18);border-color:var(--brand-hi)}
+.chip.side[aria-pressed="true"]::before{background:linear-gradient(100deg,#ff2a1f,#b8060b);border-color:transparent}
+.chip svg{width:16px;height:16px}
+.chip em{font-style:normal;font:600 11px/1 var(--mono);color:var(--dim)}
+.chip:focus-visible{outline:none}
+.chip:focus-visible::before{box-shadow:inset 0 0 0 2px #fff}
+.search{position:relative;flex:1 1 220px;max-width:360px;margin-left:auto}
+.search input{width:100%;min-height:42px;padding:10px 14px 10px 40px;background:var(--steel);border:1px solid var(--line-2);border-radius:4px;color:#fff;font:400 15px/1.2 var(--f)}
+.search input::placeholder{color:var(--dim)}
+.search input:focus{outline:none;border-color:var(--brand-hi);box-shadow:0 0 0 1px var(--brand-hi)}
+.search svg{position:absolute;left:13px;top:50%;width:17px;height:17px;margin-top:-8.5px;color:var(--dim)}
+.count{font:400 12px/1 var(--mono);color:var(--dim);white-space:nowrap}
+/* Grille */
+.lib{padding:clamp(26px,4cqi,50px) var(--pad) clamp(60px,7cqi,100px)}
+.zone-h{display:flex;align-items:baseline;gap:14px;margin:36px 0 14px}
+.zone-h:first-child{margin-top:0}
+.zone-h h2{margin:0;font:800 clamp(24px,2.8cqi,36px)/1 var(--f);font-stretch:112%;letter-spacing:-.02em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.card{position:relative;display:grid;grid-template-rows:auto 1fr;text-decoration:none;background:var(--ink-2);border:1px solid var(--line);clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%);transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s}
+.card:hover{transform:translateY(-4px);border-color:var(--line-2)}
+.card:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #fff}
+.shot{position:relative;aspect-ratio:16/9;max-width:100%;overflow:hidden;background-repeat:no-repeat;background-size:280% auto;display:grid;place-items:center}
+.shot::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,16,17,1),rgba(18,16,17,.55) 60%,rgba(18,16,17,.4))}
+.shot .ph{position:relative;display:grid;justify-items:center;gap:6px;font:600 12px/1.3 var(--f);color:var(--silver);text-align:center}
+.shot .ph svg{width:26px;height:26px;opacity:.7}
+.shot .fake{position:absolute;top:10px;right:10px;padding:4px 7px;font:600 10px/1 var(--mono);color:var(--amber);background:rgba(5,5,5,.8);border:1px solid rgba(245,165,36,.4)}
+.shot .tb{position:absolute;top:10px;left:10px;display:flex;gap:6px}
+.nb{display:inline-flex;align-items:center;gap:6px;padding:5px 9px 5px 7px;background:rgba(5,5,5,.86);font:700 11.5px/1 var(--f);border-radius:3px}
+.nb svg{width:14px;height:14px}
+.sb{display:inline-grid;place-items:center;min-width:32px;padding:5px 7px;font:800 11.5px/1 var(--f);border-radius:3px}
+.sb.t{background:#3a1508;color:#ffcfb8}
+.sb.ct{background:#13263a;color:#cfe4f8}
+.card .body{display:grid;gap:9px;align-content:start;padding:14px 18px 20px}
+.card h3{margin:0;font:700 19px/1.15 var(--f);font-stretch:104%}
+.route{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13.5px}
+.route dt{color:var(--dim)}
+.route dd{margin:0;color:var(--white);font-weight:600}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:13px;color:var(--muted)}
+.tech{padding:3px 8px;background:var(--steel-2);border-radius:3px;color:var(--silver);font-weight:600}
+.ver{font:400 11px/1.3 var(--mono);color:var(--dim)}
+.ver.old{color:var(--amber)}
+.card .admin-edit{position:absolute;bottom:14px;right:28px;font:600 12px/1 var(--f);color:var(--silver)}
+.empty{display:none;padding:40px 22px;border:1px dashed var(--line-2);text-align:center;color:var(--muted)}
+.empty strong{display:block;margin-bottom:8px;font:700 22px/1.1 var(--f);color:#fff}
+.lib.is-empty .empty{display:block}
+.fake-note{margin:0 0 22px;padding:12px 14px;border:1px dashed rgba(245,165,36,.4);color:var(--amber);font:400 12px/1.5 var(--mono)}
+
+@container site (max-width: 900px){
+  .mhero{min-height:330px;padding-top:24px}
+  .tools{top:53px}
+  .tools-row{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .tools-row::-webkit-scrollbar{display:none}
+  .search{max-width:none;margin-left:0}
+  .tools-row.r-search{flex-wrap:wrap}
+  .mcard{flex-basis:132px;height:78px}
+}
+@container site (max-width: 560px){
+  .counts b{font-size:24px}
+  .grid{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="member" data-live="live" data-fresh="ok">
+  <div id="nav-slot"></div>
+  <div class="ribbon">Prototype Forge V2 · stuffs fictifs pour la mise en page · ce ne sont pas de vraies lineups</div>
+
+  <section class="mhero">
+    <div class="art" aria-hidden="true"></div>
+    <p class="crumb"><a href="home.html#stuffs">Stuffs</a><span aria-hidden="true">/</span><span>Mirage</span></p>
+    <div class="mhero-row">
+      <h1 class="display metal">Mirage</h1>
+      <a class="btn btn-red only-admin" href="stuff-fiche.html">+ Ajouter un stuff</a>
+    </div>
+    <ul class="counts">
+      <li class="n-smoke"><svg aria-hidden="true"><use href="#g-smoke"/></svg><b>9</b>smokes</li>
+      <li class="n-flash"><svg aria-hidden="true"><use href="#g-flash"/></svg><b>7</b>flashs</li>
+      <li class="n-molo"><svg aria-hidden="true"><use href="#g-molo"/></svg><b>5</b>molotovs</li>
+      <li class="n-he"><svg aria-hidden="true"><use href="#g-he"/></svg><b>3</b>HE</li>
+    </ul>
+  </section>
+  <nav class="mapstrip" id="mapstrip" aria-label="Choisir une map"></nav>
+
+  <div class="tools" id="tools">
+    <div class="tools-row">
+      <div class="grp" role="group" aria-label="Camp"><span class="glbl">Camp</span>
+        <button class="chip side" type="button" data-side="all" aria-pressed="true">Tous</button>
+        <button class="chip side" type="button" data-side="T" aria-pressed="false">T</button>
+        <button class="chip side" type="button" data-side="CT" aria-pressed="false">CT</button></div>
+      <div class="grp" role="group" aria-label="Type de grenade"><span class="glbl">Grenade</span>
+        <button class="chip n-smoke" type="button" data-type="smoke" aria-pressed="false"><svg aria-hidden="true"><use href="#g-smoke"/></svg>Smoke</button>
+        <button class="chip n-flash" type="button" data-type="flash" aria-pressed="false"><svg aria-hidden="true"><use href="#g-flash"/></svg>Flash</button>
+        <button class="chip n-molo" type="button" data-type="molo" aria-pressed="false"><svg aria-hidden="true"><use href="#g-molo"/></svg>Molotov</button>
+        <button class="chip n-he" type="button" data-type="he" aria-pressed="false"><svg aria-hidden="true"><use href="#g-he"/></svg>HE</button></div>
+      <div class="grp" role="group" aria-label="Zone"><span class="glbl">Zone</span>
+        <button class="chip" type="button" data-zone="A" aria-pressed="false">Site A</button>
+        <button class="chip" type="button" data-zone="Mid" aria-pressed="false">Mid</button>
+        <button class="chip" type="button" data-zone="B" aria-pressed="false">Site B</button></div>
+    </div>
+    <div class="tools-row r-search">
+      <label class="search"><span class="sr">Rechercher un stuff</span><svg aria-hidden="true"><use href="#i-search"/></svg><input id="q" type="search" placeholder="Fenêtre, jungle, jumpthrow…" autocomplete="off"></label>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <main class="lib" id="lib">
+    <p class="fake-note">Exemples fictifs : les titres et positions servent à la mise en page. Les captures seront prises par la team, et chaque stuff sera vérifié en jeu avant publication.</p>
+    <div id="zones"></div>
+    <div class="empty"><strong>Aucun stuff pour ces filtres</strong>Essaie un autre camp ou une autre zone.</div>
+  </main>
+
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/v2.js"></script>
+<script>
+(function () {
+  var D = window.LFE_DATA;
+  LFE.mount({ active: 'stuffs', demo: ['view', 'role'] });
+  var TYPES = { smoke: 'Smoke', flash: 'Flash', molo: 'Molotov', he: 'HE' };
+  var ZONES = { A: 'Site A', Mid: 'Mid', B: 'Site B' };
+  var stuffs = [
+    { t: 'Smoke fenêtre', type: 'smoke', side: 'T', zone: 'Mid', from: 'T spawn', to: 'Fenêtre', tech: 'Jumpthrow', ver: '01/10/2026', vid: true, bx: 10 },
+    { t: 'Smoke CT', type: 'smoke', side: 'T', zone: 'A', from: 'T ramp', to: 'CT', tech: 'Lancer debout', ver: '01/10/2026', vid: true, bx: 70 },
+    { t: 'Smoke jungle', type: 'smoke', side: 'T', zone: 'A', from: 'T ramp', to: 'Jungle', tech: 'Jumpthrow', ver: '01/10/2026', vid: false, bx: 55 },
+    { t: 'Smoke stairs', type: 'smoke', side: 'T', zone: 'A', from: 'Tetris', to: 'Stairs', tech: 'Lancer debout', ver: null, vid: false, bx: 40 },
+    { t: 'Pop flash palace', type: 'flash', side: 'T', zone: 'A', from: 'Palace', to: 'Site A', tech: 'Lancer debout', ver: '28/09/2026', vid: true, bx: 85 },
+    { t: 'Molotov firebox', type: 'molo', side: 'T', zone: 'A', from: 'Tetris', to: 'Firebox', tech: 'Lancer en courant', ver: '01/10/2026', vid: false, bx: 30 },
+    { t: 'Smoke short', type: 'smoke', side: 'T', zone: 'Mid', from: 'Top mid', to: 'Short', tech: 'Jumpthrow', ver: '30/09/2026', vid: true, bx: 20 },
+    { t: 'Flash sortie apps', type: 'flash', side: 'T', zone: 'B', from: 'Apps', to: 'Site B', tech: 'Lancer sauté', ver: '01/10/2026', vid: false, bx: 60 },
+    { t: 'Molotov bench', type: 'molo', side: 'T', zone: 'B', from: 'Apps', to: 'Bench', tech: 'Lancer debout', ver: '01/10/2026', vid: true, bx: 75 },
+    { t: 'Smoke kitchen', type: 'smoke', side: 'T', zone: 'B', from: 'Apps', to: 'Kitchen', tech: 'Jumpthrow', ver: null, vid: false, bx: 45 },
+    { t: 'HE top mid', type: 'he', side: 'CT', zone: 'Mid', from: 'CT spawn', to: 'Top mid', tech: 'Lancer debout', ver: '01/10/2026', vid: false, bx: 5 },
+    { t: 'Molotov underpass', type: 'molo', side: 'CT', zone: 'Mid', from: 'Kitchen', to: 'Underpass', tech: 'Lancer en courant', ver: '01/10/2026', vid: true, bx: 90 },
+    { t: 'Smoke top mid', type: 'smoke', side: 'CT', zone: 'Mid', from: 'Connector', to: 'Top mid', tech: 'Lancer debout', ver: '01/10/2026', vid: false, bx: 35 }
+  ];
+  var state = { side: 'all', types: [], zones: [], q: '' };
+
+  document.getElementById('mapstrip').innerHTML = D.maps.map(function (m) {
+    var tot = m.s + m.f + m.m + m.h;
+    return '<a class="mcard" href="' + (m.slug === 'mirage' ? 'stuffs.html' : '#') + '"' + (m.slug === 'mirage' ? ' aria-current="page"' : '') + ' style="background-image:url(assets/maps/' + m.slug + '.svg)"><b>' + m.name + '</b><span>' + tot + ' stuffs</span></a>';
+  }).join('');
+
+  function norm(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function match(s) {
+    if (state.side !== 'all' && s.side !== state.side) return false;
+    if (state.types.length && state.types.indexOf(s.type) < 0) return false;
+    if (state.zones.length && state.zones.indexOf(s.zone) < 0) return false;
+    if (state.q && norm([s.t, s.from, s.to, s.tech, TYPES[s.type], ZONES[s.zone]].join(' ')).indexOf(norm(state.q)) < 0) return false;
+    return true;
+  }
+  function card(s) {
+    return '<a class="card" href="stuff-fiche.html">'
+      + '<div class="shot" style="background-image:url(assets/maps/mirage.svg);background-position:' + s.bx + '% 45%">'
+      + '<span class="tb"><span class="nb n-' + s.type + '"><svg aria-hidden="true"><use href="#g-' + s.type + '"/></svg>' + TYPES[s.type] + '</span><span class="sb ' + s.side.toLowerCase() + '">' + s.side + '</span></span>'
+      + '<span class="fake">Exemple fictif</span>'
+      + '<span class="ph"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1.5 2H20a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3.5L9 4zm3 4a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zm0 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z"/></svg>Capture du placement à fournir</span></div>'
+      + '<div class="body"><h3>' + D.esc(s.t) + '</h3>'
+      + '<dl class="route"><dt>Départ</dt><dd>' + D.esc(s.from) + '</dd><dt>Arrivée</dt><dd>' + D.esc(s.to) + '</dd></dl>'
+      + '<div class="meta"><span class="tech">' + s.tech + '</span>' + (s.vid ? '<span>Vidéo dispo</span>' : '')
+      + (s.ver ? '<span class="ver">Vérifié le ' + s.ver + '</span>' : '<span class="ver old">À revérifier · MAJ 22/09</span>') + '</div></div>'
+      + '<span class="admin-edit only-admin">Modifier</span></a>';
+  }
+  function render() {
+    var list = stuffs.filter(match);
+    document.getElementById('count').textContent = list.length + ' stuff' + (list.length > 1 ? 's' : '') + ' sur ' + stuffs.length;
+    document.getElementById('lib').classList.toggle('is-empty', !list.length);
+    document.getElementById('zones').innerHTML = ['A', 'Mid', 'B'].map(function (z) {
+      var items = list.filter(function (s) { return s.zone === z; });
+      if (!items.length) return '';
+      return '<div class="zone-h"><h2>' + ZONES[z] + '</h2><span class="mono">' + items.length + ' stuff' + (items.length > 1 ? 's' : '') + '</span></div><div class="grid">' + items.map(card).join('') + '</div>';
+    }).join('');
+  }
+  render();
+  function toggleIn(a, v) { var i = a.indexOf(v); if (i < 0) a.push(v); else a.splice(i, 1); }
+  document.querySelectorAll('[data-side]').forEach(function (b) { b.addEventListener('click', function () { state.side = b.dataset.side; document.querySelectorAll('[data-side]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); }); render(); }); });
+  document.querySelectorAll('[data-type]').forEach(function (b) { b.addEventListener('click', function () { toggleIn(state.types, b.dataset.type); b.setAttribute('aria-pressed', String(state.types.indexOf(b.dataset.type) >= 0)); render(); }); });
+  document.querySelectorAll('[data-zone]').forEach(function (b) { b.addEventListener('click', function () { toggleIn(state.zones, b.dataset.zone); b.setAttribute('aria-pressed', String(state.zones.indexOf(b.dataset.zone) >= 0)); render(); }); });
+  document.getElementById('q').addEventListener('input', function (e) { state.q = e.target.value.trim(); render(); });
+})();
+</script>
+</body>
+</html>

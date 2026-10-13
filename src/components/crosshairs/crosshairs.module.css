@@ -1,0 +1,221 @@
+/* Crosshairs (référence : design/forge-v2-final/crosshairs.html). */
+.compat {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 28px var(--pad) 0;
+  padding: 14px 18px;
+  border: 1px solid rgba(245, 165, 36, 0.4);
+  background: rgba(245, 165, 36, 0.07);
+  font-size: 14.5px;
+  color: var(--silver);
+}
+.compat b {
+  color: var(--amber);
+}
+.compat svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--amber);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  height: 100%;
+  background: linear-gradient(180deg, #19191c, #111113);
+  border: 1px solid var(--line);
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.25s;
+}
+.card:hover,
+.card:focus-within {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.prev {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, #1b1b1f, #0b0b0c 70%);
+}
+.prev img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.4);
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.card:hover .prev img {
+  transform: scale(1.5);
+}
+.prev svg {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+.ind {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.55);
+  font: 500 10px/1 var(--mono);
+  color: rgba(255, 255, 255, 0.75);
+}
+.noPrev {
+  font: 500 12px/1 var(--mono);
+  color: var(--dim);
+}
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px 16px;
+}
+.body > :global(.chip) {
+  justify-self: start;
+  white-space: normal;
+  line-height: 1.3;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.head > div {
+  min-width: 0;
+}
+.head h3 {
+  margin: 0;
+  font: 800 18px/1.15 var(--f);
+  overflow-wrap: anywhere;
+}
+.own {
+  font-size: 13px;
+  color: var(--muted);
+}
+.params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.params li {
+  padding: 4px 7px;
+  background: var(--steel-2);
+  font: 600 11.5px/1 var(--mono);
+  color: var(--silver);
+}
+.notes {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+.code {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  border: 1px solid var(--line-2);
+}
+.code code {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  overflow: hidden;
+  background: #0b0b0c;
+  font: 600 12px/1.3 var(--mono);
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.code button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-left: 1px solid var(--line-2);
+  background: var(--steel-2);
+  font: 700 13px/1 var(--f);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.code button:hover {
+  background: var(--brand-hi);
+}
+.code button[data-done] {
+  background: var(--win);
+  color: var(--win-ink);
+}
+.code button svg {
+  width: 15px;
+  height: 15px;
+}
+.howto {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: h;
+}
+.howto li {
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: #121214;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.howto li::before {
+  counter-increment: h;
+  content: counter(h);
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 10px;
+  background: var(--brand-hi);
+  font: 900 14px/1 var(--f);
+  color: #fff;
+  transform: skewX(var(--slant));
+}
+.howto b {
+  display: block;
+  margin-bottom: 6px;
+  font: 800 15px/1.2 var(--f);
+  color: #fff;
+}
+
+@container site (max-width: 900px) {
+  .howto {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container site (max-width: 560px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

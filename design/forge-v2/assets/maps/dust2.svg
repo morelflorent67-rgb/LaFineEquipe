@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+<title>Dust II (illustration provisoire LaFineEquipe)</title>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#060505"/><stop offset=".42" stop-color="#1c0404"/><stop offset=".64" stop-color="#5e0707"/><stop offset=".718" stop-color="#b30e0c"/><stop offset=".72" stop-color="#0c0606"/><stop offset="1" stop-color="#050505"/>
+</linearGradient>
+<radialGradient id="sun" cx=".5" cy=".72" r=".42"><stop offset="0" stop-color="#ff3b22" stop-opacity=".8"/><stop offset=".5" stop-color="#d0120e" stop-opacity=".25"/><stop offset="1" stop-color="#d0120e" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#sky)"/>
+<rect width="1600" height="900" fill="url(#sun)"/>
+<g fill="#2b0707"><rect x="0" y="560" width="300" height="90"/><rect x="260" y="590" width="260" height="60"/><rect x="1050" y="540" width="240" height="110"/><rect x="1260" y="575" width="340" height="75"/></g>
+<g fill="#130404"><path fill-rule="evenodd" d="M520 660 V470 H1080 V660 Z M690 660 V560 A110 110 0 0 1 910 560 V660 Z"/><rect x="500" y="455" width="600" height="22"/><rect x="380" y="560" width="100" height="100"/><path d="M386 566 L474 654 M474 566 L386 654" stroke="#2a0808" stroke-width="5"/><rect x="420" y="470" width="90" height="90"/><path d="M426 476 L504 554 M504 476 L426 554" stroke="#2a0808" stroke-width="5"/><rect x="1150" y="600" width="200" height="60"/></g>
+<g fill="#070505"><rect x="0" y="690" width="420" height="210"/><rect x="430" y="650" width="120" height="120"/><path d="M436 656 L544 764 M544 656 L436 764" stroke="#2a0808" stroke-width="5"/><rect x="1180" y="640" width="130" height="130"/><path d="M1186 646 L1304 764 M1304 646 L1186 764" stroke="#2a0808" stroke-width="5"/><rect x="1320" y="680" width="90" height="90"/><path d="M1326 686 L1404 764 M1404 686 L1326 764" stroke="#2a0808" stroke-width="5"/><rect x="1420" y="620" width="180" height="280"/><rect y="770" width="1600" height="130"/></g>
+<rect y="648" width="1600" height="2" fill="#ff3b22" opacity=".35"/>
+</svg>

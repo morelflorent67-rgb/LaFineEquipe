@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forge · LaFineEquipe</title>
+<script>if(/[?&]shot=1/.test(location.search))document.documentElement.classList.add("capture-mode");if(location.search.indexOf("narrow=1")>-1)document.documentElement.classList.add("capture-narrow")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+/* ---------- Hero ---------- */
+.hero{position:relative;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);align-items:center;gap:2cqi;padding:clamp(36px,5cqi,80px) var(--pad) clamp(96px,11cqi,170px);isolation:isolate;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-20% -15% -10% 35%;z-index:-2;background:radial-gradient(closest-side at 58% 46%,rgba(255,42,31,.42),rgba(227,8,14,.14) 46%,transparent 76%);animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.8}50%{opacity:1}}
+.hero::after{content:"";position:absolute;left:-10%;right:-10%;top:62%;height:1px;z-index:-1;background:linear-gradient(90deg,transparent 5%,rgba(255,42,31,.75) 42%,rgba(255,255,255,.55) 56%,transparent 80%);transform:rotate(-6deg)}
+.hero-copy{position:relative;z-index:1;min-width:0}
+.hero-copy .t-label{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hero h1{margin-top:22px}
+.hero h1 span{display:inline-block;padding-right:.08em}
+.lede{max-width:46ch;margin:26px 0 0;font-size:clamp(16px,1.35cqi,19px);color:var(--muted)}
+.lede strong{color:var(--white);font-weight:600}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:0;margin:40px 0 0;padding:0}
+.hero-stats div{position:relative;padding:4px 30px 4px 0;margin-right:26px}
+.hero-stats div+div::before{content:"";position:absolute;left:-28px;top:6px;bottom:6px;width:1px;background:var(--line-2);transform:skewX(var(--slant))}
+.hero-stats dt{font:600 10.5px/1.2 var(--f);font-stretch:125%;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.hero-stats dd{margin:6px 0 0;font-size:clamp(40px,4.2cqi,60px);line-height:.9}
+.hero-stats dd small{font-size:.45em;color:var(--dim);margin-left:2px}
+.hero-stats dd .red{color:var(--red-hi)}
+.hero-emblem{position:relative;justify-self:center;width:min(100%,600px);aspect-ratio:1;display:grid;place-items:center}
+.hero-emblem::before{content:"";position:absolute;inset:-4%;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.22) 0 .5deg,transparent .5deg 7.5deg);-webkit-mask:radial-gradient(circle,transparent 64.5%,#000 65%,#000 67%,transparent 67.5%);mask:radial-gradient(circle,transparent 64.5%,#000 65%,#000 67%,transparent 67.5%)}
+.hero-emblem::after{content:"";position:absolute;inset:6%;border-radius:50%;border:1px solid rgba(255,255,255,.06);box-shadow:inset 0 0 120px rgba(227,8,14,.18)}
+.hero-emblem img{position:relative;z-index:1;width:100%;height:auto;filter:drop-shadow(0 30px 60px rgba(0,0,0,.8))}
+
+/* ---------- En ce moment ---------- */
+.now{background:var(--ink)}
+.fight{position:relative;display:grid;grid-template-rows:auto 1fr auto;gap:22px;min-height:360px;padding:24px clamp(16px,3cqi,40px);overflow:hidden;isolation:isolate;border:1px solid var(--line-2)}
+.fight-bg{position:absolute;inset:0;z-index:-2;background:url(assets/maps/mirage.svg) center 60%/cover no-repeat;transform:scale(1.05)}
+.fight::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.82),rgba(5,5,5,.12) 50%,rgba(5,5,5,.82)),linear-gradient(0deg,rgba(5,5,5,.88),transparent 45%)}
+.fight::after{content:"";position:absolute;inset:10px;pointer-events:none;
+  background:
+   linear-gradient(var(--red-hi),var(--red-hi)) left top/22px 2px no-repeat,linear-gradient(var(--red-hi),var(--red-hi)) left top/2px 22px no-repeat,
+   linear-gradient(var(--red-hi),var(--red-hi)) right top/22px 2px no-repeat,linear-gradient(var(--red-hi),var(--red-hi)) right top/2px 22px no-repeat,
+   linear-gradient(var(--silver),var(--silver)) left bottom/22px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) left bottom/2px 22px no-repeat,
+   linear-gradient(var(--silver),var(--silver)) right bottom/22px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) right bottom/2px 22px no-repeat}
+.fight-top{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.live-tag{display:inline-flex;align-items:center;gap:9px;padding:8px 16px 8px 14px;background:var(--red);color:#fff;font:italic 800 13px/1 var(--f);font-stretch:125%;letter-spacing:.16em;text-transform:uppercase;clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%)}
+.verif{font-family:var(--mono);font-size:11.5px;color:var(--silver)}
+.verif b{color:#fff;font-weight:600}
+.plates{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center}
+.plate{position:relative;padding:22px clamp(18px,3cqi,40px);min-width:0;isolation:isolate}
+.plate::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant))}
+.plate-us::before{background:linear-gradient(100deg,rgba(255,42,31,.95),rgba(110,0,0,.9));box-shadow:0 0 50px rgba(255,42,31,.28)}
+.plate-them{text-align:right}
+.plate-them::before{background:linear-gradient(260deg,rgba(46,46,51,.95),rgba(18,18,20,.92));outline:1px solid var(--line-2)}
+.plate .t-label{color:rgba(255,255,255,.75)}
+.plate strong{display:block;margin-top:8px;font:italic 800 clamp(22px,2.8cqi,40px)/1 var(--f);font-stretch:112%;overflow-wrap:anywhere}
+.tracked{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tracked span{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;background:rgba(0,0,0,.45);font:600 12px/1 var(--mono);color:#fff;border-radius:20px}
+.tracked img{width:22px;height:22px;border-radius:50%;background:#1a1a1d}
+.plate-them .note{margin-top:12px;font:400 12px/1.4 var(--mono);color:var(--muted)}
+.vs{position:relative;z-index:2;width:82px;height:82px;margin-inline:-18px;display:grid;place-items:center;background:var(--void);border:1px solid var(--line-2);transform:rotate(45deg);box-shadow:0 0 0 6px rgba(5,5,5,.6)}
+.vs span{transform:rotate(-45deg);font:italic 900 22px/1 var(--f);font-stretch:125%}
+.fight-foot{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:baseline}
+.fight-foot .map{font:italic 900 clamp(30px,3.4cqi,46px)/1 var(--f);font-stretch:125%}
+.fight-foot .meta{color:var(--silver);font-size:15px}
+.fight-foot .meta i{font-style:normal;color:var(--dim)}
+.fight-foot a{margin-left:auto}
+.results{margin-top:44px}
+.results-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.res-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.res{display:grid;grid-template-columns:62px minmax(120px,170px) 96px minmax(0,1fr) auto;align-items:center;gap:18px;padding:8px 16px 8px 0;background:linear-gradient(90deg,rgba(255,255,255,.04),transparent 75%);border-left:2px solid transparent;transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.res:hover{transform:translateX(6px);border-left-color:var(--red-hi);background:linear-gradient(90deg,rgba(255,42,31,.08),transparent 75%)}
+.wl{height:42px;display:grid;place-items:center;font:italic 900 19px/1 var(--f);font-stretch:125%;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.wl.w{background:var(--red);color:#fff}
+.wl.l{background:var(--steel-3);color:var(--silver)}
+.res .mapc{position:relative;height:42px;display:flex;align-items:center;padding-left:14px;font:italic 800 16px/1 var(--f);font-stretch:112%;background:center 62%/cover no-repeat;isolation:isolate;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.res .mapc::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.85),rgba(5,5,5,.35))}
+.res .score{font-size:28px;line-height:1}
+.res .score i{font-style:normal;color:var(--dim);margin:0 4px}
+.res .who{font-size:14px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res .who b{color:var(--white);font-weight:600}
+
+/* ---------- ELO Run ---------- */
+.run{background:url(assets/grain.png) repeat,linear-gradient(180deg,var(--void),#0a0606 60%,var(--void));overflow:hidden}
+.backword{position:absolute;right:-3cqi;top:1cqi;z-index:0;margin:0;font:italic 900 33cqi/.8 var(--f);font-stretch:125%;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.075);pointer-events:none;user-select:none}
+.run-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,2fr);gap:clamp(28px,4.5cqi,72px);align-items:start}
+.run-meta{position:sticky;top:110px;display:grid;gap:22px;align-content:start}
+.run-meta h2{margin-top:-4px}
+.ring{position:relative;width:200px;height:200px}
+.ring svg{width:100%;height:100%}
+.ring .c{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .c b{font-size:64px;line-height:.8}
+.ring .c span{font:600 10.5px/1.6 var(--f);font-stretch:125%;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.run-meta p{margin:0;color:var(--muted);font-size:15px}
+.run-meta p.mono{font-size:11px;color:var(--dim)}
+.run-meta p.mono.stale{color:var(--amber)}
+.toggle{display:inline-flex;gap:4px}
+.toggle button{position:relative;white-space:nowrap;padding:11px 18px;background:transparent;border:0;cursor:pointer;font:italic 800 14px/1 var(--f);font-stretch:112%;color:var(--muted);isolation:isolate}
+.toggle button::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant));border:1px solid var(--line-2);transition:background .2s}
+.toggle button:hover{color:#fff}
+.toggle button[aria-pressed="true"]{color:#fff}
+.toggle button[aria-pressed="true"]::before{background:linear-gradient(100deg,#ff2a1f,#b8060b);border-color:transparent}
+.toggle button:focus-visible{outline:none}
+.toggle button:focus-visible::before{box-shadow:inset 0 0 0 2px #fff}
+.board{transition:opacity .18s ease,transform .18s ease}
+.board.swap{opacity:0;transform:translateY(8px)}
+.podium{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:clamp(10px,1.4cqi,20px)}
+.pod{position:relative;display:grid;justify-items:center;align-content:end;text-align:center;padding:26px 14px 24px;isolation:isolate;min-width:0}
+.pod::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(var(--slant));background:linear-gradient(180deg,#26262b,#0e0e10 85%);border:1px solid var(--line-2)}
+.pod.p1{order:2;min-height:380px}
+.pod.p2{order:1;min-height:320px}
+.pod.p3{order:3;min-height:290px}
+.pod.p1::before{background:linear-gradient(180deg,#ff2a1f 0%,#a30008 55%,#3a0000 100%);border-color:rgba(255,120,100,.5);box-shadow:0 30px 80px rgba(227,8,14,.38)}
+.pod .rk{position:absolute;top:8px;left:18px;font:italic 900 74px/.8 var(--f);font-stretch:125%;color:rgba(255,255,255,.14)}
+.pod.p1 .rk{color:rgba(255,255,255,.3)}
+.pod .ava{--s:96px}
+.pod.p1 .ava{--s:120px}
+.pod .nm{margin-top:14px;font:italic 800 clamp(16px,1.6cqi,21px)/1.1 var(--f);font-stretch:112%;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .val{margin-top:10px;font-size:clamp(46px,5.2cqi,76px);line-height:.85}
+.pod .sub{margin-top:8px;font:400 11px/1.4 var(--mono);color:rgba(255,255,255,.7)}
+.pod .tag{position:absolute;top:14px;right:16px;font:italic 800 10px/1 var(--f);font-stretch:125%;letter-spacing:.2em;text-transform:uppercase;padding:5px 8px;background:var(--void);color:#fff;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
+.bars{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:4px}
+.bar-row{display:grid;grid-template-columns:42px 44px minmax(100px,170px) minmax(0,1fr) 82px;align-items:center;gap:14px;padding:8px 6px;border-bottom:1px solid var(--line)}
+.bar-row .rk{font:italic 900 26px/1 var(--f);font-stretch:125%;color:var(--dim)}
+.bar-row .ava{--s:42px;padding:3px}
+.bar-row .ava .lv{display:none}
+.bar-row .nm{min-width:0}
+.bar-row .nm b{display:block;font:italic 800 17px/1.1 var(--f);font-stretch:112%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-row .nm span{font:400 10.5px/1.5 var(--mono);color:var(--dim)}
+.track{position:relative;height:16px;background:rgba(255,255,255,.035)}
+.track .axis{position:absolute;left:50%;top:-6px;bottom:-6px;width:1px;background:var(--line-2)}
+.fill{position:absolute;top:0;bottom:0;animation:grow .8s cubic-bezier(.2,.8,.2,1) both}
+.fill.pos{left:50%;transform-origin:left;background:linear-gradient(90deg,#b8060b,#ff2a1f);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.fill.neg{right:50%;transform-origin:right;background:linear-gradient(270deg,#3d3d43,#6a6a72);clip-path:polygon(8px 0,100% 0,100% 100%,0 100%)}
+.fill.elo{left:0;transform-origin:left;background:linear-gradient(90deg,#2b2b30,#a9a9b0);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+@keyframes grow{from{transform:scaleX(0)}}
+.bar-row .v{text-align:right;font-size:28px;line-height:1}
+.v.up{color:var(--white)} .v.down{color:var(--dim)}
+.v .s{font-size:.6em;margin-right:2px}
+.run-src{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:22px}
+
+/* ---------- La team ---------- */
+.team{background:var(--ink-2)}
+.roster{list-style:none;margin:0;padding:0;display:flex;gap:12px;height:460px}
+.pl{position:relative;flex:1 1 0;min-width:0;transition:flex-grow .5s cubic-bezier(.2,.8,.2,1)}
+.pl.is-open{flex-grow:2.7}
+.pl a{position:absolute;inset:0;display:block;text-decoration:none;overflow:hidden;isolation:isolate;clip-path:polygon(64px 0,100% 0,calc(100% - 64px) 100%,0 100%);background:linear-gradient(180deg,#1d1d21,#0b0b0d 80%)}
+.pl a::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#ff2a1f,#7a0000 70%,#1a0000);opacity:0;transition:opacity .35s}
+.pl.is-open a::before{opacity:1}
+.pl a:focus-visible{outline:none}
+.pl a:focus-visible::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px #fff}
+.pl .sil{position:absolute;left:50%;bottom:-8px;width:min(300px,170%);max-width:none;transform:translateX(-50%);opacity:.92;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.pl.is-open .sil{transform:translateX(-30%) scale(1.06)}
+.pl .vname{position:absolute;left:50%;bottom:26px;margin:0;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);font:italic 900 30px/1 var(--f);font-stretch:125%;white-space:nowrap;text-shadow:0 2px 20px rgba(0,0,0,.9);transition:opacity .25s}
+.pl.is-open .vname{opacity:0}
+.pl.is-open .roster-tag{opacity:1}
+.pl .info{position:absolute;left:34px;right:76px;bottom:28px;display:grid;gap:10px;opacity:0;transform:translateY(12px);transition:opacity .3s .1s,transform .3s .1s}
+.pl.is-open .info{opacity:1;transform:none}
+.pl .info h3{margin:0;font:italic 900 clamp(24px,2.5cqi,36px)/.95 var(--f);overflow-wrap:anywhere;font-stretch:125%;letter-spacing:-.02em;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.pl .info .row{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
+.pl .info .row div{display:grid}
+.pl .info .row span{font:600 10px/1.3 var(--f);font-stretch:125%;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.pl .info .row b{font-size:40px;line-height:.9}
+.pl .info .links{display:flex;gap:14px;font:600 13px/1 var(--f);color:#fff}
+.pl .roster-tag{position:absolute;top:22px;right:70px;opacity:0;transition:opacity .25s;font:italic 800 10px/1 var(--f);font-stretch:125%;letter-spacing:.22em;text-transform:uppercase;padding:6px 9px;background:rgba(5,5,5,.75);color:var(--silver);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
+.team-note{margin-top:18px}
+
+/* ---------- Clips ---------- */
+.clips{background:var(--void)}
+.mosaic{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);grid-template-rows:1fr 1fr;gap:14px;height:min(52cqi,560px);min-height:420px}
+.clip{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:clamp(16px,2cqi,28px);text-decoration:none;overflow:hidden;isolation:isolate;clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%)}
+.clip.feature{grid-row:1 / 3}
+.clip .th{position:absolute;inset:0;z-index:-3;background:center/cover no-repeat;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.clip::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(0deg,rgba(5,5,5,.95),rgba(5,5,5,.15) 60%),linear-gradient(90deg,rgba(5,5,5,.5),transparent)}
+.clip .scan{position:absolute;left:0;right:0;top:-40%;height:40%;z-index:-1;background:linear-gradient(180deg,transparent,rgba(255,42,31,.22),transparent);transition:top .8s ease}
+.clip:hover .th{transform:scale(1.05)}
+.clip:hover .scan{top:100%}
+.clip .prov{position:absolute;top:16px;left:16px;font:italic 800 10.5px/1 var(--f);font-stretch:125%;letter-spacing:.2em;text-transform:uppercase;padding:6px 10px;background:rgba(5,5,5,.8);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.clip .play{position:absolute;top:50%;left:50%;width:76px;height:76px;margin:-38px 0 0 -38px;display:grid;place-items:center;border-radius:50%;background:rgba(5,5,5,.55);border:1.5px solid rgba(255,255,255,.55);transition:transform .25s,background .25s,border-color .25s}
+.clip .play svg{width:30px;height:30px;fill:#fff;margin-left:5px}
+.clip:hover .play{transform:scale(1.08);background:var(--red);border-color:var(--red-hi)}
+.clip:not(.feature) .play{width:56px;height:56px;margin:-28px 0 0 -28px}
+.clip:not(.feature) .play svg{width:22px;height:22px}
+.clip h3{margin:0;font:italic 800 clamp(20px,2.2cqi,30px)/1 var(--f);font-stretch:112%;max-width:22ch}
+.clip.feature h3{font-size:clamp(28px,3.6cqi,54px);font-weight:900;font-stretch:125%;letter-spacing:-.02em}
+.clip .meta{font:400 11.5px/1.4 var(--mono);color:var(--silver)}
+.clips-note{margin-top:16px}
+
+/* ---------- Stuffs ---------- */
+.stuffs{background:linear-gradient(180deg,var(--ink),var(--void))}
+.maps{display:flex;gap:8px;height:440px}
+.mp{position:relative;flex:1 1 0;min-width:0;display:block;text-decoration:none;overflow:hidden;isolation:isolate;clip-path:polygon(40px 0,100% 0,calc(100% - 40px) 100%,0 100%);transition:flex-grow .55s cubic-bezier(.2,.8,.2,1)}
+.mp.is-open{flex-grow:4.2}
+.mp .art{position:absolute;inset:0;z-index:-2;background:center/cover no-repeat;filter:grayscale(.45) brightness(.85) contrast(1.05);transform:scale(1.08);transition:filter .5s,transform .7s cubic-bezier(.2,.8,.2,1)}
+.mp.is-open .art{filter:none;transform:scale(1)}
+.mp::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(5,5,5,.92),rgba(5,5,5,.1) 55%)}
+.mp:focus-visible{outline:none}
+.mp:focus-visible::before{content:"";position:absolute;inset:0;z-index:2;box-shadow:inset 0 0 0 3px #fff}
+.mp .vname{position:absolute;left:50%;bottom:28px;margin:0;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);font:italic 900 32px/1 var(--f);font-stretch:125%;white-space:nowrap;transition:opacity .25s}
+.mp.is-open .vname{opacity:0}
+.mp .open{position:absolute;left:64px;right:64px;bottom:30px;display:grid;gap:14px;opacity:0;transform:translateY(14px);transition:opacity .3s .12s,transform .3s .12s}
+.mp.is-open .open{opacity:1;transform:none}
+.mp .open h3{margin:0;font:italic 900 clamp(40px,5.4cqi,80px)/.85 var(--f);font-stretch:125%;letter-spacing:-.03em}
+.nades{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0;padding:0;list-style:none}
+.nades li{display:flex;align-items:center;gap:7px;font:600 14px/1 var(--f)}
+.nades li b{font-size:24px;line-height:1}
+.nades svg{width:18px;height:18px}
+.n-smoke{color:#C9CDD4}.n-flash{color:#F6E27A}.n-molo{color:#FF8A3D}.n-he{color:#8BE3A6}
+.mp .go{display:inline-flex;align-items:center;gap:10px;font:italic 800 14px/1 var(--f);font-stretch:112%}
+.mp .go svg{width:20px;height:9px;fill:var(--red-hi)}
+.mp .total{position:absolute;top:20px;left:50%;transform:translateX(-50%);white-space:nowrap;font:italic 800 12px/1 var(--f);font-stretch:112%;color:var(--silver);opacity:.85;transition:left .4s}
+.mp.is-open .total{left:auto;right:56px;transform:none}
+.maps-note{margin-top:16px}
+
+/* ---------- Mobile ---------- */
+@container site (max-width: 900px){
+  .hero{grid-template-columns:minmax(0,1fr);text-align:left;padding-top:20px}
+  .hero-emblem{order:-1;width:min(78%,360px);margin-bottom:-10px}
+  .run-grid{grid-template-columns:minmax(0,1fr)}
+  .run-meta{position:static;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:14px 18px}
+  .run-meta > *{grid-column:1}
+  .run-meta .ring{grid-column:2;grid-row:1 / span 2;width:132px;height:132px}
+  .run-meta .ring .c b{font-size:40px}
+  .roster{height:auto;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;scrollbar-width:thin}
+  .pl{flex:0 0 268px;height:400px;scroll-snap-align:start}
+  .pl.is-open{flex-grow:0}
+  .pl .vname{opacity:0}
+  .pl .info{opacity:1;transform:none;left:30px;right:52px}
+  .pl .info h3{font-size:21px;letter-spacing:-.03em;overflow-wrap:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pl .info .row b{font-size:32px}
+  .pl a{clip-path:polygon(36px 0,100% 0,calc(100% - 36px) 100%,0 100%)}
+  .pl a::before{opacity:.0}
+  .pl:first-child a::before{opacity:1}
+  .pl .sil{transform:translateX(-50%)}
+  .pl .roster-tag{right:44px;opacity:1}
+  .maps{flex-direction:column;height:auto}
+  .mp{flex:none;height:92px;clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%);transition:height .45s cubic-bezier(.2,.8,.2,1)}
+  .mp.is-open{height:230px}
+  .mp .vname{writing-mode:horizontal-tb;transform:none;left:20px;bottom:26px;font-size:28px}
+  .mp .open{left:20px;right:20px;bottom:20px}
+  .mp .total,.mp.is-open .total{left:auto;right:34px;transform:none}
+}
+@container site (max-width: 640px){
+  .hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:32px}
+  .hero-stats div{padding:0;margin:0}
+  .hero-stats div+div::before{left:-8px}
+  .hero-stats dt{font-size:9.5px;letter-spacing:.2em}
+  .hero-stats dd{font-size:38px}
+  .ctas .btn{flex:1 1 auto;justify-content:center}
+  .plates{grid-template-columns:minmax(0,1fr)}
+  .vs{margin:-14px auto;width:60px;height:60px}
+  .vs span{font-size:16px}
+  .plate-them{text-align:left}
+  .fight-foot a{margin-left:0}
+  .res{grid-template-columns:48px minmax(0,1fr) auto;gap:12px}
+  .res .who{grid-column:2 / 4;white-space:normal;margin-top:-4px}
+  .res .score{grid-column:3;grid-row:1}
+  .res .mapc{grid-column:2;grid-row:1}
+  .podium{gap:6px}
+  .pod{padding:18px 6px 16px}
+  .pod.p1{min-height:270px}.pod.p2{min-height:236px}.pod.p3{min-height:216px}
+  .pod .ava{--s:62px}.pod.p1 .ava{--s:76px}
+  .pod .rk{font-size:44px;left:10px}
+  .pod .tag{display:none}
+  .pod .val{font-size:40px}
+  .pod .sub{font-size:9.5px}
+  .bar-row{grid-template-columns:30px 36px minmax(0,1fr) 62px;gap:10px}
+  .bar-row .ava{--s:36px}
+  .bar-row .track{grid-column:2 / 5;grid-row:2;height:10px}
+  .bar-row .v{font-size:24px}
+  .mosaic{grid-template-columns:minmax(0,1fr);grid-template-rows:none;height:auto;min-height:0}
+  .clip{min-height:200px}
+  .clip.feature{grid-row:auto;min-height:300px}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-spk" viewBox="0 0 20 40"><path d="M10 0 L15 24 L10 40 L5 24 Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 44 20"><path d="M0 8 H30 L26 0 L44 10 L26 20 L30 12 H0 Z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M5 2 L22 12 L5 22 L9 12 Z"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.4l-8.3 8.3-1.4-1.4L17.6 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></symbol>
+  <symbol id="g-smoke" viewBox="0 0 24 24"><path d="M7 19a4.5 4.5 0 0 1-.7-8.95A6 6 0 0 1 17.6 8.6 5 5 0 0 1 17.5 19H7z"/></symbol>
+  <symbol id="g-flash" viewBox="0 0 24 24"><path d="M12 1 L14 9 L22 6 L16 12 L22 18 L14 15 L12 23 L10 15 L2 18 L8 12 L2 6 L10 9 Z"/></symbol>
+  <symbol id="g-molo" viewBox="0 0 24 24"><path d="M12 1c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z"/></symbol>
+  <symbol id="g-he" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M10 1h4v3h-4z M12 5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 0 1 0-17z M12 9a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9z"/></symbol>
+</svg>
+
+<div class="stage" id="stage">
+<div class="phone">
+<div class="site" id="site" data-live="live" data-fresh="ok">
+
+  <header class="nav" id="nav">
+    <a class="brand" href="#top" aria-label="LaFineEquipe, accueil">
+      <img src="assets/lfe-mark.webp" alt="" width="44" height="44">
+      <span class="brand-word">La <b>Fine</b> Equipe</span>
+    </a>
+    <nav class="menu" id="menu" aria-label="Menu principal">
+      <a href="#top" aria-current="page">Accueil</a>
+      <a href="#run">ELO Run</a>
+      <a href="#now">Matchs</a>
+      <a href="#clips">Clips</a>
+      <a href="#top">Crosshairs</a>
+      <a href="proto-b-stuffs.html">Stuffs</a>
+      <a href="#team">Joueurs</a>
+    </nav>
+    <a class="live-pill only-live" href="#now"><i class="dot"></i><span>1 match en cours</span></a>
+    <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu"><i></i>Menu</button>
+  </header>
+  <div class="demo-ribbon">Prototype · données de démonstration · aucune donnée FACEIT réelle</div>
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="hero-copy">
+      <p class="t-label">Team Counter-Strike 2 <svg class="spk" aria-hidden="true"><use href="#i-spk"/></svg> Communauté FACEIT</p>
+      <h1 class="t-hero"><span class="metal">La</span> <span class="ember">Fine</span><br><span class="metal">Equipe</span></h1>
+      <p class="lede">Le QG de la team : <strong>classement ELO</strong>, matchs, clips, crosshairs et <strong>stuffs map par map</strong>. Phrase d'accroche à écrire avec toi.</p>
+      <div class="ctas">
+        <a class="btn btn-red" href="#run">Voir l'ELO Run <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-steel" href="proto-b-stuffs.html">Ouvrir les stuffs</a>
+      </div>
+      <dl class="hero-stats">
+        <div><dt>Joueurs suivis</dt><dd class="t-num">8</dd></div>
+        <div><dt>ELO Run</dt><dd class="t-num">J12<small>/31</small></dd></div>
+        <div class="only-live"><dt>En game</dt><dd class="t-num"><span class="red">3</span><small>vérifié</small></dd></div>
+        <div class="only-none"><dt>En game</dt><dd class="t-num">0</dd></div>
+      </dl>
+    </div>
+    <div class="hero-emblem">
+      <img src="assets/lfe-emblem.webp" alt="Logo LaFineEquipe" width="760" height="725">
+    </div>
+    <svg class="cut" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,60 1000,0 1000,60" fill="#0B0909"/><polyline points="0,60 1000,0" fill="none" stroke="#FF2A1F" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>
+  </section>
+
+  <!-- EN CE MOMENT -->
+  <section class="sec now" id="now">
+    <div class="sec-h">
+      <div>
+        <div class="kicker"><svg class="spk" aria-hidden="true"><use href="#i-spk"/></svg><span class="t-label">Matchs FACEIT</span></div>
+        <h2 class="t-sec">En ce moment</h2>
+      </div>
+      <a class="more" href="#now">Tous les matchs <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+
+    <article class="fight only-live" aria-label="Match en cours sur Mirage">
+      <div class="fight-bg" aria-hidden="true"></div>
+      <div class="fight-top">
+        <span class="live-tag"><i class="dot"></i>En cours</span>
+        <span class="verif">Vérifié par FACEIT <b>il y a 1 min</b> · 14:31</span>
+      </div>
+      <div class="plates">
+        <div class="plate plate-us">
+          <span class="t-label">LaFineEquipe</span>
+          <strong>team_demo_alpha</strong>
+          <div class="tracked">
+            <span><img src="assets/player.svg" alt="">demo_alpha</span>
+            <span><img src="assets/player.svg" alt="">demo_bravo</span>
+            <span><img src="assets/player.svg" alt="">demo_foxtrot</span>
+          </div>
+        </div>
+        <div class="vs" aria-hidden="true"><span>VS</span></div>
+        <div class="plate plate-them">
+          <span class="t-label">Adversaires</span>
+          <strong>team_adverse</strong>
+          <p class="note">Score en direct non fourni par FACEIT</p>
+        </div>
+      </div>
+      <div class="fight-foot">
+        <span class="map">Mirage</span>
+        <span class="meta">Démarré à 14:05 <i>·</i> 5v5 matchmaking</span>
+        <a class="more" href="#now">Ouvrir sur FACEIT <svg class="ico" aria-hidden="true"><use href="#i-ext"/></svg></a>
+      </div>
+    </article>
+
+    <div class="state-note only-none"><strong>Personne en game pour l'instant.</strong><span class="mono">Dernier contrôle FACEIT : 14:32</span></div>
+    <div class="state-note only-na"><strong>Statut en direct non disponible.</strong><span>FACEIT ne permet pas encore de le vérifier pour nos joueurs. Les derniers matchs restent à jour ci-dessous.</span></div>
+
+    <div class="results">
+      <div class="results-h"><span class="t-label">Derniers résultats</span></div>
+      <ol class="res-list">
+        <li class="res"><span class="wl w">V</span><span class="mapc" style="background-image:url(assets/maps/inferno.svg)">Inferno</span><span class="score t-num">13<i>–</i>9</span><span class="who"><b>demo_charlie</b>, demo_hotel</span><span class="mono">Aujourd'hui 13:12</span></li>
+        <li class="res"><span class="wl l">D</span><span class="mapc" style="background-image:url(assets/maps/ancient.svg)">Ancient</span><span class="score t-num">10<i>–</i>13</span><span class="who"><b>demo_echo</b></span><span class="mono">Aujourd'hui 11:40</span></li>
+        <li class="res"><span class="wl w">V</span><span class="mapc" style="background-image:url(assets/maps/mirage.svg)">Mirage</span><span class="score t-num">13<i>–</i>6</span><span class="who"><b>demo_alpha</b>, demo_bravo, demo_foxtrot</span><span class="mono">Hier 22:31</span></li>
+        <li class="res"><span class="wl w">V</span><span class="mapc" style="background-image:url(assets/maps/nuke.svg)">Nuke</span><span class="score t-num">16<i>–</i>14</span><span class="who"><b>demo_delta</b></span><span class="mono">Hier 21:02</span></li>
+        <li class="res"><span class="wl l">D</span><span class="mapc" style="background-image:url(assets/maps/dust2.svg)">Dust II</span><span class="score t-num">7<i>–</i>13</span><span class="who"><b>demo_golf</b>, demo_hotel</span><span class="mono">Hier 19:47</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ELO RUN -->
+  <section class="sec run" id="run">
+    <p class="backword" aria-hidden="true">ELO</p>
+    <div class="run-grid">
+      <aside class="run-meta">
+        <div>
+          <div class="kicker"><svg class="spk" aria-hidden="true"><use href="#i-spk"/></svg><span class="t-label">ELO Run</span></div>
+          <h2 class="t-sec">Automne 2026</h2>
+        </div>
+        <div class="ring" role="img" aria-label="Jour 12 sur 31">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="url(#ringGrad)" stroke-width="10" stroke-dasharray="209 540" transform="rotate(-90 100 100)"/>
+            <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2a1f"/><stop offset="1" stop-color="#9a0000"/></linearGradient></defs>
+            <path d="M100 2 L104 12 L100 22 L96 12 Z" fill="#BDBDBD"/>
+            <path d="M100 178 L104 188 L100 198 L96 188 Z" fill="#BDBDBD"/>
+            <g transform="rotate(139.4 100 100)"><path d="M100 4 L106 14 L100 30 L94 14 Z" fill="#fff"/></g>
+          </svg>
+          <div class="c"><b class="t-num">J12</b><span>sur 31</span></div>
+        </div>
+        <p>Du 1er au 31 octobre · 8 participants · départ relevé le 01/10 à 00:05</p>
+        <div class="toggle" role="group" aria-label="Critère de classement">
+          <button type="button" data-mode="delta" aria-pressed="true">Progression</button>
+          <button type="button" data-mode="elo" aria-pressed="false">ELO actuel</button>
+        </div>
+        <p class="mono only-fresh">Source FACEIT Data API v4 · relevé 12/10 à 14:32</p>
+        <p class="mono stale only-stale">Données du 12/10 à 09:14 · FACEIT injoignable, valeurs conservées</p>
+      </aside>
+      <div class="board" id="board" aria-live="polite">
+        <ol class="podium" id="podium"></ol>
+        <ol class="bars" id="bars" start="4"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- LA TEAM -->
+  <section class="sec team" id="team">
+    <div class="sec-h">
+      <div>
+        <div class="kicker"><svg class="spk" aria-hidden="true"><use href="#i-spk"/></svg><span class="t-label">Le roster</span></div>
+        <h2 class="t-sec">La team</h2>
+      </div>
+      <a class="more" href="#team">Tous les joueurs <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+    <ul class="roster" id="roster"></ul>
+    <p class="mono team-note">Silhouettes de démonstration. En production : avatar FACEIT du joueur, passé dans le même cadre incliné.</p>
+  </section>
+
+  <!-- CLIPS -->
+  <section class="sec clips" id="clips">
+    <div class="sec-h">
+      <div>
+        <div class="kicker"><svg class="spk" aria-hidden="true"><use href="#i-spk"/></svg><span class="t-label">Highlights</span></div>
+        <h2 class="t-sec">Les clips</h2>
+      </div>
+      <a class="more" href="#clips">Tous les clips <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="mosaic">
+      <a class="clip feature" href="#clips">
+        <span class="th" style="background-image:url(assets/maps/inferno.svg)"></span><span class="scan"></span>
+        <span class="prov">YouTube</span>
+        <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
+        <h3>Clutch 1v3 à la banane</h3>
+        <span class="meta">demo_bravo · Inferno · 10/10/2026</span>
+      </a>
+      <a class="clip" href="#clips">
+        <span class="th" style="background-image:url(assets/maps/mirage.svg)"></span><span class="scan"></span>
+        <span class="prov">Twitch</span>
+        <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
+        <h3>Ace au pistol round</h3>
+        <span class="meta">demo_alpha · Mirage · 08/10/2026</span>
+      </a>
+      <a class="clip" href="#clips">
+        <span class="th" style="background-image:url(assets/maps/dust2.svg)"></span><span class="scan"></span>
+        <span class="prov">Allstar</span>
+        <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
+        <h3>Flick AWP au mid</h3>
+        <span class="meta">demo_echo · Dust II · 05/10/2026</span>
+      </a>
+    </div>
+    <p class="mono clips-note">Miniatures de démo. La vidéo ne se charge qu'au clic, depuis le fournisseur d'origine.</p>
+  </section>
+
+  <!-- STUFFS -->
+  <section class="sec stuffs" id="stuffs">
+    <div class="sec-h">
+      <div>
+        <div class="kicker"><svg class="spk" aria-hidden="true"><use href="#i-spk"/></svg><span class="t-label">Bibliothèque</span></div>
+        <h2 class="t-sec">Les stuffs, map par map</h2>
+      </div>
+      <a class="more" href="proto-b-stuffs.html">Voir la page Mirage <svg class="arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="maps" id="maps"></div>
+    <p class="mono maps-note">Illustrations provisoires dessinées pour le prototype. En production : captures prises par la team, passées dans le même traitement rouge et noir.</p>
+  </section>
+
+  <footer class="foot">
+    <p class="foot-word" aria-hidden="true">La<b>Fine</b>Equipe</p>
+    <div class="foot-row">
+      <span class="foot-brand"><img src="assets/lfe-mark.webp" alt="" width="36" height="36">Site communautaire, non affilié à FACEIT ni à Valve.</span>
+      <nav aria-label="Pied de page"><a href="#run">ELO Run</a><a href="#now">Matchs</a><a href="#clips">Clips</a><a href="proto-b-stuffs.html">Stuffs</a><a href="#top">Mentions</a></nav>
+      <span class="mono">Données joueurs : FACEIT Data API</span>
+    </div>
+  </footer>
+</div>
+</div>
+</div>
+
+<aside class="demo" id="demo" aria-label="Contrôles du prototype">
+  <b>B · Forge</b>
+  <div class="grp"><span>Vue</span><button type="button" data-view="desktop" aria-pressed="true">Desktop</button><button type="button" data-view="mobile" aria-pressed="false">Mobile 390</button></div>
+  <div class="grp"><span>Match</span><button type="button" data-live="live" aria-pressed="true">En cours</button><button type="button" data-live="none" aria-pressed="false">Aucun</button><button type="button" data-live="na" aria-pressed="false">Indisponible</button></div>
+  <div class="grp"><span>Données</span><button type="button" data-fresh="ok" aria-pressed="true">À jour</button><button type="button" data-fresh="stale" aria-pressed="false">Périmées</button></div>
+  <a class="hide-min" href="index.html">← Exploration</a>
+  <button type="button" id="demo-min" aria-pressed="false">Réduire</button>
+</aside>
+
+<script>
+(function () {
+  var players = [
+    { nick: 'demo_alpha',   elo: 2214, start: 2176, lvl: 10, roster: 'Team' },
+    { nick: 'demo_bravo',   elo: 1987, start: 2008, lvl: 9,  roster: 'Team' },
+    { nick: 'demo_charlie', elo: 1842, start: 1756, lvl: 9,  roster: 'Team' },
+    { nick: 'demo_delta',   elo: 1655, start: 1643, lvl: 8,  roster: 'Guest' },
+    { nick: 'demo_echo',    elo: 1503, start: 1547, lvl: 7,  roster: 'Team' },
+    { nick: 'demo_foxtrot', elo: 2051, start: 1990, lvl: 10, roster: 'Team' },
+    { nick: 'demo_golf',    elo: 1398, start: 1404, lvl: 7,  roster: 'Guest' },
+    { nick: 'demo_hotel',   elo: 1720, start: 1695, lvl: 8,  roster: 'Team' }
+  ];
+  var maps = [
+    { slug: 'mirage', name: 'Mirage', s: 9, f: 7, m: 5, h: 3, href: 'proto-b-stuffs.html' },
+    { slug: 'inferno', name: 'Inferno', s: 7, f: 5, m: 4, h: 2 },
+    { slug: 'dust2', name: 'Dust II', s: 6, f: 4, m: 3, h: 2 },
+    { slug: 'nuke', name: 'Nuke', s: 4, f: 3, m: 1, h: 1 },
+    { slug: 'ancient', name: 'Ancient', s: 3, f: 2, m: 1, h: 1 },
+    { slug: 'anubis', name: 'Anubis', s: 3, f: 1, m: 1, h: 1 },
+    { slug: 'train', name: 'Train', s: 2, f: 1, m: 1, h: 0 }
+  ];
+  var nf = { format: function (n) { return new Intl.NumberFormat('fr-FR').format(n).replace(/\u202f/g, '\u00a0'); } };
+  function delta(p) { return p.elo - p.start; }
+  function signed(n) { return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '±0'; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function ava(p, size) {
+    return '<span class="ava" style="--lvl:' + p.lvl + (size ? ';--s:' + size + 'px' : '') + '"><img src="assets/player.svg" alt=""><span class="lv">' + p.lvl + '</span></span>';
+  }
+
+  // ---- Classement ELO Run ----
+  var mode = 'delta';
+  var podium = document.getElementById('podium');
+  var bars = document.getElementById('bars');
+  var board = document.getElementById('board');
+  function renderRun() {
+    var sorted = players.slice().sort(function (a, b) { return mode === 'delta' ? delta(b) - delta(a) : b.elo - a.elo; });
+    podium.innerHTML = sorted.slice(0, 3).map(function (p, i) {
+      var main = mode === 'delta' ? signed(delta(p)) : nf.format(p.elo);
+      var sub = mode === 'delta' ? nf.format(p.start) + ' → ' + nf.format(p.elo) + ' ELO' : signed(delta(p)) + ' depuis le départ';
+      return '<li class="pod p' + (i + 1) + '"><span class="rk" aria-hidden="true">' + (i + 1) + '</span>'
+        + (i === 0 ? '<span class="tag">' + (mode === 'delta' ? 'Meilleure chauffe' : 'Top ELO') + '</span>' : '')
+        + ava(p) + '<span class="nm">' + esc(p.nick) + '</span>'
+        + '<span class="val t-num">' + main + '</span><span class="sub">' + sub + '</span></li>';
+    }).join('');
+    var rest = sorted.slice(3);
+    var maxAbs = Math.max.apply(null, players.map(function (p) { return Math.abs(delta(p)); }));
+    var maxElo = Math.max.apply(null, players.map(function (p) { return p.elo; }));
+    var minElo = Math.min.apply(null, players.map(function (p) { return p.elo; })) * 0.85;
+    bars.innerHTML = rest.map(function (p, i) {
+      var d = delta(p), fill, val;
+      if (mode === 'delta') {
+        var w = (Math.abs(d) / maxAbs * 50).toFixed(1);
+        fill = '<span class="axis"></span><span class="fill ' + (d >= 0 ? 'pos' : 'neg') + '" style="width:' + w + '%"></span>';
+        val = '<span class="v t-num ' + (d >= 0 ? 'up' : 'down') + '">' + signed(d) + '</span>';
+      } else {
+        var we = ((p.elo - minElo) / (maxElo - minElo) * 100).toFixed(1);
+        fill = '<span class="fill elo" style="width:' + we + '%"></span>';
+        val = '<span class="v t-num up">' + nf.format(p.elo) + '</span>';
+      }
+      return '<li class="bar-row"><span class="rk">' + (i + 4) + '</span>' + ava(p)
+        + '<span class="nm"><b>' + esc(p.nick) + '</b><span>' + nf.format(p.start) + ' → ' + nf.format(p.elo) + '</span></span>'
+        + '<span class="track">' + fill + '</span>' + val + '</li>';
+    }).join('');
+  }
+  renderRun();
+  document.querySelectorAll('.toggle button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.dataset.mode === mode) return;
+      mode = btn.dataset.mode;
+      document.querySelectorAll('.toggle button').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+      board.classList.add('swap');
+      setTimeout(function () { renderRun(); board.classList.remove('swap'); }, 180);
+    });
+  });
+
+  // ---- Roster ----
+  var roster = document.getElementById('roster');
+  var team = players.slice().sort(function (a, b) { return (a.roster === b.roster ? 0 : a.roster === 'Team' ? -1 : 1) || b.elo - a.elo; }).slice(0, 6);
+  roster.innerHTML = team.map(function (p, i) {
+    return '<li class="pl' + (i === 0 ? ' is-open' : '') + '"><a href="#team" aria-label="' + esc(p.nick) + ', ' + nf.format(p.elo) + ' ELO, niveau ' + p.lvl + '">'
+      + '<img class="sil" src="assets/player.svg" alt="">'
+      + '<span class="roster-tag">' + p.roster + '</span>'
+      + '<p class="vname">' + esc(p.nick) + '</p>'
+      + '<div class="info"><h3>' + esc(p.nick) + '</h3><div class="row">'
+      + '<div><span>ELO</span><b class="t-num">' + nf.format(p.elo) + '</b></div>'
+      + '<div><span>Niveau</span><b class="t-num">' + p.lvl + '</b></div>'
+      + '<div><span>Run</span><b class="t-num">' + signed(delta(p)) + '</b></div></div>'
+      + '<div class="links"><span>Profil FACEIT ↗</span><span>Twitch ↗</span></div></div></a></li>';
+  }).join('');
+
+  // ---- Maps ----
+  var mapsEl = document.getElementById('maps');
+  mapsEl.innerHTML = maps.map(function (m, i) {
+    var total = m.s + m.f + m.m + m.h;
+    return '<a class="mp' + (i === 0 ? ' is-open' : '') + '" href="' + (m.href || '#stuffs') + '" aria-label="' + m.name + ', ' + total + ' stuffs">'
+      + '<span class="art" style="background-image:url(assets/maps/' + m.slug + '.svg)"></span>'
+      + '<span class="total">' + total + ' stuffs</span>'
+      + '<p class="vname">' + m.name + '</p>'
+      + '<div class="open"><h3>' + m.name + '</h3><ul class="nades">'
+      + '<li class="n-smoke"><svg aria-hidden="true"><use href="#g-smoke"/></svg><b class="t-num">' + m.s + '</b>smokes</li>'
+      + '<li class="n-flash"><svg aria-hidden="true"><use href="#g-flash"/></svg><b class="t-num">' + m.f + '</b>flashs</li>'
+      + '<li class="n-molo"><svg aria-hidden="true"><use href="#g-molo"/></svg><b class="t-num">' + m.m + '</b>molotovs</li>'
+      + '<li class="n-he"><svg aria-hidden="true"><use href="#g-he"/></svg><b class="t-num">' + m.h + '</b>HE</li></ul>'
+      + '<span class="go">Ouvrir ' + m.name + ' <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div></a>';
+  }).join('');
+
+  // Accordéons : survol ou focus ouvre le panneau
+  function accordion(container, selector) {
+    var items = container.querySelectorAll(selector);
+    items.forEach(function (item) {
+      function open() { items.forEach(function (o) { o.classList.toggle('is-open', o === item); }); }
+      item.addEventListener('mouseenter', open);
+      item.addEventListener('focusin', open);
+    });
+  }
+  accordion(mapsEl, '.mp');
+  accordion(roster, '.pl');
+
+  // ---- Navigation mobile ----
+  var nav = document.getElementById('nav');
+  var burger = document.getElementById('burger');
+  burger.addEventListener('click', function () {
+    var open = nav.classList.toggle('open');
+    burger.setAttribute('aria-expanded', String(open));
+  });
+  document.getElementById('menu').addEventListener('click', function () { nav.classList.remove('open'); burger.setAttribute('aria-expanded', 'false'); });
+
+  // ---- Panneau de démo ----
+  var site = document.getElementById('site');
+  var stage = document.getElementById('stage');
+  function press(group, attr, value) {
+    document.querySelectorAll('.demo [' + attr + ']').forEach(function (b) { if (b.hasAttribute(attr)) b.setAttribute('aria-pressed', String(b.getAttribute(attr) === value)); });
+  }
+  document.querySelectorAll('.demo [data-live]').forEach(function (b) { b.addEventListener('click', function () { site.dataset.live = b.dataset.live; press('live', 'data-live', b.dataset.live); }); });
+  document.querySelectorAll('.demo [data-fresh]').forEach(function (b) { b.addEventListener('click', function () { site.dataset.fresh = b.dataset.fresh; press('fresh', 'data-fresh', b.dataset.fresh); }); });
+  function setView(v) { stage.classList.toggle('mobile', v === 'mobile'); press('view', 'data-view', v); }
+  document.querySelectorAll('.demo [data-view]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.view); }); });
+  if (location.hash === '#mobile') setView('mobile');
+  var demoEl = document.getElementById('demo');
+  if (window.innerWidth < 640) { demoEl.classList.add('min'); document.getElementById('demo-min').textContent = 'Contrôles'; }
+  var demo = document.getElementById('demo');
+  document.getElementById('demo-min').addEventListener('click', function () {
+    var min = demo.classList.toggle('min');
+    this.textContent = min ? 'Contrôles' : 'Réduire';
+    this.setAttribute('aria-pressed', String(min));
+  });
+})();
+</script>
+</body>
+</html>

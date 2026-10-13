@@ -1,0 +1,76 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lafineequipe-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3000"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "lafineequipe-demo",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "dev",
+        "--port",
+        "3100"
+      ],
+      "env": {
+        "LFE_DATA_BACKEND": "local",
+        "FACEIT_MODE": "fixtures",
+        "LFE_LOCAL_DATA_DIR": ".data/e2e",
+        "NEXT_TELEMETRY_DISABLED": "1"
+      },
+      "port": 3100
+    },
+    {
+      "name": "design-exploration",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4173",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "design/exploration"
+      ],
+      "port": 4173
+    },
+    {
+      "name": "forge-v2",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4174",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "design/forge-v2"
+      ],
+      "port": 4174
+    },
+    {
+      "name": "forge-v2-final",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4175",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "design/forge-v2-final"
+      ],
+      "port": 4175
+    }
+  ]
+}

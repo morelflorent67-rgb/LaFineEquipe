@@ -1,0 +1,396 @@
+<meta charset="utf-8">
+<title>Exploration LaFineEquipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wght@400;600&family=Oxanium:wght@600;800&family=Hanken+Grotesk:wght@400;600&family=Share+Tech+Mono&family=Big+Shoulders+Stencil+Display:wght@800;900&family=Instrument+Sans:wght@400;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Hub d'exploration : document sombre à une colonne large ; les aperçus des prototypes portent la page. */
+:root{
+  color-scheme: dark;
+  --void:#050505; --ink:#0D0B0B; --ink-2:#151212; --ink-3:#1F1A1A;
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.17);
+  --red:#E3080E; --red-hi:#FF2A1F; --red-text:#FF3B30;
+  --white:#F4F4F4; --silver:#BDBDBD; --muted:#A3A3A3; --dim:#7C7C7C; --amber:#FFB020;
+  --f:"Archivo","Arial Narrow",Arial,sans-serif;
+  --mono:"Martian Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--void);color:var(--white);font:400 17px/1.6 var(--f);-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--red-text);text-underline-offset:3px}
+a:hover{color:var(--white)}
+:focus-visible{outline:2px solid var(--white);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:0 110px}
+.label{font:600 11.5px/1.3 var(--f);font-stretch:125%;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+.label b{color:var(--red-hi);font-weight:800}
+.mono{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.num{font-variant-numeric:tabular-nums}
+
+/* En-tête */
+.top{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;align-items:center;padding-block:44px 36px;border-bottom:1px solid var(--line)}
+.top h1{margin-top:14px;font:italic 900 clamp(44px,7vw,92px)/.9 var(--f);font-stretch:125%;letter-spacing:-.03em}
+.top h1 em{font-style:italic;color:var(--red-hi)}
+.top .intro{margin-top:20px;max-width:62ch;color:var(--muted);font-size:18px}
+.top .intro strong{color:var(--white);font-weight:600}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border:1px solid var(--line-2);font:600 12.5px/1 var(--f);color:var(--silver)}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.top .emb{filter:drop-shadow(0 20px 50px rgba(227,8,14,.3))}
+@media (max-width:820px){.top{grid-template-columns:minmax(0,1fr)}.top .emb{max-width:220px;order:-1}}
+
+/* Sommaire */
+.toc{position:sticky;top:0;z-index:10;background:rgba(5,5,5,.96);border-bottom:1px solid var(--line);margin-inline:-20px;padding-inline:20px}
+.toc ul{list-style:none;display:flex;gap:2px;margin:0;padding:0;overflow-x:auto}
+.toc a{display:block;padding:13px 12px;font:700 14px/1 var(--f);font-stretch:112%;color:var(--muted);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.toc a:hover{color:var(--white);border-bottom-color:var(--red-hi)}
+
+section{padding-top:72px;scroll-margin-top:50px}
+.sh{display:grid;gap:12px;max-width:76ch;margin-bottom:30px}
+.sh h2{font:italic 800 clamp(32px,4.4vw,52px)/.98 var(--f);font-stretch:112%;letter-spacing:-.015em}
+.sh p{color:var(--muted)}
+
+/* Choix rapide : les trois directions */
+.pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.dcard{position:relative;display:grid;grid-template-rows:auto 1fr;background:var(--ink-2);text-decoration:none;color:inherit;overflow:hidden;transition:transform .25s ease}
+.dcard:hover{transform:translateY(-4px);color:inherit}
+.dcard img{aspect-ratio:16/10;object-fit:cover;width:100%;border-bottom:1px solid var(--line)}
+.dcard .b{display:grid;gap:8px;align-content:start;padding:18px 20px 22px}
+.dcard h3{font:italic 800 26px/1 var(--f);font-stretch:112%}
+.dcard p{color:var(--muted);font-size:15.5px}
+.dcard .go{font:italic 800 14px/1 var(--f);font-stretch:112%;color:var(--red-text);margin-top:4px}
+.dcard.rec{outline:2px solid var(--red);outline-offset:-2px}
+.badge{position:absolute;top:12px;left:12px;z-index:2;padding:7px 11px;background:var(--red);color:#fff;font:italic 800 11.5px/1 var(--f);font-stretch:125%;letter-spacing:.14em;text-transform:uppercase;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+@media (max-width:900px){.pick{grid-template-columns:minmax(0,1fr)}}
+
+/* Changements */
+.changes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.changes div{background:var(--void);padding:20px 22px}
+.changes h4{font:italic 800 19px/1.15 var(--f);font-stretch:112%;margin-bottom:8px}
+.changes p{color:var(--muted);font-size:15.5px}
+@media (max-width:820px){.changes{grid-template-columns:minmax(0,1fr)}}
+
+/* Le logo comme source */
+.dna{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.gene{display:grid;grid-template-rows:150px auto;background:var(--ink);border:1px solid var(--line);overflow:hidden}
+.gene .vis{position:relative;display:grid;place-items:center;overflow:hidden;border-bottom:1px solid var(--line);background:radial-gradient(circle at 50% 60%,rgba(227,8,14,.12),transparent 70%)}
+.gene .t{padding:16px 18px 18px;display:grid;gap:6px}
+.gene h4{font:italic 800 18px/1.15 var(--f);font-stretch:112%}
+.gene p{color:var(--muted);font-size:14.5px}
+.gene .use{font:400 11.5px/1.5 var(--mono);color:var(--silver)}
+.sw{display:flex;width:80%;height:56px}
+.sw span{flex:1}
+.metalbar{width:80%;height:56px;background:linear-gradient(180deg,#fff 0%,#e9e9e9 36%,#8f8f8f 50%,#d4d4d4 64%,#f7f7f7 100%)}
+.slants{display:flex;gap:10px}
+.slants i{width:26px;height:84px;background:linear-gradient(180deg,#ff2a1f,#7a0000);transform:skewX(-14deg)}
+.slants i:nth-child(2){background:linear-gradient(180deg,#f4f4f4,#8f8f8f)}
+.spikes{display:flex;gap:26px;align-items:center}
+.spikes svg{width:22px;height:70px;fill:var(--red-hi)}
+.spikes svg:nth-child(2){width:70px;height:22px;fill:var(--silver)}
+.ringv{width:110px;height:110px;border-radius:50%;background:conic-gradient(from -90deg,var(--red-hi) 0 140deg,rgba(255,255,255,.12) 0);-webkit-mask:radial-gradient(circle,transparent 58%,#000 59%);mask:radial-gradient(circle,transparent 58%,#000 59%)}
+.wordm{font:italic 700 18px/1 var(--f);font-stretch:125%;letter-spacing:.32em;color:var(--silver)}
+.wordm b{color:var(--red-hi);font-weight:800}
+@media (max-width:900px){.dna{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.dna{grid-template-columns:minmax(0,1fr)}}
+
+/* Direction détaillée */
+.dir{padding-top:84px}
+.dir-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 32px;align-items:end;margin-bottom:22px}
+.dir-head .letter{font:italic 900 clamp(70px,10vw,140px)/.75 var(--f);font-stretch:125%;color:transparent;-webkit-text-stroke:1px var(--line-2)}
+.dir.b .dir-head .letter{-webkit-text-stroke-color:var(--red-hi)}
+.dir-head h2{margin-top:10px;font:italic 800 clamp(34px,4.8vw,58px)/.95 var(--f);font-stretch:112%;letter-spacing:-.015em}
+.dir-head p.lead{margin-top:12px;max-width:64ch;color:var(--muted);font-size:18px}
+.dir-head .acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+@media (max-width:820px){.dir-head{grid-template-columns:minmax(0,1fr)}.dir-head .acts{justify-content:flex-start}}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;font:italic 800 14.5px/1 var(--f);font-stretch:112%;text-decoration:none;color:#fff;background:linear-gradient(100deg,#ff2a1f,#c3070c);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);white-space:nowrap}
+.btn:hover{color:#fff;filter:brightness(1.1)}
+.btn.ghost{background:linear-gradient(180deg,#2c2c31,#151517)}
+.btn:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #fff}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.gallery figure{margin:0;background:var(--ink);border:1px solid var(--line);min-width:0}
+.gallery figure.wide{grid-column:1 / -1}
+.gallery figcaption{padding:10px 14px;font:400 12px/1.5 var(--mono);color:var(--silver)}
+@media (max-width:700px){.gallery{grid-template-columns:minmax(0,1fr)}}
+.phones{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;padding:24px;background:radial-gradient(circle at 50% 0,#1d0909,#050505 70%);border:1px solid var(--line)}
+.phones img{border-radius:22px;border:5px solid #1a1a1a;box-shadow:0 18px 40px rgba(0,0,0,.6)}
+@media (max-width:900px){.phones{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.phones{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:20px;background:var(--line);border:1px solid var(--line)}
+.specs div{background:var(--void);padding:18px 20px;min-width:0}
+.specs dt{font:600 10.5px/1.3 var(--f);font-stretch:125%;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.specs dd{margin:0;font-size:15.5px;color:var(--silver)}
+.specs dd strong{color:var(--white);font-weight:600}
+.specs .pro dd::before{content:"+ ";color:var(--white);font-weight:700}
+.specs .con dd::before{content:"− ";color:var(--dim);font-weight:700}
+@media (max-width:900px){.specs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.specs{grid-template-columns:minmax(0,1fr)}}
+
+/* Typographies */
+.types{display:grid;gap:12px}
+.type{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:center;padding:24px;background:var(--ink);border:1px solid var(--line)}
+.type .who{display:grid;gap:6px}
+.type .who b{font:italic 800 20px/1 var(--f);font-stretch:112%}
+.type .sample{display:grid;gap:10px;min-width:0}
+.type .sample .h{font-size:clamp(34px,4.6vw,58px);line-height:.95;overflow-wrap:anywhere}
+.type .sample .p{max-width:62ch;color:var(--silver)}
+.type .sample .m{font-size:13px;color:var(--dim)}
+@media (max-width:700px){.type{grid-template-columns:minmax(0,1fr)}}
+
+/* Comparatif */
+.tbl{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:13px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:15px}
+th{font:600 11px/1.3 var(--f);font-stretch:125%;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);background:var(--ink)}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--white);font-weight:600;width:24%}
+td{color:var(--silver)}
+.lvl{display:inline-flex;gap:3px;vertical-align:middle;margin-right:8px}
+.lvl i{width:7px;height:14px;background:var(--ink-3);transform:skewX(-14deg)}
+.lvl i.on{background:var(--red-hi)}
+th.rec{color:var(--red-text)}
+
+/* Recommandation */
+.reco{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;align-items:start;padding:30px;background:linear-gradient(120deg,rgba(227,8,14,.16),transparent 55%),var(--ink);border:1px solid rgba(255,42,31,.45)}
+.reco h3{font:italic 900 clamp(30px,4vw,46px)/.95 var(--f);font-stretch:125%;letter-spacing:-.02em}
+.reco p{margin-top:14px;color:var(--silver)}
+.reco ul{margin:14px 0 0;padding-left:1.1em;color:var(--silver)}
+.reco li+li{margin-top:6px}
+.reco li strong{color:var(--white)}
+.reco .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+@media (max-width:820px){.reco{grid-template-columns:minmax(0,1fr)}}
+
+.asks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.ask{padding:22px;background:var(--ink);border:1px solid var(--line)}
+.ask h4{font:italic 800 20px/1.1 var(--f);font-stretch:112%;margin-bottom:10px}
+.ask ol,.ask ul{margin:0;padding-left:1.2em;color:var(--silver)}
+.ask li+li{margin-top:6px}
+.ask li strong{color:var(--white)}
+@media (max-width:820px){.asks{grid-template-columns:minmax(0,1fr)}}
+.note{margin-top:14px;padding:14px 16px;border:1px dashed rgba(255,176,32,.4);color:var(--amber);font:400 12.5px/1.6 var(--mono)}
+footer{margin-top:80px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:14px}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="label">LaFineEquipe <b>/</b> Exploration graphique</p>
+      <h1>Trois directions,<br>un seul <em>logo</em></h1>
+      <p class="intro">Ton emblème devient la source du design : son rouge, son argent, l'inclinaison des lettres, les pointes et l'anneau. Chaque direction a <strong>ses propres typographies, sa composition et ses interactions</strong>. Les prototypes s'ouvrent dans le navigateur, avec des données fictives.</p>
+      <div class="pills">
+        <span class="pill"><i></i>Phase 1 non lancée</span>
+        <span class="pill"><i></i>Prototypes statiques, sans base ni clé FACEIT</span>
+        <span class="pill"><i></i>Joueurs, matchs et stuffs fictifs</span>
+      </div>
+    </div>
+    <img class="emb" src="assets/lfe-emblem.webp" alt="Logo LaFineEquipe" width="760" height="725">
+  </header>
+
+  <nav class="toc" aria-label="Sommaire">
+    <ul>
+      <li><a href="#choix">Les 3 directions</a></li>
+      <li><a href="#logo">Le logo comme source</a></li>
+      <li><a href="#dir-a">A · Broadcast</a></li>
+      <li><a href="#dir-b">B · Forge</a></li>
+      <li><a href="#dir-c">C · Collectif</a></li>
+      <li><a href="#typo">Typographies</a></li>
+      <li><a href="#comparatif">Comparatif</a></li>
+      <li><a href="#reco">Recommandation</a></li>
+      <li><a href="#suite">Ce qu'il me faut</a></li>
+    </ul>
+  </nav>
+
+  <section id="choix">
+    <div class="sh">
+      <p class="label">Vue d'ensemble</p>
+      <h2>Trois partis pris, pas trois couleurs</h2>
+      <p>Clique sur une direction pour ouvrir son prototype. Chacune a un panneau « Contrôles » en bas à gauche pour afficher les états : match en cours, aucun match, statut indisponible.</p>
+    </div>
+    <div class="pick">
+      <a class="dcard" href="proto-a-broadcast.html"><img src="assets/previews/a-hero.webp" alt="Aperçu de la direction Broadcast" width="1200" height="750" loading="lazy"><div class="b"><h3>A · Broadcast</h3><p>Le site comme une régie de diffusion de tournoi : scorebug, tableau TAB, killfeed, veto des maps.</p><span class="go">Ouvrir le prototype →</span></div></a>
+      <a class="dcard rec" href="proto-b-forge.html"><span class="badge">Recommandée</span><img src="assets/previews/b-hero.webp" alt="Aperçu de la direction Forge" width="1200" height="750"><div class="b"><h3>B · Forge</h3><p>Tout naît de l'emblème : lames inclinées, pointes, anneau, braise rouge et argent brossé.</p><span class="go">Ouvrir le prototype →</span></div></a>
+      <a class="dcard" href="proto-c-collectif.html"><img src="assets/previews/c-hero.webp" alt="Aperçu de la direction Collectif" width="1200" height="750" loading="lazy"><div class="b"><h3>C · Collectif</h3><p>Le mur du local de LAN : affiches, stickers des joueurs, tampons et pochoirs.</p><span class="go">Ouvrir la planche →</span></div></a>
+    </div>
+    <div class="changes" style="margin-top:22px">
+      <div><h4>Fini les cartes anthracite en série</h4><p>Chaque section a sa propre forme : podium, fight card, plaques de joueurs, mosaïque, accordéon de maps.</p></div>
+      <div><h4>Plus de titres tout en capitales condensées</h4><p>Bas de casse, largeurs variables, graisses contrastées. Les capitales espacées restent pour les petites étiquettes, comme dans ton logo.</p></div>
+      <div><h4>Le logo au centre du système</h4><p>Ton vrai fichier est utilisé partout. Ses formes deviennent boutons, séparateurs, anneaux de niveau et coupes de sections.</p></div>
+    </div>
+  </section>
+
+  <section id="logo">
+    <div class="sh">
+      <p class="label">Analyse du fichier fourni</p>
+      <h2>Ce que ton logo nous donne</h2>
+      <p>Couleurs mesurées sur ton fichier (1254 × 1254 px, fond noir). Les formes sont redessinées en CSS et SVG, jamais copiées d'un autre site.</p>
+    </div>
+    <div class="dna">
+      <div class="gene"><div class="vis"><div class="sw"><span style="background:#8E0000"></span><span style="background:#D90A0A"></span><span style="background:#E3080E"></span><span style="background:#FF2A1F"></span></div></div><div class="t"><h4>Le rouge braise</h4><p>Rouge dominant mesuré : <span class="num">#D90A0A</span>, reflets rouge pur. Interface : <span class="num">#E3080E</span> pour les aplats, <span class="num">#FF2A1F</span> pour la lumière.</p><span class="use">Boutons, badge En cours, podium, chauffe ELO</span></div></div>
+      <div class="gene"><div class="vis"><div class="metalbar"></div></div><div class="t"><h4>L'argent brossé</h4><p>Gris mesurés entre <span class="num">#989898</span> et <span class="num">#F8F8F8</span>. Dégradé métal réservé aux très grands titres.</p><span class="use">« La Fine Equipe » du hero, titres de maps</span></div></div>
+      <div class="gene"><div class="vis"><div class="slants"><i></i><i></i><i></i></div></div><div class="t"><h4>L'inclinaison</h4><p>Les lettres penchent vers l'avant d'environ 14°. Cet angle est réutilisé partout.</p><span class="use">Boutons, onglets, plaques de joueurs, podium</span></div></div>
+      <div class="gene"><div class="vis"><div class="spikes"><svg viewBox="0 0 20 40" aria-hidden="true"><path d="M10 0 L15 24 L10 40 L5 24 Z"/></svg><svg viewBox="0 0 40 20" aria-hidden="true"><path d="M0 10 L24 5 L40 10 L24 15 Z"/></svg></div></div><div class="t"><h4>Les pointes</h4><p>Les pointes de boussole en haut et en bas de l'emblème.</p><span class="use">Puces, marqueurs de section, flèches, losange VS</span></div></div>
+      <div class="gene"><div class="vis"><div class="ringv"></div></div><div class="t"><h4>L'anneau</h4><p>Le cercle qui entoure les lettres.</p><span class="use">Niveau FACEIT autour des avatars, progression du run</span></div></div>
+      <div class="gene"><div class="vis"><span class="wordm">LA <b>FINE</b> EQUIPE</span></div><div class="t"><h4>Le lettrage espacé</h4><p>Capitales italiques très espacées, « FINE » en rouge.</p><span class="use">Petites étiquettes, nom dans la navbar</span></div></div>
+    </div>
+    <p class="note">Pour les prototypes, j'ai retiré le fond noir du logo automatiquement. En production, il faudra tes fichiers d'origine en PNG transparent ou en SVG, et la version ronde que tu mentionnes : je n'ai reçu qu'un seul fichier.</p>
+  </section>
+
+  <!-- ===================== A ===================== -->
+  <section class="dir" id="dir-a">
+    <div class="dir-head">
+      <div>
+        <span class="letter" aria-hidden="true">A</span>
+        <h2>Broadcast</h2>
+        <p class="lead">Le site vit comme une diffusion de tournoi CS2. Tout ce qu'un joueur reconnaît de l'écran de jeu et des streams : bug de chaîne, scorebug, tableau TAB, killfeed, écran de veto.</p>
+      </div>
+      <div class="acts"><a class="btn" href="proto-a-broadcast.html">Ouvrir le prototype</a></div>
+    </div>
+    <div class="gallery">
+      <figure class="wide"><img src="assets/previews/a-hero.webp" alt="Broadcast : présentation d'équipe avec caméras joueurs" width="1200" height="750" loading="lazy"><figcaption>Hero « team intro » : emblème dans un cadre caméra, lineup en caméras joueurs avec bandeaux de nom.</figcaption></figure>
+      <figure><img src="assets/previews/a-match.webp" alt="Broadcast : scorebug du match en cours et killfeed" width="1200" height="750" loading="lazy"><figcaption>Matchs : scorebug sur la map, killfeed des derniers résultats.</figcaption></figure>
+      <figure><img src="assets/previews/a-run.webp" alt="Broadcast : tableau des scores de l'ELO Run" width="1200" height="750" loading="lazy"><figcaption>ELO Run : tableau TAB, étoile MVP, historique des jours façon historique des rounds.</figcaption></figure>
+      <figure class="wide"><img src="assets/previews/a-veto.webp" alt="Broadcast : veto des maps pour les stuffs" width="1200" height="750" loading="lazy"><figcaption>Stuffs : écran de veto, une colonne par map avec la répartition des grenades.</figcaption></figure>
+    </div>
+    <dl class="specs">
+      <div><dt>Typographies</dt><dd><strong>Oxanium</strong> pour titres et chiffres, <strong>Hanken Grotesk</strong> pour le texte, <strong>Share Tech Mono</strong> pour les étiquettes HUD.</dd></div>
+      <div><dt>Composition</dt><dd>Grille stricte visible en fond, zones cadrées par des coins de viseur, sections numérotées comme les emplacements d'armes.</dd></div>
+      <div><dt>Logo</dt><dd>Version compacte dans un « bug » rouge incliné en haut à gauche, emblème complet dans un cadre caméra.</dd></div>
+      <div><dt>Classement</dt><dd>Tableau TAB : rang, niveau, départ, actuel, delta, MVP, carrés de progression par jour.</dd></div>
+      <div><dt>Matchs en cours</dt><dd>Scorebug centré « équipe | map | équipe », bandeau EN DIRECT, killfeed à droite.</dd></div>
+      <div><dt>Navigation</dt><dd>Touches 1 à 7, comme la sélection d'armes. Horloge, indicateur EN DIRECT.</dd></div>
+      <div class="pro"><dt>Avantages</dt><dd>Reconnu instantanément par un joueur CS2. Très dense en données. Idéal pour le live.</dd></div>
+      <div><dt>Mouvement</dt><dd>Balayage de scan au chargement, clignotement EN DIRECT, caméras et maps qui se soulèvent au survol.</dd></div>
+      <div class="con"><dt>Limites</dt><dd>Plus froid, moins émotionnel. Risque de ressembler à un overlay officiel. Beaucoup de petits textes HUD à surveiller.</dd></div>
+    </dl>
+  </section>
+
+  <!-- ===================== B ===================== -->
+  <section class="dir b" id="dir-b">
+    <div class="dir-head">
+      <div>
+        <span class="letter" aria-hidden="true">B</span>
+        <h2>Forge</h2>
+        <p class="lead">Tout part de l'emblème. Les sections sont coupées en biais comme ses lettres, les pointes deviennent des marqueurs, l'anneau entoure les avatars. Le rouge sert à « la chauffe » : ce qui monte, ce qui joue, ce qui compte.</p>
+      </div>
+      <div class="acts"><a class="btn" href="proto-b-forge.html">Accueil desktop</a><a class="btn ghost" href="proto-b-forge.html#mobile">Aperçu mobile</a><a class="btn ghost" href="proto-b-stuffs.html">Page Stuffs Mirage</a></div>
+    </div>
+    <div class="gallery">
+      <figure class="wide"><img src="assets/previews/b-hero.webp" alt="Forge : hero avec l'emblème et le titre en métal et braise" width="1200" height="750"><figcaption>Hero : « La Fine Equipe » en argent brossé et rouge braise, emblème sur un cadran, ligne de lumière en biais.</figcaption></figure>
+      <figure><img src="assets/previews/b-now.webp" alt="Forge : fight card du match en cours" width="1200" height="750" loading="lazy"><figcaption>Matchs : fight card sur la map, deux lames qui se croisent, losange VS, coins de viseur.</figcaption></figure>
+      <figure><img src="assets/previews/b-run.webp" alt="Forge : podium et barres de progression de l'ELO Run" width="1200" height="750" loading="lazy"><figcaption>ELO Run : podium incliné, barres divergentes autour de zéro, anneau du run. Bascule progression / ELO animée.</figcaption></figure>
+      <figure><img src="assets/previews/b-team.webp" alt="Forge : plaques de joueurs inclinées" width="1200" height="750" loading="lazy"><figcaption>Joueurs : plaques inclinées, le survol déplie la fiche (ELO, niveau, run, liens).</figcaption></figure>
+      <figure><img src="assets/previews/b-clips.webp" alt="Forge : mosaïque de clips" width="1200" height="750" loading="lazy"><figcaption>Clips : mosaïque asymétrique, balayage rouge au survol, vidéo chargée au clic.</figcaption></figure>
+      <figure class="wide"><img src="assets/previews/b-stuffs.webp" alt="Forge : accordéon des maps" width="1200" height="750" loading="lazy"><figcaption>Stuffs : les maps en lames qui s'ouvrent au survol, avec le compte par type de grenade.</figcaption></figure>
+      <figure><img src="assets/previews/s-hero.webp" alt="Forge : en-tête de la page Stuffs Mirage" width="1200" height="750" loading="lazy"><figcaption>Page Mirage : la map en fond plein écran, sélecteur de maps en vignettes.</figcaption></figure>
+      <figure><img src="assets/previews/s-lib.webp" alt="Forge : grille de stuffs filtrable" width="1200" height="750" loading="lazy"><figcaption>Filtres camp, grenade, zone et recherche. Chaque carte montre la trajectoire et le point visé. Fiche détaillée au clic.</figcaption></figure>
+    </div>
+    <h3 class="label" style="margin:28px 0 12px">Aperçu mobile, 390 px</h3>
+    <div class="phones">
+      <img src="assets/previews/m-hero.webp" alt="Mobile : hero" width="585" height="1266" loading="lazy">
+      <img src="assets/previews/m-now.webp" alt="Mobile : match en cours" width="585" height="1266" loading="lazy">
+      <img src="assets/previews/m-run.webp" alt="Mobile : ELO Run" width="585" height="1266" loading="lazy">
+      <img src="assets/previews/m-team.webp" alt="Mobile : joueurs" width="585" height="1266" loading="lazy">
+      <img src="assets/previews/m-stuffs.webp" alt="Mobile : stuffs" width="585" height="1266" loading="lazy">
+    </div>
+    <dl class="specs">
+      <div><dt>Typographies</dt><dd><strong>Archivo</strong> en police variable : très large, noire et italique pour les titres, étroite pour les chiffres, normale pour le texte. <strong>Martian Mono</strong> pour les sources et horodatages.</dd></div>
+      <div><dt>Composition</dt><dd>Sections asymétriques séparées par des coupes en biais avec un filet rouge. Mot géant en contour derrière l'ELO Run. Aucune section n'a la même forme.</dd></div>
+      <div><dt>Logo</dt><dd>Emblème complet en héros sur un cadran gradué. Version compacte dans la navbar. Ses formes dérivées sont partout.</dd></div>
+      <div><dt>Classement</dt><dd>Podium à trois lames, puis barres qui partent de zéro : rouge vers la droite si l'ELO monte, acier vers la gauche s'il baisse.</dd></div>
+      <div><dt>Matchs en cours</dt><dd>Fight card sur l'illustration de la map. « Vérifié par FACEIT il y a 1 min » toujours visible. Pas de score inventé.</dd></div>
+      <div><dt>Navigation</dt><dd>Onglets en parallélogrammes, actif en rouge. Pastille « 1 match en cours » si vérifié. Menu plein écran sur mobile.</dd></div>
+      <div class="pro"><dt>Avantages</dt><dd>Identité unique, tirée de ton logo. La plus émotionnelle et la plus « premium ». Se décline bien sur mobile.</dd></div>
+      <div><dt>Mouvement</dt><dd>Braise qui respire lentement derrière l'emblème, barres qui se remplissent, plaques et maps qui se déplient au survol, reflet sur les boutons.</dd></div>
+      <div class="con"><dt>Limites</dt><dd>Demande de la discipline pour ne pas surcharger. Les formes inclinées sont plus longues à intégrer et à tester.</dd></div>
+    </dl>
+  </section>
+
+  <!-- ===================== C ===================== -->
+  <section class="dir" id="dir-c">
+    <div class="dir-head">
+      <div>
+        <span class="letter" aria-hidden="true">C</span>
+        <h2>Collectif</h2>
+        <p class="lead">Le mur du local où la team se retrouve : affiche de tournoi rouge, joueurs en stickers, tampon « EN COURS » sur un polaroid, scotch et pochoirs. L'esprit d'équipe passe avant la performance.</p>
+      </div>
+      <div class="acts"><a class="btn" href="proto-c-collectif.html">Ouvrir la planche</a></div>
+    </div>
+    <div class="gallery">
+      <figure class="wide"><img src="assets/previews/c-hero.webp" alt="Collectif : affiche d'ouverture et logo en sticker" width="1200" height="750" loading="lazy"><figcaption>Hero : titre au pochoir, ton logo en sticker scotché.</figcaption></figure>
+      <figure><img src="assets/previews/c-live.webp" alt="Collectif : polaroid du match avec tampon EN COURS" width="1200" height="750" loading="lazy"><figcaption>Matchs : polaroid de la map, tampon EN COURS, post-it de vérification.</figcaption></figure>
+      <figure><img src="assets/previews/c-run.webp" alt="Collectif : affiche rouge du classement" width="1200" height="750" loading="lazy"><figcaption>ELO Run : affiche rouge au pochoir, grands numéros de rang.</figcaption></figure>
+      <figure class="wide"><img src="assets/previews/c-roster.webp" alt="Collectif : mur de stickers des joueurs" width="1200" height="750" loading="lazy"><figcaption>Joueurs : mur de stickers, invités en bordure pointillée.</figcaption></figure>
+    </div>
+    <dl class="specs">
+      <div><dt>Typographies</dt><dd><strong>Big Shoulders Stencil</strong> pour les titres, <strong>Instrument Sans</strong> pour le texte, <strong>DM Mono</strong> pour les étiquettes.</dd></div>
+      <div><dt>Composition</dt><dd>Éléments posés de travers (±3°), papier, scotch, grain. Chaque bloc est un objet collé au mur.</dd></div>
+      <div><dt>Logo</dt><dd>En sticker détouré avec bord blanc. Il peut aussi devenir un pochoir rouge en fond.</dd></div>
+      <div><dt>Classement</dt><dd>Affiche de tournoi rouge, rangs au pochoir.</dd></div>
+      <div><dt>Matchs en cours</dt><dd>Polaroid de la map avec tampon et post-it.</dd></div>
+      <div><dt>Navigation</dt><dd>Étiquettes en scotch légèrement inclinées.</dd></div>
+      <div class="pro"><dt>Avantages</dt><dd>La plus chaleureuse et la plus « communauté ». Très mémorable.</dd></div>
+      <div class="con"><dt>Limites</dt><dd>Moins premium, risque de kitsch, s'éloigne du métal de ton logo. Les rotations et textures gênent les pages denses : filtres de stuffs, admin.</dd></div>
+      <div><dt>Mouvement</dt><dd>Stickers et affiches qui se redressent au survol. Très peu d'animation.</dd></div>
+    </dl>
+  </section>
+
+  <section id="typo">
+    <div class="sh">
+      <p class="label">Trois associations réellement différentes</p>
+      <h2>Typographies</h2>
+      <p>Toutes gratuites (Google Fonts, licence libre). Elles seront auto-hébergées au build, sans requête vers Google pour tes visiteurs. Accents français vérifiés.</p>
+    </div>
+    <div class="types">
+      <div class="type"><div class="who"><span class="label">A · Broadcast</span><b>Oxanium + Hanken Grotesk + Share Tech Mono</b></div><div class="sample"><span class="h" style="font-family:Oxanium,sans-serif;font-weight:800;letter-spacing:-.02em">Tableau des scores</span><span class="p" style="font-family:'Hanken Grotesk',sans-serif">Classement ELO, matchs, clips et stuffs. Une lecture nette, technique, comme un HUD.</span><span class="m" style="font-family:'Share Tech Mono',monospace;letter-spacing:.08em;text-transform:uppercase">Vérifié par FACEIT · 14:31 · J12/31</span></div></div>
+      <div class="type"><div class="who"><span class="label">B · Forge</span><b>Archivo variable + Martian Mono</b></div><div class="sample"><span class="h" style="font-family:Archivo,sans-serif;font-style:italic;font-weight:900;font-stretch:125%;letter-spacing:-.025em">Équipe d'automne <span style="font-stretch:62%;font-weight:800;color:#FF2A1F">+86</span></span><span class="p" style="font-family:Archivo,sans-serif">Une seule famille, trois largeurs : large pour l'impact, étroite pour les chiffres, normale pour lire.</span><span class="m" style="font-family:'Martian Mono',monospace">Source FACEIT Data API v4 · relevé 12/10 à 14:32</span></div></div>
+      <div class="type"><div class="who"><span class="label">C · Collectif</span><b>Big Shoulders Stencil + Instrument Sans + DM Mono</b></div><div class="sample"><span class="h" style="font-family:'Big Shoulders Stencil Display',sans-serif;font-weight:900">On monte ensemble</span><span class="p" style="font-family:'Instrument Sans',sans-serif">Pochoir de caisse de munitions pour les titres, texte simple et chaleureux à côté.</span><span class="m" style="font-family:'DM Mono',monospace">Mirage · 14:05 · tampon EN COURS</span></div></div>
+    </div>
+  </section>
+
+  <section id="comparatif">
+    <div class="sh"><p class="label">Mon évaluation</p><h2>Comparatif</h2></div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Critère</th><th>A · Broadcast</th><th class="rec">B · Forge</th><th>C · Collectif</th></tr></thead>
+        <tbody>
+          <tr><td>Fidélité au logo</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i></i></span>Couleurs oui, formes peu</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i></span>Formes et couleurs</td><td><span class="lvl"><i class="on"></i><i></i><i></i></span>Logo en objet, pas en système</td></tr>
+          <tr><td>Ambiance CS2 reconnaissable</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i></span>HUD et diffusion</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i></i></span>Esport, fight card</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i></i></span>LAN, pochoirs</td></tr>
+          <tr><td>Premium</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i></i></span></td><td><span class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td><span class="lvl"><i class="on"></i><i></i><i></i></span></td></tr>
+          <tr><td>Lisibilité des pages denses</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td><span class="lvl"><i class="on"></i><i class="on"></i><i></i></span></td><td><span class="lvl"><i class="on"></i><i></i><i></i></span></td></tr>
+          <tr><td>Mobile</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i></i></span>Tableau à adapter</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i></span>Testé à 390 px</td><td><span class="lvl"><i class="on"></i><i class="on"></i><i></i></span></td></tr>
+          <tr><td>Effort d'intégration</td><td>Moyen</td><td>Moyen à élevé</td><td>Élevé (textures, rotations)</td></tr>
+          <tr><td>Performance</td><td>Très légère</td><td>Légère : CSS et SVG, un seul effet continu</td><td>Plus d'images et de masques</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="reco">
+    <div class="reco">
+      <div>
+        <p class="label">Ma recommandation</p>
+        <h3>B · Forge, avec deux idées de A</h3>
+        <p>C'est la seule direction qui transforme ton logo en système complet. Elle donne une identité qu'on reconnaît sans lire le nom, tout en gardant des textes posés sur des fonds calmes.</p>
+        <ul>
+          <li><strong>Emprunt à A :</strong> les touches 1 à 7 pour naviguer, comme la sélection d'armes.</li>
+          <li><strong>Emprunt à A :</strong> les carrés « historique des rounds » sur la page ELO Run complète, un par jour.</li>
+          <li><strong>À garder sobre :</strong> une seule animation continue, le point « En cours » vérifié ; tout le reste au survol ou au focus, et désactivé si l'utilisateur réduit les animations.</li>
+        </ul>
+        <div class="acts"><a class="btn" href="proto-b-forge.html">Ouvrir Forge</a><a class="btn ghost" href="proto-b-forge.html#mobile">Version mobile</a><a class="btn ghost" href="proto-b-stuffs.html">Page Stuffs</a></div>
+      </div>
+      <img src="assets/previews/m-run.webp" alt="Forge sur mobile : ELO Run" width="585" height="1266" loading="lazy" style="max-width:300px;justify-self:center;border-radius:26px;border:6px solid #1a1a1a">
+    </div>
+  </section>
+
+  <section id="suite">
+    <div class="sh"><p class="label">Avant la phase 1</p><h2>Ce qu'il me faut</h2></div>
+    <div class="asks">
+      <div class="ask"><h4>Ta décision</h4><ol><li><strong>La direction</strong> : A, B, C, ou un mélange précis (par exemple « B avec le tableau de A »).</li><li><strong>Les typographies</strong> de cette direction, ou une autre association à tester.</li><li><strong>Ce que tu veux changer</strong> dans le prototype choisi : section, couleur, animation, ton des textes.</li></ol></div>
+      <div class="ask"><h4>Tes fichiers</h4><ul><li><strong>La version ronde compacte</strong> du logo (je n'ai reçu que l'emblème détaillé).</li><li><strong>Les deux versions en PNG transparent ou en SVG</strong>, pour un détourage propre.</li><li><strong>Une phrase d'accroche</strong> pour le hero, si tu en as une.</li></ul></div>
+    </div>
+    <p class="note">Les illustrations de maps sont des silhouettes provisoires dessinées pour ces prototypes, sans aucune ressource Valve. Elles seront remplacées par des captures de la team passées dans le même traitement. Les stuffs de la page Mirage sont fictifs : ce ne sont pas de vraies lineups. L'architecture technique validée ne change pas ; seule la couche visuelle évolue.</p>
+  </section>
+
+  <footer>Prototypes HTML statiques · dossier <span class="mono">design/exploration/</span> du projet · 12 octobre 2026</footer>
+</div>

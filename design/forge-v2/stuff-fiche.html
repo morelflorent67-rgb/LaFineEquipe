@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smoke fenêtre · Stuffs · Forge V2 · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/v2.css">
+<style>
+.fhead{position:relative;padding:clamp(24px,3.5cqi,48px) var(--pad) 26px;isolation:isolate;overflow:hidden;border-bottom:1px solid var(--line)}
+.fhead .art{position:absolute;inset:0;z-index:-2;background:url(assets/maps/mirage.svg) center 60%/cover no-repeat;opacity:.45}
+.fhead::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.96),rgba(5,5,5,.7) 60%,rgba(5,5,5,.9)),linear-gradient(0deg,var(--void),transparent 70%)}
+.crumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:600 13px/1 var(--f);color:var(--muted)}
+.crumb a{text-decoration:none}
+.crumb a:hover{color:#fff}
+.fhead .h1{margin-top:14px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.bdg{display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:6px 11px;background:rgba(5,5,5,.75);border:1px solid var(--line-2);border-radius:4px;font:700 13px/1 var(--f)}
+.bdg svg{width:16px;height:16px}
+.bdg.t{background:#3a1508;border-color:#5a2410;color:#ffcfb8}
+.n-smoke{color:var(--smoke)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.fake-note{margin-top:18px;max-width:80ch;padding:10px 12px;border:1px dashed rgba(245,165,36,.45);color:var(--amber);font:400 12px/1.5 var(--mono)}
+
+.fbody{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.8fr);gap:clamp(20px,3cqi,40px);align-items:start;padding:clamp(26px,4cqi,50px) var(--pad) clamp(50px,6cqi,90px)}
+.step-h{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+.step-h .n{display:grid;place-items:center;width:34px;height:34px;font:800 16px/1 var(--f);background:var(--brand);color:#fff;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%)}
+.step-h h2{margin:0;font:800 22px/1.1 var(--f);font-stretch:108%}
+.step-h p{margin:0 0 0 auto;font-size:13.5px;color:var(--muted)}
+.shots{display:grid;gap:26px}
+.frame{position:relative;aspect-ratio:16/9;max-width:100%;overflow:hidden;background:url(assets/maps/mirage.svg) no-repeat;background-size:240% auto;border:1px solid var(--line-2);display:grid;place-items:center}
+.frame::before{content:"";position:absolute;inset:0;background:rgba(10,8,9,.72)}
+.frame::after{content:"";position:absolute;inset:12px;pointer-events:none;background:
+  linear-gradient(var(--silver),var(--silver)) left top/18px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) left top/2px 18px no-repeat,
+  linear-gradient(var(--silver),var(--silver)) right top/18px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) right top/2px 18px no-repeat,
+  linear-gradient(var(--silver),var(--silver)) left bottom/18px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) left bottom/2px 18px no-repeat,
+  linear-gradient(var(--silver),var(--silver)) right bottom/18px 2px no-repeat,linear-gradient(var(--silver),var(--silver)) right bottom/2px 18px no-repeat}
+.frame .ph{position:relative;z-index:1;display:grid;justify-items:center;gap:10px;max-width:40ch;padding:0 20px;text-align:center}
+.frame .ph svg{width:40px;height:40px;color:var(--silver);opacity:.8}
+.frame .ph b{font:700 18px/1.2 var(--f)}
+.frame .ph span{font-size:14px;color:var(--muted)}
+.frame .stamp{position:absolute;z-index:1;top:24px;right:30px;padding:5px 9px;font:600 11px/1 var(--mono);color:var(--amber);border:1px solid rgba(245,165,36,.5);background:rgba(5,5,5,.7)}
+.frame .cap{position:absolute;z-index:1;left:30px;bottom:24px;font:600 12px/1 var(--mono);color:var(--silver)}
+.video{position:relative;aspect-ratio:16/9;max-width:100%;display:grid;place-items:center;background:#0d0b0c;border:1px solid var(--line-2);overflow:hidden}
+.video .ph{display:grid;justify-items:center;gap:14px;text-align:center;padding:0 20px}
+.video .play{width:76px;height:76px;display:grid;place-items:center;border-radius:50%;background:var(--brand);border:0;cursor:pointer;transition:transform .2s}
+.video .play:hover{transform:scale(1.06)}
+.video .play svg{width:30px;height:30px;margin-left:5px;color:#fff}
+.video p{margin:0;max-width:46ch;font-size:14px;color:var(--muted)}
+.video .loaded{display:none;padding:20px;text-align:center;color:var(--amber);font:400 12.5px/1.5 var(--mono)}
+.video.on .ph{display:none}
+.video.on .loaded{display:block}
+.steps{list-style:none;counter-reset:st;margin:0;padding:0;display:grid;gap:10px}
+.steps li{counter-increment:st;display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;padding:14px 16px;background:var(--ink-2);border:1px solid var(--line);font-size:15.5px;color:var(--silver)}
+.steps li::before{content:counter(st);display:grid;place-items:center;height:32px;font:800 16px/1 var(--f);background:var(--steel-2);border-radius:4px;color:#fff}
+.steps li b{color:#fff;font-weight:700}
+
+.facts{position:sticky;top:80px;display:grid;gap:14px}
+.sheet-box{background:var(--ink-2);border:1px solid var(--line-2)}
+.sheet-box h3{margin:0;padding:14px 18px;font:700 13px/1 var(--f);font-stretch:112%;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+.facts dl{margin:0;display:grid}
+.facts dl div{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;padding:11px 18px;border-bottom:1px solid var(--line);font-size:14.5px}
+.facts dl div:last-child{border-bottom:0}
+.facts dt{color:var(--dim)}
+.facts dd{margin:0;font-weight:600}
+.diff{display:inline-flex;gap:3px;vertical-align:middle;margin-right:8px}
+.diff i{width:6px;height:13px;background:var(--steel-3);transform:skewX(var(--slant))}
+.diff i.on{background:var(--white)}
+.verified{display:grid;gap:6px;padding:14px 18px;font-size:14px;color:var(--muted)}
+.verified b{color:var(--white)}
+.verified .state-chip{justify-self:start}
+.related{display:grid;gap:8px;padding:14px 18px}
+.related a{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:8px 12px;background:var(--steel);border:1px solid var(--line);text-decoration:none;font:600 14px/1.2 var(--f)}
+.related a:hover{border-color:var(--line-2)}
+.related a span{font:400 11px/1 var(--mono);color:var(--dim)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
+
+@container site (max-width: 900px){
+  .fbody{grid-template-columns:minmax(0,1fr)}
+  .facts{position:static}
+  .step-h p{display:none}
+}
+@container site (max-width: 560px){
+  .facts dl div{grid-template-columns:104px minmax(0,1fr)}
+  .actions .btn{flex:1 1 auto}
+}
+</style>
+</head>
+<body>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="member" data-live="live" data-fresh="ok">
+  <div id="nav-slot"></div>
+  <div class="ribbon">Prototype Forge V2 · fiche fictive · ce n'est pas une vraie lineup</div>
+
+  <header class="fhead">
+    <div class="art" aria-hidden="true"></div>
+    <p class="crumb"><a href="stuffs.html">Stuffs</a><span aria-hidden="true">/</span><a href="stuffs.html">Mirage</a><span aria-hidden="true">/</span><span>Mid</span></p>
+    <h1 class="h1">Smoke fenêtre</h1>
+    <div class="badges">
+      <span class="bdg">Mirage</span>
+      <span class="bdg t">Camp T</span>
+      <span class="bdg n-smoke"><svg aria-hidden="true"><use href="#g-smoke"/></svg>Smoke</span>
+      <span class="bdg">Jumpthrow</span>
+      <span class="bdg">Facile</span>
+    </div>
+    <div class="actions">
+      <button class="btn btn-steel btn-sm" type="button" id="share">Copier le lien</button>
+      <button class="btn btn-steel btn-sm only-team" type="button" id="flag">Signaler « à revérifier »</button>
+      <a class="btn btn-red btn-sm only-admin" href="#">Modifier la fiche</a>
+    </div>
+    <p class="fake-note">Exemple de mise en page. Les captures, positions et instructions définitives seront fournies et testées en jeu par la team.</p>
+  </header>
+
+  <div class="fbody">
+    <div class="shots">
+      <section>
+        <div class="step-h"><span class="n">1</span><h2>Placement</h2><p>Où se mettre</p></div>
+        <div class="frame" style="background-position:12% 50%">
+          <span class="stamp">Exemple fictif</span>
+          <div class="ph"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1.5 2H20a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3.5L9 4zm3 4a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zm0 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z"/></svg><b>Capture du placement</b><span>Image fournie par la team : position des pieds, repère au sol.</span></div>
+          <span class="cap">Départ · T spawn</span>
+        </div>
+      </section>
+      <section>
+        <div class="step-h"><span class="n">2</span><h2>Point de visée</h2><p>Où regarder</p></div>
+        <div class="frame" style="background-position:62% 40%">
+          <span class="stamp">Exemple fictif</span>
+          <div class="ph"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-target"/></svg><b>Capture du point de visée</b><span>Image fournie par la team, viseur sur le repère.</span></div>
+          <span class="cap">Arrivée · Fenêtre</span>
+        </div>
+      </section>
+      <section>
+        <div class="step-h"><span class="n">3</span><h2>Démonstration</h2><p>Vidéo facultative</p></div>
+        <div class="video" id="video">
+          <div class="ph"><button class="play" type="button" id="load" aria-label="Charger la vidéo YouTube"><svg aria-hidden="true"><use href="#i-play"/></svg></button><p>Vidéo YouTube. Elle ne se charge qu'au clic : aucun cookie tiers avant ton accord.</p></div>
+          <p class="loaded">Prototype : en production, le lecteur youtube-nocookie.com s'affiche ici.</p>
+        </div>
+      </section>
+      <section>
+        <div class="step-h"><span class="n">4</span><h2>Étapes</h2></div>
+        <ol class="steps">
+          <li><span><b>Se placer</b> au point de départ montré sur la capture 1. <i class="muted">(texte d'exemple)</i></span></li>
+          <li><span><b>Viser</b> le repère de la capture 2. <i class="muted">(texte d'exemple)</i></span></li>
+          <li><span><b>Lancer</b> en jumpthrow, avec le bind de la team. <i class="muted">(texte d'exemple)</i></span></li>
+        </ol>
+      </section>
+      <nav class="pager" aria-label="Stuffs voisins"><a class="link" href="stuffs.html">← Smoke top mid</a><a class="link" href="stuffs.html">Smoke short →</a></nav>
+    </div>
+
+    <aside class="facts">
+      <div class="sheet-box">
+        <h3>Fiche</h3>
+        <dl>
+          <div><dt>Map</dt><dd>Mirage</dd></div>
+          <div><dt>Camp</dt><dd>T</dd></div>
+          <div><dt>Grenade</dt><dd>Smoke</dd></div>
+          <div><dt>Départ</dt><dd>T spawn</dd></div>
+          <div><dt>Arrivée</dt><dd>Fenêtre</dd></div>
+          <div><dt>Lancer</dt><dd>Jumpthrow</dd></div>
+          <div><dt>Difficulté</dt><dd><span class="diff" aria-hidden="true"><i class="on"></i><i></i><i></i></span>Facile</dd></div>
+          <div><dt>Zone</dt><dd>Mid</dd></div>
+          <div><dt>Ajouté par</dt><dd>demo_charlie</dd></div>
+        </dl>
+      </div>
+      <div class="sheet-box">
+        <h3>Vérification</h3>
+        <div class="verified"><span class="state-chip ok">Vérifié en jeu</span><span>Le <b>01/10/2026</b>, après la MAJ CS2 du 30/09.</span><span class="mono">Une fiche non revérifiée depuis une MAJ passe automatiquement en « à revérifier ».</span></div>
+      </div>
+      <div class="sheet-box">
+        <h3>Autres stuffs vers Fenêtre</h3>
+        <div class="related"><a href="stuffs.html">Smoke fenêtre depuis top mid<span>Fictif</span></a><a href="stuffs.html">Flash fenêtre<span>Fictif</span></a></div>
+      </div>
+    </aside>
+  </div>
+
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/v2.js"></script>
+<script>
+(function () {
+  LFE.mount({ active: 'stuff-fiche', demo: ['view', 'role'] });
+  document.getElementById('load').addEventListener('click', function () { document.getElementById('video').classList.add('on'); });
+  document.getElementById('share').addEventListener('click', function () {
+    var url = location.href.split('?')[0];
+    try { navigator.clipboard.writeText(url).then(function () { LFE.toast('Lien copié'); }, function () { LFE.toast(url); }); } catch (e) { LFE.toast(url); }
+  });
+  document.getElementById('flag').addEventListener('click', function () { LFE.toast('Signalement simulé : un admin revérifiera la fiche'); });
+})();
+</script>
+</body>
+</html>

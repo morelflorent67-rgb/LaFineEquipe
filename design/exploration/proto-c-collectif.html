@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Collectif · LaFineEquipe</title>
+<script>if(/[?&]shot=1/.test(location.search))document.documentElement.classList.add("capture-mode")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800;900&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* =========================================================================
+   Direction C · Collectif
+   Le mur du local de LAN : affiches de tournoi, stickers des joueurs,
+   tampons, scotch et pochoirs. L'esprit d'équipe avant la performance.
+   ========================================================================= */
+:root{
+  color-scheme: dark;
+  --wall:#0A0909; --wall-2:#121010; --paper:#ECE7DC; --paper-ink:#141212;
+  --red:#E3080E; --red-hi:#FF2A1F; --red-paper:#C8070D;
+  --white:#F3F1EC; --muted:#A8A39A; --dim:#857F76; --tape:rgba(226,219,200,.62); --amber:#FFB020;
+  --stencil:"Big Shoulders Stencil Display","Arial Narrow",Impact,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"DM Mono",ui-monospace,Consolas,monospace;
+  --pad:clamp(16px,4vw,64px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--wall);color:var(--white)}
+body{font:400 17px/1.55 var(--body);-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(600px 380px at 85% 8%,rgba(200,7,13,.22),transparent 70%),
+    radial-gradient(500px 420px at 6% 46%,rgba(200,7,13,.14),transparent 70%),
+    radial-gradient(700px 500px at 70% 88%,rgba(255,255,255,.035),transparent 70%),
+    url(assets/grain.png),var(--wall)}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px dashed var(--white);outline-offset:4px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+.ribbon{padding:7px var(--pad);background:repeating-linear-gradient(-45deg,rgba(255,176,32,.14) 0 10px,rgba(255,176,32,.05) 10px 20px);color:var(--amber);font:500 12px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;text-align:center}
+
+/* Scotch */
+.tape{position:absolute;width:110px;height:28px;background:var(--tape);box-shadow:0 1px 3px rgba(0,0,0,.35);z-index:3;
+  clip-path:polygon(0 8%,4% 0,9% 10%,14% 0,20% 8%,26% 0,32% 9%,38% 1%,45% 8%,52% 0,58% 9%,65% 1%,72% 8%,79% 0,86% 9%,92% 1%,100% 7%,100% 92%,95% 100%,89% 91%,83% 100%,76% 92%,70% 100%,63% 91%,57% 100%,50% 92%,43% 100%,36% 91%,30% 100%,23% 92%,17% 100%,10% 91%,5% 100%,0 93%)}
+
+/* ---------- Navigation : étiquettes de scotch ---------- */
+.nav{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding:18px var(--pad)}
+.home{display:flex;align-items:center;gap:12px;text-decoration:none}
+.home img{width:52px;height:auto;transform:rotate(-8deg);filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
+.home b{font:900 28px/1 var(--stencil);letter-spacing:.02em}
+.home b span{color:var(--red-hi)}
+.labels{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+.labels a{display:inline-block;padding:8px 14px;background:var(--tape);color:var(--paper-ink);text-decoration:none;font:500 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;transform:rotate(var(--r,-1.5deg));transition:transform .15s,background .15s}
+.labels a:nth-child(2n){--r:1.2deg}
+.labels a:nth-child(3n){--r:-.6deg}
+.labels a:hover{transform:rotate(0) translateY(-2px);background:#f1ead6}
+.labels a[aria-current="page"]{background:var(--red);color:#fff}
+
+/* ---------- Affiche d'ouverture ---------- */
+.poster-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:24px;align-items:center;padding:clamp(24px,4vw,56px) var(--pad) clamp(40px,6vw,90px)}
+.big{margin:0;font:900 clamp(84px,14vw,230px)/.78 var(--stencil);letter-spacing:-.01em;text-transform:none}
+.big .l1{display:block;color:var(--white);transform:rotate(-2deg);transform-origin:left}
+.big .l2{display:block;color:var(--red-hi);transform:rotate(-2deg) translateX(.12em);transform-origin:left;
+  text-shadow:0 0 30px rgba(255,42,31,.35)}
+.manifesto{position:relative;max-width:44ch;margin-top:30px;padding:18px 22px;background:var(--paper);color:var(--paper-ink);transform:rotate(1deg);box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:16px}
+.manifesto .tape{top:-12px;left:30px;transform:rotate(-6deg)}
+.manifesto strong{font-weight:600}
+.sticker-logo{position:relative;justify-self:center;width:min(100%,420px);transform:rotate(9deg);filter:drop-shadow(0 18px 30px rgba(0,0,0,.7));transition:transform .3s}
+.sticker-logo:hover{transform:rotate(4deg) scale(1.02)}
+.sticker-logo .tape{top:-6px;left:50%;margin-left:-55px;transform:rotate(-3deg)}
+
+/* ---------- Sections ---------- */
+.sec{position:relative;padding:clamp(40px,6vw,90px) var(--pad)}
+.sec-title{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 18px;margin:0 0 30px}
+.sec-title h2{margin:0;font:900 clamp(52px,7vw,104px)/.85 var(--stencil)}
+.sec-title .mono{color:var(--muted)}
+
+/* ---------- En cours : polaroid + tampon ---------- */
+.live{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center}
+.polaroid{position:relative;padding:14px 14px 56px;background:var(--paper);transform:rotate(-2.5deg);box-shadow:0 18px 40px rgba(0,0,0,.6)}
+.polaroid .ph{aspect-ratio:4/3;max-width:100%;background:url(assets/maps/mirage.svg) center 60%/cover}
+.polaroid .cap{position:absolute;left:18px;right:18px;bottom:16px;display:flex;justify-content:space-between;color:var(--paper-ink);font:500 15px/1 var(--mono)}
+.polaroid .tape{top:-14px;right:40px;transform:rotate(8deg)}
+.stamp-solid{position:absolute;top:34%;left:22%;padding:10px 20px;border:5px solid var(--red-hi);color:var(--red-hi);font:900 54px/1 var(--stencil);letter-spacing:.04em;transform:rotate(-14deg);background:rgba(10,9,9,.35)}
+.live-info{display:grid;gap:18px;align-content:start}
+.live-info h3{margin:0;font:900 clamp(40px,4.6vw,68px)/.9 var(--stencil)}
+.live-info h3 span{color:var(--red-hi)}
+.note{position:relative;max-width:34ch;padding:14px 16px;background:#F7E15A;color:#1a1600;font:500 14px/1.45 var(--mono);transform:rotate(1.5deg);box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.who-stick{display:flex;flex-wrap:wrap;gap:10px}
+.who-stick span{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:#fff;color:var(--paper-ink);border-radius:30px;font:600 14px/1 var(--body);transform:rotate(var(--r,-2deg));box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.who-stick span:nth-child(2){--r:2deg}
+.who-stick img{width:26px;height:26px;border-radius:50%;background:#1b1b1f}
+.site[data-live="none"] .only-live,.site[data-live="na"] .only-live{display:none}
+.site:not([data-live="none"]) .only-none{display:none}
+.site:not([data-live="na"]) .only-na{display:none}
+
+/* ---------- Classement : affiche rouge ---------- */
+.run-wrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(24px,4vw,64px);align-items:start}
+.redposter{position:relative;padding:clamp(22px,3vw,40px);background:url(assets/grain.png),linear-gradient(160deg,#df0b11,#a20409);color:#0c0606;transform:rotate(-1deg);box-shadow:0 24px 50px rgba(0,0,0,.6)}
+.redposter .tape.t1{top:-12px;left:-18px;transform:rotate(-35deg)}
+.redposter .tape.t2{top:-12px;right:-18px;transform:rotate(35deg)}
+.redposter header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;border-bottom:3px solid #0c0606;padding-bottom:12px;margin-bottom:8px}
+.redposter header h3{margin:0;font:900 clamp(40px,4.4vw,64px)/.85 var(--stencil)}
+.redposter header .mono{color:#2a0505}
+.ranks{list-style:none;margin:0;padding:0}
+.ranks li{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:baseline;gap:14px;padding:6px 0;border-bottom:1.5px dashed rgba(12,6,6,.45)}
+.ranks li:last-child{border-bottom:0}
+.ranks .n{font:900 56px/.9 var(--stencil)}
+.ranks .p{font:800 26px/1 var(--stencil);letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ranks .p small{display:block;font:500 12px/1.4 var(--mono);letter-spacing:.02em;color:#2a0505}
+.ranks .v{font:900 40px/1 var(--stencil);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.ranks .v.down{color:#2a0505;text-shadow:none}
+.ranks li:first-child .n{font-size:84px;color:#fff}
+.ranks li:first-child .p{font-size:36px}
+.toggle-tape{display:flex;gap:8px;margin-bottom:18px}
+.toggle-tape button{padding:9px 14px;background:var(--tape);color:var(--paper-ink);border:0;cursor:pointer;font:500 13px/1 var(--mono);text-transform:uppercase;transform:rotate(-1deg)}
+.toggle-tape button[aria-pressed="true"]{background:#fff;box-shadow:0 0 0 2px var(--red-hi)}
+.side-notes{display:grid;gap:18px}
+.card-paper{position:relative;padding:18px 20px;background:var(--paper);color:var(--paper-ink);transform:rotate(1.2deg);box-shadow:0 10px 24px rgba(0,0,0,.5)}
+.card-paper:nth-child(2){transform:rotate(-1.5deg)}
+.card-paper b{display:block;font:900 34px/1 var(--stencil)}
+.card-paper .tape{top:-12px;left:40%;transform:rotate(4deg);width:80px}
+
+/* ---------- Roster : mur de stickers ---------- */
+.wall{display:flex;flex-wrap:wrap;justify-content:center;gap:28px 34px;padding:10px 0}
+.stick{display:grid;justify-items:center;gap:10px;text-decoration:none;transform:rotate(var(--r));transition:transform .2s}
+.stick:hover{transform:rotate(0) scale(1.06)}
+.stick .disc{width:132px;height:132px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#2a2a30,#0c0c0e);border:7px solid #F4F4F4;box-shadow:0 10px 22px rgba(0,0,0,.6);overflow:hidden;position:relative}
+.stick .disc img{position:absolute;left:50%;bottom:-8%;width:86%;transform:translateX(-50%)}
+.stick .disc .lv{position:absolute;top:8px;right:14px;font:900 24px/1 var(--stencil);color:var(--red-hi);text-shadow:0 1px 0 #000}
+.stick .name{padding:5px 12px;background:var(--tape);color:var(--paper-ink);font:500 13px/1 var(--mono);transform:rotate(-2deg)}
+.stick.guest .disc{border-color:#c9c3b6;border-style:dashed}
+
+/* ---------- Maps : affiches punaisées ---------- */
+.posters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px 26px}
+.mposter{position:relative;display:block;text-decoration:none;padding:10px 10px 16px;background:var(--paper);color:var(--paper-ink);transform:rotate(var(--r));box-shadow:0 14px 30px rgba(0,0,0,.55);transition:transform .2s}
+.mposter:hover{transform:rotate(0) translateY(-4px)}
+.mposter .ph{aspect-ratio:4/5;max-width:100%;background:center 60%/cover;filter:contrast(1.1)}
+.mposter b{display:block;margin-top:10px;font:900 40px/.9 var(--stencil)}
+.mposter span{font:500 12.5px/1.4 var(--mono);color:#3a3530}
+.mposter .tape{top:-12px;left:50%;margin-left:-40px;width:80px;transform:rotate(-4deg)}
+
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px 24px;padding:40px var(--pad) 100px;color:var(--muted);font-size:14px}
+footer .tag{font:900 46px/1 var(--stencil);color:var(--red-hi);transform:rotate(-4deg)}
+
+.demo{position:fixed;left:12px;bottom:12px;z-index:100;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;max-width:calc(100vw - 24px);padding:10px 12px;background:rgba(22,22,24,.96);border:1px solid #38383d;border-radius:10px;font:500 12px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;color:#d6d6d6;box-shadow:0 12px 30px rgba(0,0,0,.55)}
+.demo b{color:#fff}
+.demo .grp{display:flex;gap:3px;align-items:center}
+.demo .grp>span{margin-right:4px;color:#9a9a9a}
+.demo button{font:inherit;color:#d0d0d0;background:#2a2a2e;border:1px solid #3d3d42;border-radius:6px;padding:5px 9px;cursor:pointer}
+.demo button[aria-pressed="true"]{background:#f2f2f2;color:#111;border-color:#f2f2f2}
+.demo a{color:#ff8a80;text-decoration:none;font-weight:600}
+
+@media (max-width:980px){
+  .poster-hero,.live,.run-wrap{grid-template-columns:minmax(0,1fr)}
+  .sticker-logo{width:min(70%,320px);order:-1}
+  .posters{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .ranks li{grid-template-columns:48px minmax(0,1fr) auto}
+  .ranks .n{font-size:40px}.ranks li:first-child .n{font-size:56px}
+  .ranks .p{font-size:20px}.ranks li:first-child .p{font-size:26px}
+  .ranks .v{font-size:30px}
+  .stamp-solid{font-size:36px}
+  .stick .disc{width:104px;height:104px}
+}
+html.capture-mode .demo{display:none!important}
+section[id]{scroll-margin-top:72px}
+</style>
+</head>
+<body>
+<div class="site" id="site" data-live="live">
+<header class="nav">
+  <a class="home" href="#top" aria-label="LaFineEquipe, accueil"><img src="assets/lfe-sticker.webp" alt="" width="52" height="57"><b>La<span>Fine</span>Equipe</b></a>
+  <nav class="labels" aria-label="Menu principal">
+    <a href="#top" aria-current="page">Accueil</a><a href="#run">ELO Run</a><a href="#live">Matchs</a><a href="#top">Clips</a><a href="#top">Crosshairs</a><a href="#maps">Stuffs</a><a href="#roster">Joueurs</a>
+  </nav>
+</header>
+<div class="ribbon">Prototype · planche de direction · données de démonstration</div>
+
+<section class="poster-hero" id="top">
+  <div>
+    <h1 class="big"><span class="l1">La Fine</span><span class="l2">Equipe</span></h1>
+    <div class="manifesto"><span class="tape" aria-hidden="true"></span><strong>On joue ensemble, on monte ensemble.</strong> Le mur de la team : classement, matchs, clips, crosshairs et stuffs. Texte d'exemple à réécrire avec toi.</div>
+  </div>
+  <div class="sticker-logo"><span class="tape" aria-hidden="true"></span><img src="assets/lfe-sticker.webp" alt="Logo LaFineEquipe en sticker" width="560" height="609"></div>
+</section>
+
+<section class="sec" id="live">
+  <div class="sec-title"><h2>En game</h2><span class="mono">Matchs FACEIT des joueurs suivis</span></div>
+  <div class="live only-live">
+    <div class="polaroid"><span class="tape" aria-hidden="true"></span><div class="ph" role="img" aria-label="Illustration de Mirage"></div><span class="stamp-solid" aria-hidden="true">EN COURS</span><div class="cap"><span>Mirage</span><span>14:05</span></div></div>
+    <div class="live-info">
+      <h3>team_demo_alpha <span>vs</span> team_adverse</h3>
+      <div class="who-stick"><span><img src="assets/player.svg" alt="">demo_alpha</span><span><img src="assets/player.svg" alt="">demo_bravo</span><span><img src="assets/player.svg" alt="">demo_foxtrot</span></div>
+      <div class="note">Vérifié par FACEIT à 14:31.<br>Score en direct non communiqué.</div>
+    </div>
+  </div>
+  <div class="note only-none" style="font-size:16px">Personne en game pour l'instant.<br>Dernier contrôle FACEIT à 14:32.</div>
+  <div class="note only-na" style="font-size:16px">Statut en direct non disponible.<br>Les derniers résultats restent à jour.</div>
+</section>
+
+<section class="sec" id="run">
+  <div class="sec-title"><h2>ELO Run</h2><span class="mono">Automne 2026 · jour 12 sur 31</span></div>
+  <div class="run-wrap">
+    <div>
+      <div class="toggle-tape" role="group" aria-label="Critère de classement"><button type="button" data-mode="delta" aria-pressed="true">Progression</button><button type="button" data-mode="elo" aria-pressed="false">ELO actuel</button></div>
+      <article class="redposter">
+        <span class="tape t1" aria-hidden="true"></span><span class="tape t2" aria-hidden="true"></span>
+        <header><h3>Le classement</h3><span class="mono">Relevé FACEIT 12/10 · 14:32</span></header>
+        <ol class="ranks" id="ranks"></ol>
+      </article>
+    </div>
+    <div class="side-notes">
+      <div class="card-paper"><span class="tape" aria-hidden="true"></span><span class="mono">Meilleure chauffe</span><b>demo_charlie +86</b></div>
+      <div class="card-paper"><span class="tape" aria-hidden="true"></span><span class="mono">Run</span><b>Du 1er au 31 octobre</b><span class="mono">8 participants · départ relevé le 01/10</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="roster">
+  <div class="sec-title"><h2>La team</h2><span class="mono">Stickers de démo · avatars FACEIT en production</span></div>
+  <div class="wall" id="wall"></div>
+</section>
+
+<section class="sec" id="maps">
+  <div class="sec-title"><h2>Stuffs</h2><span class="mono">Une affiche par map</span></div>
+  <div class="posters" id="posters"></div>
+</section>
+
+<footer><span class="tag">LFE</span><span>Site communautaire, non affilié à FACEIT ni à Valve.</span><span class="mono">Données joueurs : FACEIT Data API</span></footer>
+</div>
+
+<aside class="demo" aria-label="Contrôles du prototype">
+  <b>C · Collectif</b>
+  <div class="grp"><span>Match</span><button type="button" data-live="live" aria-pressed="true">En cours</button><button type="button" data-live="none" aria-pressed="false">Aucun</button><button type="button" data-live="na" aria-pressed="false">Indisponible</button></div>
+  <a href="index.html">← Exploration</a>
+</aside>
+
+<script>
+(function () {
+  var players = [
+    { nick: 'demo_alpha', elo: 2214, start: 2176, lvl: 10, roster: 'Team' },
+    { nick: 'demo_bravo', elo: 1987, start: 2008, lvl: 9, roster: 'Team' },
+    { nick: 'demo_charlie', elo: 1842, start: 1756, lvl: 9, roster: 'Team' },
+    { nick: 'demo_delta', elo: 1655, start: 1643, lvl: 8, roster: 'Guest' },
+    { nick: 'demo_echo', elo: 1503, start: 1547, lvl: 7, roster: 'Team' },
+    { nick: 'demo_foxtrot', elo: 2051, start: 1990, lvl: 10, roster: 'Team' },
+    { nick: 'demo_golf', elo: 1398, start: 1404, lvl: 7, roster: 'Guest' },
+    { nick: 'demo_hotel', elo: 1720, start: 1695, lvl: 8, roster: 'Team' }
+  ];
+  function fmt(n) { return new Intl.NumberFormat('fr-FR').format(n).replace(/ /g, ' '); }
+  function d(p) { return p.elo - p.start; }
+  function signed(n) { return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '±0'; }
+  var mode = 'delta';
+  function render() {
+    var s = players.slice().sort(function (a, b) { return mode === 'delta' ? d(b) - d(a) : b.elo - a.elo; });
+    document.getElementById('ranks').innerHTML = s.map(function (p, i) {
+      var v = mode === 'delta' ? signed(d(p)) : fmt(p.elo);
+      return '<li><span class="n">' + (i + 1) + '</span><span class="p">' + p.nick + '<small>' + fmt(p.start) + ' → ' + fmt(p.elo) + ' · niveau ' + p.lvl + '</small></span><span class="v' + (mode === 'delta' && d(p) < 0 ? ' down' : '') + '">' + v + '</span></li>';
+    }).join('');
+  }
+  render();
+  document.querySelectorAll('.toggle-tape button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      mode = b.dataset.mode;
+      document.querySelectorAll('.toggle-tape button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      render();
+    });
+  });
+  var rots = [-6, 4, -3, 7, -5, 3, -8, 5];
+  document.getElementById('wall').innerHTML = players.map(function (p, i) {
+    return '<a class="stick' + (p.roster === 'Guest' ? ' guest' : '') + '" href="#roster" style="--r:' + rots[i] + 'deg"><span class="disc"><img src="assets/player.svg" alt=""><span class="lv">' + p.lvl + '</span></span><span class="name">' + p.nick + (p.roster === 'Guest' ? ' · guest' : '') + '</span></a>';
+  }).join('');
+  var maps = [['mirage', 'Mirage', 24], ['inferno', 'Inferno', 18], ['dust2', 'Dust II', 15], ['nuke', 'Nuke', 9], ['ancient', 'Ancient', 7], ['anubis', 'Anubis', 6], ['train', 'Train', 4]];
+  var mr = [-2, 1.5, -1, 2.5, -2.5, 1, -1.5];
+  document.getElementById('posters').innerHTML = maps.map(function (m, i) {
+    return '<a class="mposter" href="' + (m[0] === 'mirage' ? 'proto-b-stuffs.html' : '#maps') + '" style="--r:' + mr[i] + 'deg"><span class="tape" aria-hidden="true"></span><span class="ph" style="display:block;background-image:url(assets/maps/' + m[0] + '.svg)"></span><b>' + m[1] + '</b><span>' + m[2] + ' stuffs</span></a>';
+  }).join('');
+  var site = document.getElementById('site');
+  document.querySelectorAll('.demo [data-live]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      site.dataset.live = b.dataset.live;
+      document.querySelectorAll('.demo [data-live]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

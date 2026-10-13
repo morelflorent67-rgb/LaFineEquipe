@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+<title>Train (illustration provisoire LaFineEquipe)</title>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#060505"/><stop offset=".42" stop-color="#1c0404"/><stop offset=".64" stop-color="#5e0707"/><stop offset=".718" stop-color="#b30e0c"/><stop offset=".72" stop-color="#0c0606"/><stop offset="1" stop-color="#050505"/>
+</linearGradient>
+<radialGradient id="sun" cx=".3" cy=".72" r=".42"><stop offset="0" stop-color="#ff3b22" stop-opacity=".8"/><stop offset=".5" stop-color="#d0120e" stop-opacity=".25"/><stop offset="1" stop-color="#d0120e" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#sky)"/>
+<rect width="1600" height="900" fill="url(#sun)"/>
+<g fill="#2b0707"><rect x="0" y="560" width="520" height="90"/><path d="M0 560 L260 500 L520 560 Z"/><rect x="1100" y="580" width="500" height="70"/></g>
+<g fill="#130404"><rect x="180" y="380" width="12" height="280"/><rect x="140" y="390" width="92" height="8"/><rect x="620" y="380" width="12" height="280"/><rect x="580" y="390" width="92" height="8"/><rect x="1060" y="380" width="12" height="280"/><rect x="1020" y="390" width="92" height="8"/><rect x="1500" y="380" width="12" height="280"/><rect x="1460" y="390" width="92" height="8"/><path d="M0 410 Q400 440 800 410 T1600 410" stroke="#130404" stroke-width="3" fill="none"/><rect x="560" y="492" width="300" height="140" rx="6"/><circle cx="600" cy="642" r="18"/><circle cx="820" cy="642" r="18"/><rect x="880" y="492" width="300" height="140" rx="6"/><circle cx="920" cy="642" r="18"/><circle cx="1140" cy="642" r="18"/></g>
+<g fill="#070505"><rect x="-40" y="592" width="420" height="200" rx="6"/><circle cx="0" cy="802" r="18"/><circle cx="340" cy="802" r="18"/><path d="M380 820 V640 H520 V700 L600 720 V820 Z"/><rect x="640" y="602" width="380" height="190" rx="6"/><circle cx="680" cy="802" r="18"/><circle cx="980" cy="802" r="18"/><rect x="1050" y="602" width="380" height="190" rx="6"/><circle cx="1090" cy="802" r="18"/><circle cx="1390" cy="802" r="18"/><rect y="820" width="1600" height="80"/><rect y="828" width="1600" height="6" fill="#3a0a0a"/><rect y="846" width="1600" height="6" fill="#3a0a0a"/></g>
+<rect y="648" width="1600" height="2" fill="#ff3b22" opacity=".35"/>
+</svg>

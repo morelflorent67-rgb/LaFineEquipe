@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forge V2 final · Sommaire</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+.ihead{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 40px;align-items:center;padding:clamp(40px,6cqi,90px) var(--pad) clamp(30px,4cqi,56px);overflow:hidden;isolation:isolate}
+.ihead img{width:clamp(120px,16cqi,220px);filter:drop-shadow(0 20px 50px rgba(227,8,14,.35));animation:rise .9s .1s var(--ease) both}
+.ihead .h1{margin-top:16px}
+.deliv{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;counter-reset:d}
+.deliv a{position:relative;display:grid;grid-template-rows:140px auto;height:100%;text-decoration:none;background:linear-gradient(180deg,#19191c,#111113);border:1px solid var(--line);overflow:hidden;transition:transform .3s var(--ease),border-color .25s}
+.deliv a:hover{transform:translateY(-4px);border-color:var(--line-3)}
+.deliv .th{position:relative;overflow:hidden}
+.deliv .th img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.deliv a:hover .th img{transform:scale(1.07)}
+.deliv .th::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(17,17,19,1),rgba(17,17,19,.1) 70%)}
+.deliv .no{position:absolute;left:14px;top:12px;z-index:1;font:900 42px/.8 var(--f);font-stretch:125%;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.deliv .bd{display:grid;gap:8px;padding:6px 16px 18px}
+.deliv .t{font:800 19px/1.15 var(--f)}
+.deliv .s{font-size:14px;color:var(--muted)}
+.deliv .try{font:500 11.5px/1.45 var(--mono);color:var(--silver)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.box{padding:20px}
+.box h3{margin:0 0 12px;font:800 18px/1.2 var(--f)}
+.box ul{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;display:grid;gap:8px}
+.box b{color:#fff;font-weight:650}
+@container site (max-width: 1000px){ .deliv{grid-template-columns:repeat(2,minmax(0,1fr))} .cols{grid-template-columns:minmax(0,1fr)} }
+@container site (max-width: 560px){ .deliv{grid-template-columns:minmax(0,1fr)} .ihead{grid-template-columns:minmax(0,1fr)} .ihead img{display:none} }
+</style>
+</head>
+<body>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="visitor">
+  <div class="ribbon">Prototype navigable · rien n’est branché au backend · données fictives clairement marquées</div>
+  <main id="main">
+    <header class="ihead">
+      <div><p class="kicker">LaFineEquipe · direction Forge</p><h1 class="h1">Forge V2 <span class="ember">final</span></h1>
+        <p class="lede" style="margin-top:18px">Prototype à valider avant la phase 1 : <strong>ELO Run permanent</strong>, vraies images des maps CS2, <strong>carte tactique</strong>, Mur des lamentations, aperçu admin et nouvelles animations. Le panneau en bas à gauche de chaque page simule les rôles, les états et les mises à jour.</p></div>
+      <img src="assets/brand/lfe-emblem.webp" alt="" width="220" height="220">
+    </header>
+    <section class="sec" style="padding-top:0" aria-labelledby="d-t">
+      <h2 class="sr" id="d-t">Livrables</h2>
+      <ol class="deliv" id="deliv"></ol>
+    </section>
+    <section class="sec" style="padding-top:0" aria-labelledby="n-t">
+      <h2 class="h2" id="n-t" style="margin-bottom:20px">À savoir</h2>
+      <div class="cols">
+        <div class="box card"><h3>Sources et honnêteté</h3><ul>
+          <li><b>Joueurs, matchs, Mur, lineups, crosshairs</b> : fictifs, pseudos « demo_* » inexistants sur FACEIT.</li>
+          <li><b>Images des maps</b> : écrans de chargement et radars officiels de CS2, extraits de ton jeu installé. Ce sont des fichiers Valve, tolérés pour un usage fan non commercial, sans licence explicite.</li>
+          <li><b>7 captures de la team</b> (tes captures Steam), recadrées sans chat, pseudos ni killfeed.</li>
+          <li>Images limitées à ce prototype local : exclues de git, jamais publiées.</li>
+          <li><b>Positions de la carte tactique</b> : exemples placés à la main, non vérifiés. Aucune trajectoire inventée.</li>
+          <li>Logo rond : toujours le recadrage provisoire.</li></ul></div>
+        <div class="box card"><h3>Décisions à valider</h3><ul>
+          <li><b>Classement permanent</b> trié par ELO actuel ; tri alternatif par progression depuis l’ajout. Les tables de sessions (<code>elo_runs</code>, participants) seront supprimées.</li>
+          <li><b>Fraîcheur</b> : synchro auto toutes les 5 min (débit FACEIT constaté : 20 appels/s), actualisation manuelle limitée à 1 fois toutes les 2 min pour tout le site.</li>
+          <li><b>Mur</b> : réservé aux membres connectés, notes visibles des seuls admins (plus strict que le minimum demandé, déjà en place).</li>
+          <li><b>Animations</b> : CSS + View Transitions + Web Animations du navigateur, sans bibliothèque Motion (inutile pour ces effets).</li>
+          <li><b>Images de production</b> : visuels Valve ou captures de la team à décider avant la mise en ligne.</li></ul></div>
+      </div>
+    </section>
+  </main>
+</div>
+</div></div>
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script>
+(function () {
+  var M = 'assets/media/';
+  var items = [
+    ['Accueil desktop', 'home.html', M + 'maps/mirage/hero.webp', 'Hero animé (logo, éclats, parallaxe), accès prioritaires, scène « En ce moment » façon overlay.', 'Panneau : Match → En cours / Terminé ; « Rejouer l’intro ».'],
+    ['Accueil mobile', 'home.html#mobile', M + 'maps/inferno/hero.webp', 'Hero réduit, matchs / ELO / stuffs visibles dès le premier écran, barre d’onglets au pouce.', 'Ouvre en cadre 390 px ; ou réduis ta fenêtre.'],
+    ['ELO Run permanent', 'elo-run.html', M + 'maps/nuke/hero.webp', 'Podium, classement détaillé, graphique depuis l’ajout, tri ELO / progression, filtres.', '« Simuler une synchro », « Actualiser », « Simuler un ajout » (essaie demo_juliet).'],
+    ['Stuffs : vraies maps', 'stuffs.html', M + 'maps/dust2/hero.webp', '8 maps avec vraies images, compteurs réels, recherche sur toutes les maps.', 'Survole une map, puis clique : transition vers sa page.'],
+    ['Carte tactique', 'map.html?m=mirage#carte', M + 'maps/mirage/shot-3.webp', 'Radar officiel zoomable, marqueurs par grenade, lineups et points d’impact.', 'Molette / pincement, glisser, clic sur un losange.'],
+    ['Fiche stuff', 'fiche.html?id=mirage-smoke-window', M + 'team/mirage-team-2.webp', 'Départ + visée, étapes, vidéo, mini-radar, partage, mode entraînement.', '« Mode entraînement » puis ← → et Échap.'],
+    ['Mur des lamentations', 'mur.html', M + 'maps/ancient/hero.webp', 'Identité « mur », compteur, recherche, réservé aux membres.', 'Panneau : rôle Visiteur → écran verrouillé.'],
+    ['Administration', 'admin.html', M + 'maps/overpass/hero.webp', 'Ajout joueur immédiat, Mur avec note privée, maps, positions de la carte tactique.', 'Place une position sur Mirage puis « Voir la carte tactique ».'],
+    ['Animations & crosshairs', 'crosshairs.html', M + 'maps/train/hero.webp', 'Crosshairs V1 (copie) et atelier V2 (aperçu). Toutes les pages respectent « mouvement réduit ».', 'Panneau : Animations → Réduites.']
+  ];
+  document.getElementById('deliv').innerHTML = items.map(function (it, i) {
+    return '<li class="rv" style="--i:' + (i % 3) + '"><a href="' + it[1] + '"><span class="th"><img src="' + it[2] + '" alt="" loading="lazy"><span class="no">' + (i + 1) + '</span></span><span class="bd"><span class="t">' + it[0] + '</span><span class="s">' + it[3] + '</span><span class="try">À tester : ' + it[4] + '</span></span></a></li>';
+  }).join('');
+  window.LFE.mount({ demo: ['motion'] });
+})();
+</script>
+</body>
+</html>

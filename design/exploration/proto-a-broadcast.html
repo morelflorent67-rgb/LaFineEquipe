@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Broadcast · LaFineEquipe</title>
+<script>if(/[?&]shot=1/.test(location.search))document.documentElement.classList.add("capture-mode")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=Share+Tech+Mono&display=swap">
+<style>
+/* =========================================================================
+   Direction A · Broadcast
+   Le site comme une régie de diffusion de tournoi CS2 : bug de chaîne,
+   scorebug, tableau des scores (TAB), killfeed, écran de veto des maps.
+   ========================================================================= */
+:root{
+  color-scheme: dark;
+  --bg:#060607; --panel:rgba(17,17,20,.9); --panel-2:#141418; --panel-3:#1C1C21;
+  --hud:rgba(255,255,255,.1); --hud-2:rgba(255,255,255,.18);
+  --red:#E3080E; --red-hi:#FF2A1F; --red-soft:rgba(227,8,14,.16);
+  --white:#F2F2F2; --silver:#B8BCC4; --muted:#9A9EA6; --dim:#7A7E86; --amber:#FFB020;
+  --disp:"Oxanium","Arial Narrow",sans-serif;
+  --body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hudf:"Share Tech Mono",ui-monospace,Consolas,monospace;
+  --pad:clamp(16px,3.5vw,56px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--white)}
+body{font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:80px 80px;background-position:-1px -1px}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--white);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.hud{font-family:var(--hudf);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.num{font-variant-numeric:tabular-nums}
+.ribbon{padding:6px var(--pad);background:repeating-linear-gradient(-45deg,rgba(255,176,32,.12) 0 10px,rgba(255,176,32,.04) 10px 20px);color:var(--amber);font:12px/1.3 var(--hudf);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+
+/* Coins de cadrage (viseur de caméra) */
+.frame{position:relative}
+.frame::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+   linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) left top/16px 2px no-repeat,linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) left top/2px 16px no-repeat,
+   linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) right top/16px 2px no-repeat,linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) right top/2px 16px no-repeat,
+   linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) left bottom/16px 2px no-repeat,linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) left bottom/2px 16px no-repeat,
+   linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) right bottom/16px 2px no-repeat,linear-gradient(var(--c,var(--silver)),var(--c,var(--silver))) right bottom/2px 16px no-repeat}
+
+/* ---------- Barre de diffusion ---------- */
+.bar{position:sticky;top:0;z-index:30;display:flex;align-items:stretch;gap:0;background:rgba(6,6,7,.96);border-bottom:1px solid var(--hud);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.bug{display:flex;align-items:center;gap:12px;padding:10px 26px 10px var(--pad);background:linear-gradient(100deg,#ff2a1f,#b8060b);clip-path:polygon(0 0,100% 0,calc(100% - 18px) 100%,0 100%);text-decoration:none;flex:none}
+.bug img{width:38px;height:38px}
+.bug b{font:800 22px/1 var(--disp);letter-spacing:.02em}
+.bug span{font:600 13px/1.1 var(--disp);opacity:.9}
+.slots{display:flex;align-items:stretch;margin-left:18px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.slots a{display:flex;align-items:center;gap:9px;padding:0 14px;text-decoration:none;font:600 14px/1 var(--disp);color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s,background .15s}
+.slots a kbd{min-width:22px;height:22px;display:grid;place-items:center;font:700 12px/1 var(--disp);color:var(--white);background:var(--panel-3);border:1px solid var(--hud-2);border-radius:3px}
+.slots a:hover{color:var(--white);background:rgba(255,255,255,.04)}
+.slots a[aria-current="page"]{color:var(--white);border-bottom-color:var(--red-hi)}
+.slots a[aria-current="page"] kbd{background:var(--red);border-color:var(--red)}
+.bar-right{display:flex;align-items:center;gap:14px;padding:0 var(--pad) 0 14px;flex:none}
+.onair{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;font:700 12px/1 var(--disp);letter-spacing:.14em;color:#fff;background:var(--red);border-radius:3px;text-decoration:none}
+.onair i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.4s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.2}}
+.clock{font:700 20px/1 var(--disp);letter-spacing:.04em}
+.clock small{display:block;font:11px/1.2 var(--hudf);color:var(--dim);letter-spacing:.1em}
+
+/* ---------- Sections ---------- */
+.sec{padding:clamp(48px,6vw,96px) var(--pad);position:relative}
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;margin-bottom:24px}
+.sec-h .slot{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sec-h .slot kbd{width:26px;height:26px;display:grid;place-items:center;font:800 14px/1 var(--disp);background:var(--red);border-radius:3px}
+.sec-h h2{margin:0;font:700 clamp(30px,3.6vw,48px)/1 var(--disp);letter-spacing:-.01em}
+.sec-h a{font:600 14px/1 var(--disp);color:var(--silver);text-decoration:none;border-bottom:1px solid var(--hud-2);padding-bottom:4px}
+.sec-h a:hover{color:#fff;border-color:var(--red-hi)}
+
+/* ---------- Hero : présentation d'équipe ---------- */
+.intro{display:grid;grid-template-columns:minmax(260px,420px) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;padding-top:clamp(32px,4vw,64px)}
+.emblem-box{--c:var(--red-hi);aspect-ratio:1;max-width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(227,8,14,.22),transparent 65%),var(--panel);border:1px solid var(--hud);overflow:hidden}
+.emblem-box img{width:88%}
+.emblem-box .scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,42,31,.9),transparent);top:0;animation:scan 3.2s ease-in-out 1 both}
+@keyframes scan{from{top:0;opacity:1}to{top:100%;opacity:0}}
+.emblem-box .rec{position:absolute;top:14px;left:16px;display:flex;align-items:center;gap:8px}
+.emblem-box .rec i{width:8px;height:8px;border-radius:50%;background:var(--red-hi)}
+.intro h1{margin:10px 0 0;font:800 clamp(52px,7.4vw,112px)/.92 var(--disp);letter-spacing:-.03em}
+.intro h1 em{font-style:normal;color:var(--red-hi)}
+.intro p.sub{margin:16px 0 0;max-width:52ch;color:var(--muted);font-size:17px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:13px 18px;font:700 15px/1 var(--disp);letter-spacing:.02em;text-decoration:none;border:1px solid transparent;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:background .15s,border-color .15s}
+.btn kbd{font:700 11px/1 var(--disp);padding:4px 6px;border-radius:2px;background:rgba(0,0,0,.35)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-hi)}
+.btn-ghost{background:var(--panel-2);border-color:var(--hud-2);color:var(--white)}
+.btn-ghost:hover{border-color:var(--silver)}
+.btn:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #fff}
+.lineup{margin-top:36px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.cam{position:relative;display:block;text-decoration:none;background:var(--panel);border:1px solid var(--hud);overflow:hidden;transition:border-color .2s,transform .2s}
+.cam:hover{border-color:var(--red-hi);transform:translateY(-3px)}
+.cam .pic{position:relative;aspect-ratio:4/3;max-width:100%;background:radial-gradient(circle at 50% 35%,#24242a,#0b0b0d 70%);overflow:hidden}
+.cam .pic img{position:absolute;left:50%;bottom:-6%;width:78%;transform:translateX(-50%)}
+.cam .id{position:absolute;top:8px;left:10px}
+.cam .mvp{position:absolute;top:8px;right:8px;font:700 11px/1 var(--disp);letter-spacing:.06em;padding:5px 7px;background:var(--amber);color:#111;border-radius:2px}
+.lower{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:stretch}
+.lower .lv{display:grid;place-items:center;min-width:38px;font:800 17px/1 var(--disp);background:var(--red);color:#fff}
+.lower .nm{padding:7px 10px;background:#0c0c0f;min-width:0}
+.lower .nm b{display:block;font:700 15px/1.1 var(--disp);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lower .nm span{font:12px/1.4 var(--hudf);color:var(--silver)}
+
+/* ---------- Matchs : scorebug + killfeed ---------- */
+.match-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(280px,1fr);gap:16px;align-items:start}
+.stagebox{--c:var(--red-hi);position:relative;min-height:330px;display:grid;align-content:space-between;gap:24px;padding:22px;background:var(--panel);border:1px solid var(--hud);overflow:hidden;isolation:isolate}
+.stagebox .art{position:absolute;inset:0;z-index:-1;background:url(assets/maps/mirage.svg) center 60%/cover no-repeat;opacity:.55}
+.stagebox::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(6,6,7,.95),rgba(6,6,7,.2) 60%,rgba(6,6,7,.75))}
+.scorebug{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;max-width:760px;margin:0 auto;width:100%;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.sb-team{display:flex;align-items:center;gap:12px;padding:12px 16px;min-width:0;background:#0d0d10}
+.sb-team.us{background:linear-gradient(90deg,#8e0000,#e3080e);justify-content:flex-end}
+.sb-team.us img{width:34px;height:34px}
+.sb-team b{font:700 clamp(15px,1.7vw,22px)/1 var(--disp);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-team.them{border:1px solid var(--hud-2);border-left:0}
+.sb-mid{display:grid;place-items:center;align-content:center;gap:4px;min-width:150px;padding:8px 16px;background:#050506;border-block:1px solid var(--hud-2)}
+.sb-mid .map{font:800 20px/1 var(--disp);letter-spacing:.04em;text-transform:uppercase}
+.sb-mid .st{display:inline-flex;align-items:center;gap:6px;font:700 11px/1 var(--disp);letter-spacing:.16em;color:var(--red-hi)}
+.sb-mid .st i{width:6px;height:6px;border-radius:50%;background:var(--red-hi);animation:blink 1.4s steps(2,end) infinite}
+.sb-note{text-align:center;margin-top:10px}
+.tracked{display:flex;flex-wrap:wrap;gap:8px}
+.tracked span{display:inline-flex;align-items:center;gap:8px;padding:5px 10px 5px 5px;background:rgba(6,6,7,.8);border:1px solid var(--hud);font:600 13px/1 var(--disp)}
+.tracked img{width:22px;height:22px;border-radius:50%;background:#18181c}
+.stage-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 20px;align-items:center}
+.idle{display:grid;place-items:center;align-content:center;gap:8px;min-height:330px;text-align:center;background:var(--panel);border:1px dashed var(--hud-2)}
+.idle b{font:700 24px/1.1 var(--disp)}
+.killfeed{display:grid;gap:6px}
+.kf-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.kf{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 10px;background:rgba(0,0,0,.55);border:1px solid var(--hud);font:600 13.5px/1.2 var(--disp);transition:transform .15s}
+.kf:hover{transform:translateX(-4px)}
+.kf.w{border-color:rgba(255,42,31,.65);box-shadow:inset 0 0 0 1px rgba(255,42,31,.25)}
+.kf .who{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kf .mapt{font:600 11px/1 var(--hudf);letter-spacing:.06em;padding:4px 6px;background:var(--panel-3);color:var(--silver);text-transform:uppercase}
+.kf .res{font:800 14px/1 var(--disp)}
+.kf.w .res{color:var(--red-hi)}
+.kf.l .res{color:var(--dim)}
+.site-state[data-live="none"] .only-live,.site-state[data-live="na"] .only-live{display:none}
+.site-state:not([data-live="none"]) .only-none{display:none}
+.site-state:not([data-live="na"]) .only-na{display:none}
+
+/* ---------- Tableau des scores (ELO Run) ---------- */
+.board{background:var(--panel);border:1px solid var(--hud);overflow:hidden}
+.board-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;padding:14px 18px;background:linear-gradient(90deg,rgba(227,8,14,.22),transparent 60%);border-bottom:1px solid var(--hud)}
+.board-top h3{margin:0;font:700 20px/1 var(--disp)}
+.tabs{display:inline-flex;border:1px solid var(--hud-2)}
+.tabs button{padding:9px 14px;background:transparent;border:0;cursor:pointer;font:700 13px/1 var(--disp);color:var(--muted)}
+.tabs button+button{border-left:1px solid var(--hud-2)}
+.tabs button[aria-pressed="true"]{background:var(--white);color:#0a0a0a}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{padding:10px 14px;text-align:left;font:12px/1 var(--hudf);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--hud);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.04)}
+tbody tr:first-child{background:linear-gradient(90deg,rgba(227,8,14,.18),transparent 70%)}
+tbody tr:first-child td:first-child{box-shadow:inset 3px 0 0 var(--red-hi)}
+td.rk{font:800 20px/1 var(--disp);color:var(--dim);width:48px}
+tbody tr:first-child td.rk{color:#fff}
+.pl{display:flex;align-items:center;gap:10px;min-width:0}
+.pl img{width:32px;height:32px;border-radius:50%;background:#18181c;border:1px solid var(--hud-2)}
+.pl b{font:700 16px/1 var(--disp)}
+.pl .star{color:var(--amber);font-size:14px}
+.lvb{display:inline-grid;place-items:center;min-width:30px;height:24px;font:800 13px/1 var(--disp);background:var(--panel-3);border:1px solid var(--hud-2)}
+.lvb.top{background:var(--red);border-color:var(--red)}
+td.n{font:600 16px/1 var(--disp);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.d{font:800 18px/1 var(--disp);font-variant-numeric:tabular-nums}
+td.d.up{color:#fff} td.d.down{color:var(--dim)}
+.rounds{display:flex;gap:3px}
+.rounds i{width:12px;height:16px;border:1px solid var(--hud-2);background:transparent}
+.rounds i.g{background:var(--red);border-color:var(--red)}
+.rounds i.l{background:#3c3c43;border-color:#3c3c43}
+.board-foot{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--hud)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:13px;border:1px solid var(--hud-2);display:inline-block}
+.legend i.g{background:var(--red);border-color:var(--red)} .legend i.l{background:#3c3c43;border-color:#3c3c43}
+
+/* ---------- Replays (clips) ---------- */
+.replays{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.replay{--c:var(--white);position:relative;display:block;text-decoration:none;background:var(--panel);border:1px solid var(--hud);transition:border-color .2s}
+.replay:hover{border-color:var(--red-hi)}
+.replay .pic{position:relative;aspect-ratio:16/9;max-width:100%;background:center/cover no-repeat;overflow:hidden}
+.replay .pic::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,6,7,.85),transparent 55%)}
+.replay .tagr{position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:8px;font:700 12px/1 var(--disp);letter-spacing:.14em}
+.replay .tagr i{width:8px;height:8px;background:var(--red-hi);clip-path:polygon(0 0,100% 50%,0 100%)}
+.replay .prov{position:absolute;top:10px;right:12px}
+.replay .scrub{position:absolute;left:12px;right:12px;bottom:12px;height:3px;background:rgba(255,255,255,.2)}
+.replay .scrub span{display:block;height:100%;width:0;background:var(--red-hi);transition:width 1.2s ease}
+.replay:hover .scrub span{width:100%}
+.replay .meta{padding:12px 14px}
+.replay h3{margin:0 0 4px;font:700 18px/1.15 var(--disp)}
+
+/* ---------- Crosshairs ---------- */
+.xhs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.xh{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;align-items:center;padding:12px;background:var(--panel);border:1px solid var(--hud)}
+.xh .view{position:relative;aspect-ratio:1;max-width:100%;background:url(assets/maps/dust2.svg) center/cover;border:1px solid var(--hud)}
+.xh .view i{position:absolute;left:50%;top:50%;background:#7CFF6B;box-shadow:0 0 0 1px #000}
+.xh b{font:700 17px/1.1 var(--disp)}
+.xh code{display:block;margin:6px 0 8px;font:12px/1.4 var(--hudf);color:var(--silver);overflow-wrap:anywhere}
+.chipx{display:inline-block;font:700 11px/1 var(--disp);letter-spacing:.06em;padding:4px 7px;border-radius:2px}
+.chipx.ok{background:rgba(255,255,255,.08);color:var(--silver)}
+.chipx.old{background:rgba(255,176,32,.14);color:var(--amber)}
+
+/* ---------- Veto des maps (stuffs) ---------- */
+.veto{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.vmap{position:relative;display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:9/16;max-width:100%;padding:12px;text-decoration:none;border:1px solid var(--hud);overflow:hidden;isolation:isolate;transition:transform .2s,border-color .2s}
+.vmap .art{position:absolute;inset:0;z-index:-2;background:center/cover no-repeat;transform:scale(1.15);transition:transform .5s}
+.vmap::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(6,6,7,.95),rgba(6,6,7,.1) 60%)}
+.vmap:hover{transform:translateY(-6px);border-color:var(--red-hi)}
+.vmap:hover .art{transform:scale(1.25)}
+.vmap .pick{position:absolute;top:12px;left:12px;right:12px;padding:6px 0;text-align:center;font:800 12px/1 var(--disp);letter-spacing:.2em;background:var(--red);color:#fff;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .2s}
+.vmap:hover .pick,.vmap:focus-visible .pick{opacity:1;transform:none}
+.vmap b{font:800 20px/1 var(--disp);text-transform:uppercase;letter-spacing:.02em}
+.vmap .mini{display:grid;gap:3px;margin-top:10px}
+.vmap .mini span{display:grid;grid-template-columns:34px 1fr 18px;gap:6px;align-items:center;font:11px/1 var(--hudf);color:var(--silver)}
+.vmap .mini em{height:4px;background:var(--hud);position:relative}
+.vmap .mini em::after{content:"";position:absolute;inset:0;width:var(--w);background:var(--k)}
+
+/* ---------- Bas de page ---------- */
+.ticker{display:flex;flex-wrap:wrap;gap:6px 0;align-items:center;padding:12px var(--pad);background:var(--red);color:#fff;font:700 14px/1.2 var(--disp)}
+.ticker span{padding:0 16px;border-right:1px solid rgba(255,255,255,.35)}
+.ticker span:last-child{border-right:0}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;align-items:center;padding:20px var(--pad) 90px;color:var(--muted);font-size:14px}
+footer .l{display:flex;align-items:center;gap:10px}
+footer img{width:30px;height:30px}
+
+.toast{position:fixed;left:50%;top:84px;z-index:50;transform:translate(-50%,-10px);opacity:0;padding:10px 16px;background:#0b0b0d;border:1px solid var(--red-hi);font:700 14px/1 var(--disp);pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.demo{position:fixed;left:12px;bottom:12px;z-index:100;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;max-width:calc(100vw - 24px);padding:10px 12px;background:rgba(22,22,24,.96);border:1px solid #38383d;border-radius:10px;font:500 12px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;color:#d6d6d6;box-shadow:0 12px 30px rgba(0,0,0,.55)}
+.demo b{color:#fff}
+.demo .grp{display:flex;gap:3px;align-items:center}
+.demo .grp>span{margin-right:4px;color:#9a9a9a}
+.demo button{font:inherit;color:#d0d0d0;background:#2a2a2e;border:1px solid #3d3d42;border-radius:6px;padding:5px 9px;cursor:pointer}
+.demo button[aria-pressed="true"]{background:#f2f2f2;color:#111;border-color:#f2f2f2}
+.demo a{color:#ff8a80;text-decoration:none;font-weight:600}
+
+@media (max-width:1100px){
+  .veto{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .xhs{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:900px){
+  .intro{grid-template-columns:minmax(0,1fr)}
+  .emblem-box{max-width:320px}
+  .lineup{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .match-grid{grid-template-columns:minmax(0,1fr)}
+  .replays{grid-template-columns:minmax(0,1fr)}
+  .slots a span{display:none}
+  .clock small{display:none}
+}
+@media (max-width:560px){
+  .bug span{display:none}
+  .lineup{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .veto{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .scorebug{grid-template-columns:minmax(0,1fr)}
+  .sb-team.us{justify-content:flex-start}
+  .sb-team.them{border-left:1px solid var(--hud-2)}
+}
+html.capture-mode .demo{display:none!important}
+section[id]{scroll-margin-top:72px}
+</style>
+</head>
+<body>
+<div class="site-state" id="state" data-live="live">
+<header class="bar">
+  <a class="bug" href="#top" aria-label="LaFineEquipe, accueil"><img src="assets/lfe-mark.webp" alt="" width="38" height="38"><div><b>LFE</b><br><span>LaFineEquipe</span></div></a>
+  <nav class="slots" aria-label="Menu principal (touches 1 à 7)">
+    <a href="#top" data-slot="1" aria-current="page"><kbd>1</kbd><span>Accueil</span></a>
+    <a href="#run" data-slot="2"><kbd>2</kbd><span>ELO Run</span></a>
+    <a href="#matchs" data-slot="3"><kbd>3</kbd><span>Matchs</span></a>
+    <a href="#clips" data-slot="4"><kbd>4</kbd><span>Clips</span></a>
+    <a href="#xh" data-slot="5"><kbd>5</kbd><span>Crosshairs</span></a>
+    <a href="#stuffs" data-slot="6"><kbd>6</kbd><span>Stuffs</span></a>
+    <a href="#top" data-slot="7"><kbd>7</kbd><span>Joueurs</span></a>
+  </nav>
+  <div class="bar-right">
+    <a class="onair only-live" href="#matchs"><i></i>EN DIRECT</a>
+    <div class="clock num" id="clock">--:--<small>Paris</small></div>
+  </div>
+</header>
+<div class="ribbon">Prototype · données de démonstration · aucune donnée FACEIT réelle · touches 1 à 7 pour naviguer</div>
+
+<!-- 1 · Présentation -->
+<section class="sec" id="top">
+  <div class="intro">
+    <div class="emblem-box frame">
+      <span class="scan" aria-hidden="true"></span>
+      <span class="rec hud"><i></i>Team intro</span>
+      <img src="assets/lfe-emblem.webp" alt="Logo LaFineEquipe" width="760" height="725">
+    </div>
+    <div>
+      <span class="hud">Team Counter-Strike 2 · Communauté FACEIT</span>
+      <h1>La<em>Fine</em>Equipe</h1>
+      <p class="sub">Classement ELO, matchs, clips, crosshairs et stuffs map par map. Le site vit au rythme de la team, comme une diffusion.</p>
+      <div class="cta">
+        <a class="btn btn-red" href="#run">Voir l'ELO Run <kbd>2</kbd></a>
+        <a class="btn btn-ghost" href="#stuffs">Stuffs <kbd>6</kbd></a>
+      </div>
+    </div>
+  </div>
+  <div class="lineup" id="lineup"></div>
+</section>
+
+<!-- 3 · Matchs -->
+<section class="sec" id="matchs">
+  <div class="sec-h"><div><div class="slot"><kbd>3</kbd><span class="hud">Matchs FACEIT</span></div><h2>En direct</h2></div><a href="#matchs">Tous les matchs</a></div>
+  <div class="match-grid">
+    <div>
+      <div class="stagebox frame only-live">
+        <div class="art" aria-hidden="true"></div>
+        <div class="stage-foot"><span class="hud" style="color:var(--silver)">Vérifié par FACEIT · 14:31</span><span class="hud">Démarré 14:05</span></div>
+        <div>
+          <div class="scorebug">
+            <div class="sb-team us"><b>team_demo_alpha</b><img src="assets/lfe-mark.webp" alt=""></div>
+            <div class="sb-mid"><span class="map">Mirage</span><span class="st"><i></i>EN COURS</span></div>
+            <div class="sb-team them"><b>team_adverse</b></div>
+          </div>
+          <p class="sb-note hud">Score en direct non communiqué par FACEIT</p>
+        </div>
+        <div class="stage-foot">
+          <div class="tracked"><span><img src="assets/player.svg" alt="">demo_alpha</span><span><img src="assets/player.svg" alt="">demo_bravo</span><span><img src="assets/player.svg" alt="">demo_foxtrot</span></div>
+          <a class="btn btn-ghost" href="#matchs">Ouvrir sur FACEIT ↗</a>
+        </div>
+      </div>
+      <div class="idle only-none"><span class="hud">Hors antenne</span><b>Aucun match en cours</b><span class="hud">Dernier contrôle 14:32</span></div>
+      <div class="idle only-na"><span class="hud">Flux indisponible</span><b>Statut en direct non disponible</b><span style="color:var(--muted);max-width:44ch">FACEIT ne permet pas encore de le vérifier pour nos joueurs. Le killfeed des derniers résultats reste à jour.</span></div>
+    </div>
+    <div class="killfeed" aria-label="Derniers résultats">
+      <div class="kf-h"><span class="hud">Killfeed · derniers résultats</span></div>
+      <div class="kf w"><span class="who">demo_charlie, demo_hotel</span><span class="mapt">Inferno</span><span class="res num">V 13-9</span></div>
+      <div class="kf l"><span class="who">demo_echo</span><span class="mapt">Ancient</span><span class="res num">D 10-13</span></div>
+      <div class="kf w"><span class="who">demo_alpha +2</span><span class="mapt">Mirage</span><span class="res num">V 13-6</span></div>
+      <div class="kf w"><span class="who">demo_delta</span><span class="mapt">Nuke</span><span class="res num">V 16-14</span></div>
+      <div class="kf l"><span class="who">demo_golf, demo_hotel</span><span class="mapt">Dust II</span><span class="res num">D 7-13</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · ELO Run -->
+<section class="sec" id="run">
+  <div class="sec-h"><div><div class="slot"><kbd>2</kbd><span class="hud">ELO Run</span></div><h2>Tableau des scores</h2></div><a href="#run">Historique complet</a></div>
+  <div class="board">
+    <div class="board-top">
+      <h3>Automne 2026 <span class="hud" style="margin-left:10px">J12/31 · 8 joueurs</span></h3>
+      <div class="tabs" role="group" aria-label="Critère de classement"><button type="button" data-mode="delta" aria-pressed="true">Progression</button><button type="button" data-mode="elo" aria-pressed="false">ELO actuel</button></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Joueur</th><th>Niv.</th><th>Départ</th><th>Actuel</th><th>Δ</th><th>12 derniers jours</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="board-foot">
+      <div class="legend hud"><span><i class="g"></i>ELO en hausse</span><span><i class="l"></i>ELO en baisse</span><span><i></i>Pas de changement</span><span>★ MVP du run</span></div>
+      <span class="hud">Source FACEIT Data API v4 · relevé 12/10 14:32</span>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · Clips -->
+<section class="sec" id="clips">
+  <div class="sec-h"><div><div class="slot"><kbd>4</kbd><span class="hud">Highlights</span></div><h2>Replays</h2></div><a href="#clips">Tous les clips</a></div>
+  <div class="replays">
+    <a class="replay frame" href="#clips"><div class="pic" style="background-image:url(assets/maps/inferno.svg)"><span class="tagr"><i></i>REPLAY</span><span class="prov hud" style="color:#fff">YouTube</span><span class="scrub"><span></span></span></div><div class="meta"><h3>Clutch 1v3 à la banane</h3><span class="hud">demo_bravo · Inferno · 10/10</span></div></a>
+    <a class="replay frame" href="#clips"><div class="pic" style="background-image:url(assets/maps/mirage.svg)"><span class="tagr"><i></i>REPLAY</span><span class="prov hud" style="color:#fff">Twitch</span><span class="scrub"><span></span></span></div><div class="meta"><h3>Ace au pistol round</h3><span class="hud">demo_alpha · Mirage · 08/10</span></div></a>
+    <a class="replay frame" href="#clips"><div class="pic" style="background-image:url(assets/maps/dust2.svg)"><span class="tagr"><i></i>REPLAY</span><span class="prov hud" style="color:#fff">Allstar</span><span class="scrub"><span></span></span></div><div class="meta"><h3>Flick AWP au mid</h3><span class="hud">demo_echo · Dust II · 05/10</span></div></a>
+  </div>
+</section>
+
+<!-- 5 · Crosshairs -->
+<section class="sec" id="xh">
+  <div class="sec-h"><div><div class="slot"><kbd>5</kbd><span class="hud">Loadout</span></div><h2>Crosshairs de la team</h2></div><a href="#xh">Tous les presets</a></div>
+  <div class="xhs">
+    <div class="xh"><div class="view" aria-hidden="true"><i style="width:2px;height:8px;margin:-12px 0 0 -1px"></i><i style="width:2px;height:8px;margin:4px 0 0 -1px"></i><i style="width:8px;height:2px;margin:-1px 0 0 -12px"></i><i style="width:8px;height:2px;margin:-1px 0 0 4px"></i></div><div><b>demo_alpha · Static fin</b><code>CODE-FICTIF-DEMO-01</code><span class="chipx ok">Vérifié 03/10/2026</span></div></div>
+    <div class="xh"><div class="view" aria-hidden="true"><i style="width:3px;height:3px;margin:-1.5px 0 0 -1.5px;background:#fff"></i></div><div><b>demo_bravo · Point AWP</b><code>CODE-FICTIF-DEMO-02</code><span class="chipx ok">Vérifié 03/10/2026</span></div></div>
+    <div class="xh"><div class="view" aria-hidden="true"><i style="width:2px;height:10px;margin:-14px 0 0 -1px;background:#5CE1FF"></i><i style="width:2px;height:10px;margin:4px 0 0 -1px;background:#5CE1FF"></i><i style="width:10px;height:2px;margin:-1px 0 0 -14px;background:#5CE1FF"></i><i style="width:10px;height:2px;margin:-1px 0 0 4px;background:#5CE1FF"></i></div><div><b>demo_echo · Cyan large</b><code>CODE-FICTIF-DEMO-03</code><span class="chipx old">À revérifier · MAJ 22/09</span></div></div>
+  </div>
+</section>
+
+<!-- 6 · Stuffs -->
+<section class="sec" id="stuffs">
+  <div class="sec-h"><div><div class="slot"><kbd>6</kbd><span class="hud">Bibliothèque de stuffs</span></div><h2>Veto des maps</h2></div><a href="proto-b-stuffs.html">Exemple de page map</a></div>
+  <div class="veto" id="veto"></div>
+</section>
+
+<div class="ticker"><span>LaFineEquipe</span><span>8 joueurs suivis</span><span>Run Automne J12/31</span><span>Meilleure chauffe : demo_charlie +86</span><span>79 stuffs publiés</span></div>
+<footer><span class="l"><img src="assets/lfe-mark.webp" alt="">Site communautaire, non affilié à FACEIT ni à Valve.</span><span class="hud">Données joueurs : FACEIT Data API</span></footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<aside class="demo" aria-label="Contrôles du prototype">
+  <b>A · Broadcast</b>
+  <div class="grp"><span>Match</span><button type="button" data-live="live" aria-pressed="true">En cours</button><button type="button" data-live="none" aria-pressed="false">Aucun</button><button type="button" data-live="na" aria-pressed="false">Indisponible</button></div>
+  <a href="index.html">← Exploration</a>
+</aside>
+
+<script>
+(function () {
+  var players = [
+    { nick: 'demo_alpha', elo: 2214, start: 2176, lvl: 10, seed: 3 },
+    { nick: 'demo_bravo', elo: 1987, start: 2008, lvl: 9, seed: 5 },
+    { nick: 'demo_charlie', elo: 1842, start: 1756, lvl: 9, seed: 7 },
+    { nick: 'demo_delta', elo: 1655, start: 1643, lvl: 8, seed: 11 },
+    { nick: 'demo_echo', elo: 1503, start: 1547, lvl: 7, seed: 13 },
+    { nick: 'demo_foxtrot', elo: 2051, start: 1990, lvl: 10, seed: 17 },
+    { nick: 'demo_golf', elo: 1398, start: 1404, lvl: 7, seed: 19 },
+    { nick: 'demo_hotel', elo: 1720, start: 1695, lvl: 8, seed: 23 }
+  ];
+  var maps = [
+    { slug: 'mirage', name: 'Mirage', s: 9, f: 7, m: 5, h: 3 }, { slug: 'inferno', name: 'Inferno', s: 7, f: 5, m: 4, h: 2 },
+    { slug: 'dust2', name: 'Dust II', s: 6, f: 4, m: 3, h: 2 }, { slug: 'nuke', name: 'Nuke', s: 4, f: 3, m: 1, h: 1 },
+    { slug: 'ancient', name: 'Ancient', s: 3, f: 2, m: 1, h: 1 }, { slug: 'anubis', name: 'Anubis', s: 3, f: 1, m: 1, h: 1 },
+    { slug: 'train', name: 'Train', s: 2, f: 1, m: 1, h: 0 }
+  ];
+  function fmt(n) { return new Intl.NumberFormat('fr-FR').format(n).replace(/ /g, ' '); }
+  function d(p) { return p.elo - p.start; }
+  function signed(n) { return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '±0'; }
+  var best = players.slice().sort(function (a, b) { return d(b) - d(a); })[0].nick;
+
+  // Lineup (caméras joueurs)
+  document.getElementById('lineup').innerHTML = players.slice().sort(function (a, b) { return b.elo - a.elo; }).slice(0, 5).map(function (p, i) {
+    return '<a class="cam" href="#top"><div class="pic"><img src="assets/player.svg" alt=""><span class="id hud">Cam 0' + (i + 1) + '</span>'
+      + (p.nick === best ? '<span class="mvp">★ MVP</span>' : '') + '</div>'
+      + '<div class="lower"><span class="lv">' + p.lvl + '</span><span class="nm"><b>' + p.nick + '</b><span>' + fmt(p.elo) + ' ELO</span></span></div></a>';
+  }).join('');
+
+  // Historique façon « rounds » : demo déterministe, un carré par jour
+  function rounds(p) {
+    var out = '', x = p.seed;
+    for (var i = 0; i < 12; i++) {
+      x = (x * 37 + 11) % 97;
+      var k = x % 3; // 0 hausse, 1 baisse, 2 rien
+      if (d(p) < 0 && k === 0 && i % 2) k = 1;
+      out += '<i class="' + (k === 0 ? 'g' : k === 1 ? 'l' : '') + '"></i>';
+    }
+    return '<span class="rounds" aria-hidden="true">' + out + '</span>';
+  }
+  var mode = 'delta';
+  function render() {
+    var sorted = players.slice().sort(function (a, b) { return mode === 'delta' ? d(b) - d(a) : b.elo - a.elo; });
+    document.getElementById('rows').innerHTML = sorted.map(function (p, i) {
+      return '<tr><td class="rk">' + (i + 1) + '</td><td><span class="pl"><img src="assets/player.svg" alt=""><b>' + p.nick + '</b>' + (p.nick === best ? '<span class="star" title="MVP du run">★</span>' : '') + '</span></td>'
+        + '<td><span class="lvb' + (p.lvl === 10 ? ' top' : '') + '">' + p.lvl + '</span></td>'
+        + '<td class="n" style="color:var(--muted)">' + fmt(p.start) + '</td><td class="n">' + fmt(p.elo) + '</td>'
+        + '<td class="d ' + (d(p) >= 0 ? 'up' : 'down') + '">' + signed(d(p)) + '</td><td>' + rounds(p) + '</td></tr>';
+    }).join('');
+  }
+  render();
+  document.querySelectorAll('.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      mode = b.dataset.mode;
+      document.querySelectorAll('.tabs button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      render();
+    });
+  });
+
+  // Veto des maps
+  document.getElementById('veto').innerHTML = maps.map(function (m) {
+    var max = 9;
+    function row(lbl, n, color) { return '<span>' + lbl + '<em style="--w:' + (n / max * 100) + '%;--k:' + color + '"></em>' + n + '</span>'; }
+    return '<a class="vmap" href="' + (m.slug === 'mirage' ? 'proto-b-stuffs.html' : '#stuffs') + '"><span class="art" style="background-image:url(assets/maps/' + m.slug + '.svg)"></span><span class="pick">Ouvrir</span>'
+      + '<b>' + m.name + '</b><span class="hud" style="color:var(--silver)">' + (m.s + m.f + m.m + m.h) + ' stuffs</span>'
+      + '<span class="mini">' + row('SMK', m.s, '#C9CDD4') + row('FLS', m.f, '#F6E27A') + row('MOL', m.m, '#FF8A3D') + row('HE', m.h, '#8BE3A6') + '</span></a>';
+  }).join('');
+
+  // Horloge (heure locale réelle, pas une donnée de match)
+  var clock = document.getElementById('clock');
+  function tick() { var t = new Date(); clock.firstChild.nodeValue = String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'); }
+  tick(); setInterval(tick, 15000);
+
+  // Touches 1 à 7 : sélection d'arme = navigation
+  var toast = document.getElementById('toast'), tt;
+  var slots = document.querySelectorAll('.slots a');
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 7) {
+      var a = slots[n - 1];
+      var target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      slots.forEach(function (o) { o.toggleAttribute('aria-current', o === a); if (o === a) o.setAttribute('aria-current', 'page'); });
+      toast.textContent = 'Slot ' + n + ' · ' + a.textContent.replace(/^\d/, '').trim();
+      toast.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { toast.classList.remove('show'); }, 1200);
+    }
+  });
+
+  // Panneau de démo
+  var state = document.getElementById('state');
+  document.querySelectorAll('.demo [data-live]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      state.dataset.live = b.dataset.live;
+      document.querySelectorAll('.demo [data-live]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

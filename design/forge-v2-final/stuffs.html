@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stuffs · LaFineEquipe</title>
+<link rel="icon" href="assets/brand/lfe-round-temp.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/forge.css">
+<link rel="stylesheet" href="assets/stuffs.css">
+<style>
+.phead{padding-bottom:clamp(28px,3cqi,44px)}
+.top-search{margin-top:26px;max-width:640px}
+.top-search .input{min-height:52px;font-size:16.5px}
+.global{margin-top:18px}
+.global[hidden]{display:none}
+.global .sgrid{margin-top:12px}
+.mapgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.mtile{position:relative;display:block;aspect-ratio:4/5;overflow:hidden;text-decoration:none;isolation:isolate;background:#111;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%)}
+.mtile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.03);transition:transform 1s var(--ease),filter .5s}
+.mtile::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,rgba(5,5,5,.95) 10%,rgba(5,5,5,.25) 55%,rgba(5,5,5,.1));transition:background .4s}
+.mtile .in{position:absolute;left:18px;right:18px;bottom:18px;z-index:2;display:grid;gap:10px}
+.mtile .nm{font:900 clamp(30px,3cqi,46px)/.9 var(--f);font-stretch:122%;letter-spacing:-.03em;transition:transform .5s var(--ease)}
+.mtile .ct{display:flex;align-items:baseline;gap:8px;font:650 14px/1 var(--f);color:var(--silver)}
+.mtile .ct b{font:850 22px/1 var(--f);color:#fff;font-variant-numeric:tabular-nums}
+.mtile .types{display:flex;flex-wrap:wrap;gap:6px;max-height:0;opacity:0;overflow:hidden;transition:max-height .45s var(--ease),opacity .35s}
+.mtile .types span{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;font:700 11.5px/1 var(--f);background:rgba(0,0,0,.6);border:1px solid currentColor}
+.mtile .types svg{width:13px;height:13px}
+.mtile .tac{position:absolute;top:14px;left:14px;z-index:2}
+.mtile .bar{position:absolute;left:0;bottom:0;z-index:3;height:3px;width:100%;background:var(--brand-hi);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.mtile:hover img,.mtile:focus-visible img{transform:scale(1.1)}
+.mtile:hover .nm,.mtile:focus-visible .nm{transform:translateY(-4px)}
+.mtile:hover .types,.mtile:focus-visible .types{max-height:80px;opacity:1}
+.mtile:hover .bar,.mtile:focus-visible .bar{transform:scaleX(1)}
+.mtile:focus-visible{outline:none}
+.mtile:focus-visible::after{content:"";position:absolute;inset:0;z-index:4;box-shadow:inset 0 0 0 3px #fff}
+.mtile.empty-map img{filter:grayscale(.7) brightness(.7)}
+.admin-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding:14px 18px;border:1px dashed var(--line-2);font-size:14px;color:var(--muted)}
+@container site (max-width: 1100px){ .mapgrid{grid-template-columns:repeat(2,minmax(0,1fr))} .mtile{aspect-ratio:16/11} }
+@container site (max-width: 900px){ .mtile .types{max-height:80px;opacity:1} }
+@container site (max-width: 560px){ .mapgrid{grid-template-columns:minmax(0,1fr);gap:10px} .mtile{aspect-ratio:16/8} .mtile .nm{font-size:34px} .mtile .types{display:none} }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="stage" id="stage"><div class="phone">
+<div class="site" id="site" data-role="visitor">
+  <div class="ribbon">Prototype · lineups fictifs · images : écrans de chargement CS2 (Valve, extraits du jeu) et captures de la team</div>
+  <div id="nav-slot"></div>
+  <main id="main">
+    <header class="phead">
+      <p class="backword" aria-hidden="true">NADES</p>
+      <p class="kicker rv" id="kick">Bibliothèque de lineups</p>
+      <h1 class="h1 rv" style="--i:1">Stuffs</h1>
+      <p class="lede rv" style="--i:2">Choisis une map, puis consulte les lineups en <strong>bibliothèque</strong> ou sur la <strong>carte tactique</strong>. Pensé pour aller vite pendant l’entraînement.</p>
+      <div class="top-search search rv" style="--i:3"><svg aria-hidden="true"><use href="#i-search"/></svg><label class="sr" for="gq">Rechercher un lineup sur toutes les maps</label><input class="input" id="gq" type="search" placeholder="Toutes les maps : « fenêtre », « smoke CT », « banane »…" autocomplete="off"></div>
+    </header>
+    <section class="sec" style="padding-top:clamp(28px,3cqi,48px)" aria-labelledby="maps-title">
+      <div class="global" id="global" hidden aria-live="polite"><p class="count-line" id="gcount"></p><div class="sgrid" id="gres"></div></div>
+      <div id="maps-wrap">
+        <h2 class="sr" id="maps-title">Maps</h2>
+        <div class="mapgrid" id="mapgrid"></div>
+        <div class="admin-strip only-admin"><span>Maps gérées depuis l’administration : ajout, retrait, ordre, vignette et vue aérienne.</span><a class="btn btn-steel btn-sm" href="admin.html#maps">Gérer les maps</a></div>
+        <p class="note-demo">Vignettes : écrans de chargement officiels de CS2 (Valve). Compteurs calculés à partir des fiches publiées.</p>
+      </div>
+    </section>
+  </main>
+  <div id="foot-slot"></div>
+  <div id="tab-slot"></div>
+</div>
+</div></div>
+<script src="assets/data.js"></script>
+<script src="assets/forge.js"></script>
+<script src="assets/stuffs.js"></script>
+<script>
+(function () {
+  var D = window.LFE_DATA, L = window.LFE, S = window.LFE_STUFF;
+  document.getElementById('kick').textContent = 'Bibliothèque · ' + D.stuffs.length + ' lineups · ' + D.maps.length + ' maps';
+  document.getElementById('mapgrid').innerHTML = D.maps.map(function (m, i) {
+    var c = D.counts(m.slug), hasTac = (D.positions[m.slug] || []).length > 0;
+    var types = ['smoke', 'flash', 'molo', 'he'].filter(function (t) { return c[t]; }).map(function (t) {
+      return '<span style="color:var(--' + t + ')">' + S.icon(D.types[t].icon) + c[t] + ' ' + D.types[t].label + '</span>';
+    }).join('');
+    return '<a class="mtile rv' + (c.total ? '' : ' empty-map') + '" style="--i:' + (i % 4) + '" href="map.html?m=' + m.slug + '">'
+      + '<img src="' + m.cover + '" alt="" style="view-transition-name:map-' + m.slug + '" loading="' + (i < 4 ? 'eager' : 'lazy') + '" decoding="async">'
+      + (hasTac ? '<span class="chip src tac">' + S.icon('i-map') + 'Carte tactique</span>' : '')
+      + '<span class="in"><span class="nm">' + m.name + '</span><span class="ct">' + (c.total ? '<b>' + c.total + '</b>lineup' + (c.total > 1 ? 's' : '') : 'Aucun lineup pour l’instant') + '</span>'
+      + (types ? '<span class="types">' + types + '</span>' : '') + '</span><span class="bar"></span></a>';
+  }).join('');
+
+  var gq = document.getElementById('gq'), global = document.getElementById('global');
+  function search() {
+    var q = gq.value.trim();
+    S.writeFilters({ type: 'all', side: 'all', q: q });
+    if (!q) { global.hidden = true; document.getElementById('maps-wrap').hidden = false; return; }
+    var res = D.stuffs.filter(function (s) { return S.match(s, { type: 'all', side: 'all', q: q }); });
+    global.hidden = false; document.getElementById('maps-wrap').hidden = true;
+    document.getElementById('gcount').textContent = res.length + ' lineup' + (res.length > 1 ? 's' : '') + ' pour « ' + q + ' » sur toutes les maps';
+    document.getElementById('gres').innerHTML = res.length ? res.map(function (s, i) { return S.card(s, i, true); }).join('') : '<div class="empty"><strong>Aucun lineup trouvé</strong><span>Essaie une destination (« fenêtre »), une position (« départ T ») ou un type (« molotov »).</span></div>';
+    L.reveal(global);
+  }
+  gq.value = S.readFilters().q; if (gq.value) search();
+  gq.addEventListener('input', search);
+  L.mount({ active: 'stuffs' });
+})();
+</script>
+</body>
+</html>

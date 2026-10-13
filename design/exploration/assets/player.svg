@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
+  <title>Silhouette de joueur (démo)</title>
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a3a40"/>
+      <stop offset=".55" stop-color="#1a1a1e"/>
+      <stop offset="1" stop-color="#0c0c0e"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#ff2a1f" stop-opacity=".9"/>
+      <stop offset=".35" stop-color="#ff2a1f" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#body)">
+    <path d="M14 240 C18 190 58 166 100 164 C142 166 182 190 186 240 Z"/>
+    <rect x="83" y="136" width="34" height="36" rx="8"/>
+    <ellipse cx="100" cy="98" rx="44" ry="52"/>
+  </g>
+  <g fill="url(#rim)">
+    <path d="M14 240 C18 190 58 166 100 164 C142 166 182 190 186 240 Z"/>
+    <ellipse cx="100" cy="98" rx="44" ry="52"/>
+  </g>
+  <path d="M50 98 C50 34 150 34 150 98" fill="none" stroke="#0a0a0b" stroke-width="11" stroke-linecap="round"/>
+  <path d="M50 98 C50 34 150 34 150 98" fill="none" stroke="#5a5a62" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+  <rect x="40" y="82" width="20" height="44" rx="8" fill="#0a0a0b"/>
+  <rect x="140" y="82" width="20" height="44" rx="8" fill="#0a0a0b"/>
+  <rect x="143" y="86" width="4" height="36" rx="2" fill="#e3080e"/>
+  <path d="M150 120 C150 146 132 154 112 152" fill="none" stroke="#0a0a0b" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="110" cy="152" r="5" fill="#0a0a0b"/>
+</svg>
