@@ -14,22 +14,36 @@ create extension if not exists pg_net;
 select vault.create_secret('https://fineequipe.com', 'lfe_site_url');
 select vault.create_secret('REMPLACE-PAR-TON-CRON_SECRET', 'lfe_cron_secret');
 
--- 3. Profils + ELO + matchs toutes les 5 minutes (classement permanent ; ~20 appels FACEIT par passage
---    pour 10 joueurs, très en dessous du débit constaté de 20 appels/s).
+-- 3. Deux tâches toutes les 5 minutes, chacune dans sa propre requête : Netlify coupe une requête
+--    après ~30 s (constaté le 14/10/2026). Profils + ELO d'un côté, matchs + stats de l'autre.
 select cron.schedule(
-  'lfe-sync',
+  'lfe-sync-profiles',
   '*/5 * * * *',
   $$
   select net.http_get(
-    url := (select decrypted_secret from vault.decrypted_secrets where name = 'lfe_site_url') || '/api/cron/sync',
+    url := (select decrypted_secret from vault.decrypted_secrets where name = 'lfe_site_url') || '/api/cron/sync?job=profiles',
     headers := jsonb_build_object(
       'Authorization',
       'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'lfe_cron_secret')
     ),
-    timeout_milliseconds := 60000
+    timeout_milliseconds := 30000
+  );
+  $$
+);
+select cron.schedule(
+  'lfe-sync-matches',
+  '*/5 * * * *',
+  $$
+  select net.http_get(
+    url := (select decrypted_secret from vault.decrypted_secrets where name = 'lfe_site_url') || '/api/cron/sync?job=matches',
+    headers := jsonb_build_object(
+      'Authorization',
+      'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'lfe_cron_secret')
+    ),
+    timeout_milliseconds := 30000
   );
   $$
 );
 
 -- Vérifier : select * from cron.job;  ·  Historique : select * from cron.job_run_details order by start_time desc limit 20;
--- Arrêter : select cron.unschedule('lfe-sync');
+-- Arrêter : select cron.unschedule('lfe-sync-profiles'); select cron.unschedule('lfe-sync-matches');

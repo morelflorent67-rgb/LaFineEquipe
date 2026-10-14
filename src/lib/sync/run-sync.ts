@@ -38,10 +38,21 @@ const DETAILS_PER_PASS = 30;
 /** Fenêtre du Wall of Shame : l'historique et les stats joueurs couvrent les 30 derniers jours. */
 const WINDOW_DAYS = 30;
 /**
- * Budget d'un passage de matchs : Netlify coupe une requête après 60 s. Au-delà de ce budget,
- * les détails et stats restants sont laissés au passage suivant (5 min plus tard).
+ * Budget d'un passage de matchs : Netlify coupe une requête après ~30 s (504 « Inactivity Timeout »
+ * constaté le 14/10/2026, malgré les 60 s annoncés). Au-delà de ce budget, les détails et stats
+ * restants sont laissés au passage suivant (5 min plus tard).
  */
-const MATCHES_BUDGET_MS = 40_000;
+const MATCHES_BUDGET_MS = 18_000;
+const UPSERT_CONCURRENCY = 6;
+
+/** Exécute `fn` sur chaque élément, `size` à la fois au plus. */
+async function inPool<T>(items: T[], size: number, fn: (item: T) => Promise<void>): Promise<void> {
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) await fn(items[next++]!);
+  };
+  await Promise.all(Array.from({ length: Math.min(size, items.length) }, worker));
+}
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const targetsSchema = z.array(
@@ -167,7 +178,9 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
     }
 
     // Un match partagé par plusieurs joueurs suivis = une seule ligne (clé : identifiant FACEIT du match).
-    for (const { item, players } of collected.values()) {
+    // Enregistrés par petits groupes en parallèle : en ligne, chaque appel traverse l'Atlantique
+    // (fonctions Netlify aux États-Unis, base à Paris) ; un par un, 130 matchs dépassaient le budget.
+    await inPool([...collected.values()], UPSERT_CONCURRENCY, async ({ item, players }) => {
       const winner = item.results?.winner;
       await db.rpc('sync_upsert_match', {
         p: {
@@ -190,7 +203,7 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
         },
       });
       ok++;
-    }
+    });
 
     // Détails (map + score en manches) pour les matchs terminés qui n'en ont pas encore.
     // Débit constaté : 20 appels/s ; 30 matchs = 60 appels espacés, sans risque de quota.
