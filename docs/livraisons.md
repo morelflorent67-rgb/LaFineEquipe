@@ -1,5 +1,14 @@
 # Livraisons
 
+## Livraison 13 — 14/10/2026 : mise en ligne (Supabase + Netlify + fineequipe.com)
+
+- **Supabase** (Paris) : migrations 0100 → 1700, inscriptions fermées, compte admin unique, vraies données locales transférées par `npm run transfer` (10 joueurs, 78 relevés ELO, 130 matchs, 358 lignes de stats, 10 crosshairs, maps et 17 images).
+- **Netlify** : déploiement automatique depuis `main`, variables d'environnement côté Netlify uniquement ; aucune clé secrète dans le JavaScript envoyé aux navigateurs (vérifié sur les fichiers en ligne).
+- **Synchro** : Netlify coupe une requête après ~30 s (et non 60 s) ; matchs enregistrés en parallèle, budget de 18 s, passage interrompu libéré après 2 min (migration 1700), deux tâches Supabase Cron (profils / matchs). Mesuré en ligne : matchs ≈ 10 s, profils ≈ 5 s.
+- **Matchs** : « Map en attente » tant que les détails FACEIT ne sont pas encore récupérés.
+- **Mur** : affiches WANTED « clouées » à l'ouverture (mouvement seul, mouvement réduit respecté).
+- **Domaine** : DNS OVH → Netlify (A `75.2.60.5`, CNAME `www`, AAAA supprimés), HTTPS automatique Netlify.
+
 ## Livraison 12 — 14/10/2026 : Mur des lamentations public (Banlist + Wall of Shame)
 
 - **Page publique** `/mur-des-lamentations`, sans connexion. Banlist à gauche, Wall of Shame à droite ; colonnes empilées sous 1 100 px. La page reste non indexée par les moteurs de recherche, car elle affiche des pseudos de joueurs extérieurs.
