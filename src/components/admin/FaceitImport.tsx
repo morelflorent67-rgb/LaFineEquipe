@@ -264,7 +264,7 @@ export function FaceitImport({ target }: { target: Target }) {
                         <span className="chip stale">
                           <Icon name="lock" /> Visible uniquement par les administrateurs
                         </span>{' '}
-                        Reste factuel, sans insulte : ce motif n’est jamais affiché aux membres.
+                        Reste factuel, sans insulte : cette note n’est jamais affichée publiquement.
                       </span>
                     </div>
                     <fieldset className={styles.radios}>
@@ -273,7 +273,7 @@ export function FaceitImport({ target }: { target: Target }) {
                         <input type="radio" name="status" checked={status === 'active'} onChange={() => setStatus('active')} />
                         <span>
                           <b>Actif</b>
-                          <span>Visible sur le Mur par les membres.</span>
+                          <span>Visible publiquement sur le Mur.</span>
                         </span>
                       </label>
                       <label className={styles.radio}>
@@ -306,7 +306,7 @@ export function FaceitImport({ target }: { target: Target }) {
                 )}
                 {target === 'avoid' ? (
                   <p className="muted" style={{ margin: 0, fontSize: 14 }}>
-                    L’ajout au Mur ne donne aucun accès membre et n’inscrit pas le joueur au roster ni à un ELO Run.
+                    L’ajout au Mur ne donne aucun accès et n’inscrit le joueur ni au roster ni au classement.
                   </p>
                 ) : null}
                 {saveError ? (

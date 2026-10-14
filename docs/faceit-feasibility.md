@@ -12,6 +12,7 @@
 | `GET /players/{id}/history?game=cs2` | derniers matchs | `match_id`, `status`, `started_at`, `finished_at`, `results.winner`, `results.score`, `teams.*.players[].player_id` | OK, 100 matchs par appel au maximum |
 | `GET /matches/{id}` | map jouée | `voting.map.pick`, `voting.map.entities[].name` | OK (ex. `de_anubis` / « Anubis ») |
 | `GET /matches/{id}/stats` | score en manches (contrôle) | `rounds[0].teams[].team_stats["Final Score"]` | OK, cohérent avec l'historique |
+| `GET /matches/{id}/stats` | Wall of Shame | `rounds[0].teams[].players[].player_stats` : `Kills`, `Deaths`, `Headshots %`, `ADR`, `Result` | OK le 14/10/2026 (valeurs en texte, `Result` = `"1"` pour une victoire) |
 
 ## Constats réels
 
@@ -24,6 +25,7 @@
 - **Score** : contrairement à ce que laissait penser la spécification, `results.score` de l'historique est **en manches**, par exemple `{"faction1": 6, "faction2": 13}`. Sur 1 000 matchs, 999 ont un score normal et 1 est à 11–0, probablement un abandon. Le site l'utilise directement pour les matchs terminés, puis le contrôle avec « Final Score » de `/stats`.
 - **Type de matchs** : les 1 000 matchs observés sont tous `matchmaking`, « Europe 5v5 Queue ».
 - **Rythme de jeu** : les 100 derniers matchs couvrent de 2 à 4 semaines selon le joueur. Sur 1 000 entrées, il y a 473 matchs distincts, car les joueurs jouent souvent ensemble. La déduplication par identifiant de match fonctionne : 43 lignes pour les 10 derniers matchs de chacun des 10 joueurs.
+- **Stats individuelles** (vérifié le 14/10/2026 sur un vrai match CS2) : `player_stats` contient une cinquantaine de clés en texte, dont `Kills`, `Deaths`, `Assists`, `Headshots`, `Headshots %`, `ADR`, `Damage`, `K/D Ratio`, `MVPs`, `Result`. Le Wall of Shame n'utilise que `Kills`, `Deaths`, `Headshots %`, `ADR` et `Result` ; un joueur dont une valeur manque ou est hors bornes est ignoré.
 - **Synchro complète** : 20 s pour la première passe (10 profils, 10 historiques, 30 détails de match), 12 s pour la suivante.
 
 ## Choix faits par prudence (inchangés)

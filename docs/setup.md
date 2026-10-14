@@ -54,7 +54,7 @@ En mode local avec `FACEIT_MODE=live`, les profils réels sont enregistrés dans
 ## 3. Créer le projet Supabase
 
 1. Crée un projet sur https://supabase.com, région Europe (Paris ou Francfort).
-2. **Créer les tables et les règles d'accès.** Dans **SQL Editor**, exécute un par un, dans l'ordre, les fichiers de `supabase/migrations/` (0100 → 1500). N'exécute ni `supabase/local/*`, ni `cron.sql` à cette étape.
+2. **Créer les tables et les règles d'accès.** Dans **SQL Editor**, exécute un par un, dans l'ordre, les fichiers de `supabase/migrations/` (0100 → 1600). N'exécute ni `supabase/local/*`, ni `cron.sql` à cette étape.
    Alternative en ligne de commande :
    ```bash
    npx supabase link --project-ref TON_REF

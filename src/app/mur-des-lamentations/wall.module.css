@@ -1,5 +1,5 @@
-/* Identité du Mur (référence : design/forge-v2-final/mur.html) : appareillage de briques sombres,
-   titre gravé, fissure tracée à l'arrivée, ruban rouge pour les ajouts récents. */
+/* Identité du Mur (référence : design/forge-v2-final/mur.html) : mur de briques sombres,
+   titre gravé, affiches WANTED pour la Banlist, ruban rouge pour les ajouts récents. */
 .page {
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
@@ -86,13 +86,33 @@
   color: #fff;
 }
 
+/* Deux colonnes : Banlist (gauche) et Wall of Shame (droite) ; empilées sur écran étroit. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(28px, 3cqi, 48px);
+  padding: 0 var(--pad) clamp(56px, 6cqi, 96px);
+}
+.col {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.colTitle {
+  margin: 0;
+  font: 900 clamp(32px, 3.6cqi, 52px) / 0.95 var(--f);
+  font-stretch: 115%;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
 /* Barre : compteur, recherche, ordre */
 .bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px 24px;
-  padding: 0 var(--pad) 24px;
+  gap: 14px 20px;
 }
 .counter {
   display: flex;
@@ -100,7 +120,7 @@
   gap: 12px;
 }
 .counter b {
-  font: 900 clamp(56px, 6cqi, 88px) / 0.8 var(--f);
+  font: 900 clamp(48px, 5cqi, 72px) / 0.8 var(--f);
   font-stretch: 110%;
   font-variant-numeric: tabular-nums;
   color: #fff;
@@ -111,101 +131,125 @@
   color: var(--silver);
 }
 .search {
-  flex: 1 1 260px;
-  max-width: 420px;
+  flex: 1 1 220px;
+  max-width: 360px;
 }
 .manageAll {
   margin-left: auto;
 }
 
-/* Briques */
-.bricks {
+/* Affiches « WANTED » : papier clair, encre sombre, légère inclinaison alternée. */
+.posters {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 22px 18px;
   margin: 0;
-  padding: 0 var(--pad) clamp(56px, 6cqi, 96px);
+  padding: 6px 0 0;
   list-style: none;
 }
-.brick {
+.poster {
+  --tilt: -1.2deg;
+  --ink: #2a1a12;
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 14px;
-  padding: 16px 16px 14px 14px;
-  background: linear-gradient(180deg, #221a19, #151110);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 14px 14px;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, #ebdfc6, #d9c7a4);
+  color: var(--ink);
+  text-align: center;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.6);
-  transition:
-    transform 0.3s var(--ease),
-    border-color 0.25s;
-  animation: brickIn 0.5s var(--ease) both;
+    inset 0 0 0 3px rgba(42, 26, 18, 0.85),
+    inset 0 0 0 6px #e4d6ba,
+    inset 0 0 0 7px rgba(42, 26, 18, 0.5),
+    0 10px 24px rgba(0, 0, 0, 0.55);
+  transform: rotate(var(--tilt));
+  transition: transform 0.3s var(--ease);
+  animation: posterIn 0.5s var(--ease) both;
   animation-delay: calc(var(--i, 0) * 40ms);
 }
-.brick:hover,
-.brick:focus-within {
-  transform: translateY(-3px);
-  border-color: rgba(255, 60, 40, 0.4);
+.poster:nth-child(even) {
+  --tilt: 1deg;
 }
-.tape {
+.poster:nth-child(3n) {
+  --tilt: -0.4deg;
+}
+.poster:hover,
+.poster:focus-within {
+  transform: rotate(0deg) translateY(-4px);
+}
+/* Punaise */
+.poster::before {
+  content: '';
   position: absolute;
-  right: -4px;
-  top: 10px;
-  padding: 3px 8px;
-  background: var(--brand-hi);
-  color: #fff;
-  font: 800 10px/1 var(--f);
-  letter-spacing: 0.1em;
+  top: -6px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff7b72, var(--brand-hi) 55%, #7a0c08);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.6);
+}
+.wanted {
+  margin: 4px 0 0;
+  font: 900 34px/0.9 var(--f);
+  font-stretch: 125%;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  transform: rotate(3deg);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
-.id {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
+.sought {
+  margin: 0;
+  padding: 2px 10px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  font: 800 11px/1.4 var(--f);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
 }
-.id b {
+.mugshot {
+  margin-top: 4px;
+  padding: 4px;
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.nick {
+  max-width: 100%;
   overflow: hidden;
-  font: 800 17px/1.15 var(--f);
+  font: 900 19px/1.15 var(--f);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .meta {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 6px 8px;
   font-size: 13px;
-  color: var(--muted);
+}
+/* Étiquette « Exemple fictif » lisible sur le papier. */
+.poster :global(.chip.demo) {
+  border-color: var(--ink);
+  background: rgba(42, 26, 18, 0.08);
+  color: var(--ink);
 }
 .elo {
-  color: var(--white);
-  font-weight: 700;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-.ft {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 10px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.08);
-}
 .date {
-  font: 500 11px/1 var(--mono);
-  color: var(--dim);
-  white-space: nowrap;
+  font: 600 11px/1.2 var(--mono);
+  color: #4a3628;
 }
 .links {
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
+  margin-top: 2px;
 }
 .fl,
 .manage {
@@ -214,28 +258,38 @@
   gap: 6px;
   min-height: 32px;
   padding: 7px 10px;
-  border: 1px solid var(--line-2);
-  font: 700 13px/1 var(--f);
-  color: var(--white);
+  border: 1.5px solid var(--ink);
+  font: 800 13px/1 var(--f);
+  color: var(--ink);
   text-decoration: none;
   transition:
-    border-color 0.2s,
-    background 0.2s;
+    background 0.2s,
+    color 0.2s;
 }
 .fl:hover,
 .manage:hover {
-  border-color: var(--brand-hi);
-  background: rgba(255, 42, 31, 0.1);
+  background: var(--ink);
+  color: #f2e8d4;
 }
 .fl svg {
   width: 13px;
   height: 13px;
 }
-.manage {
-  color: var(--muted);
+.tape {
+  position: absolute;
+  right: -6px;
+  top: 12px;
+  z-index: 1;
+  padding: 3px 8px;
+  background: var(--brand-hi);
+  color: #fff;
+  font: 800 10px/1 var(--f);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: rotate(6deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 .empty {
-  margin: 0 var(--pad) 60px;
   padding: 36px 20px;
   text-align: center;
   border: 1px dashed var(--line-2);
@@ -249,34 +303,116 @@
   color: #fff;
 }
 
-/* Accès réservé : AUCUNE donnée n'est envoyée au navigateur d'un visiteur. */
-.gate {
-  display: grid;
-  justify-items: center;
-  gap: 16px;
-  max-width: 560px;
-  margin: 0 auto;
-  padding: clamp(40px, 6cqi, 80px) var(--pad) clamp(70px, 8cqi, 120px);
-  text-align: center;
+/* Wall of Shame */
+.shameCol {
+  padding: 22px clamp(16px, 2cqi, 26px) 24px;
+  background: rgba(8, 6, 6, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 3px solid var(--brand-hi);
 }
-.gate p {
+.shameScope {
+  margin: -6px 0 0;
+  font: 600 12.5px/1.4 var(--mono);
+  color: var(--dim);
+}
+.shameList {
+  display: grid;
+  gap: 12px;
   margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: shame;
+}
+.shame {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 14px 14px 14px 16px;
+  background: linear-gradient(180deg, #1d1716, #141010);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.shameTitle {
+  margin: 0;
+  font: 900 20px/1.1 var(--f);
+  font-stretch: 110%;
+  color: #fff;
+}
+.shameRule {
+  margin: -4px 0 2px;
+  font-size: 13px;
   color: var(--muted);
 }
-.lock {
+.shameFirst {
   display: grid;
-  place-items: center;
-  width: 84px;
-  height: 84px;
-  border: 1px solid var(--line-2);
-  background: rgba(5, 5, 5, 0.7);
-  transform: rotate(45deg);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
 }
-.lock svg {
-  width: 34px;
-  height: 34px;
+.shameFirst > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
+}
+.shameFirst b {
+  overflow: hidden;
+  font: 800 17px/1.2 var(--f);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shameValue {
+  flex-basis: 100%;
+  font: 900 22px/1.1 var(--f);
+  font-variant-numeric: tabular-nums;
   color: var(--brand-hi);
-  transform: rotate(-45deg);
+}
+.shameDetail {
+  flex-basis: 100%;
+  font-size: 12.5px;
+  color: var(--dim);
+}
+.shameDetail a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  color: var(--silver);
+}
+.shameDetail svg {
+  width: 11px;
+  height: 11px;
+}
+.shameOthers {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 8px 0 0 22px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  font-size: 13.5px;
+  color: var(--silver);
+}
+.shameOthers li {
+  padding-left: 2px;
+}
+.shameOthers li > span:first-child {
+  font-weight: 700;
+}
+.shameSmall {
+  margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+}
+.shameEmpty {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--dim);
+}
+.shameNote {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--dim);
 }
 
 @keyframes crack {
@@ -284,16 +420,31 @@
     stroke-dashoffset: 0;
   }
 }
-@keyframes brickIn {
+/* Glissement seul, sans opacité : une affiche reste visible même si l'animation ne démarre pas. */
+@keyframes posterIn {
   from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.98);
+    transform: translateY(14px) rotate(var(--tilt));
   }
 }
 
-@container site (max-width: 560px) {
-  .bricks {
+@container site (max-width: 1100px) {
+  .split {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container site (max-width: 560px) {
+  .posters {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 18px 12px;
+  }
+  .wanted {
+    font-size: 26px;
+  }
+  .poster {
+    padding: 14px 10px 12px;
+  }
+  .date {
+    font-size: 10px;
   }
   .crack {
     display: none;

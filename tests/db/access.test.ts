@@ -9,26 +9,31 @@ import { as, errorCode, freshDb, profile, rpc, sqlAs } from '../helpers/pg';
 let pg: PGlite;
 const mur = profile({ nickname: 'sur_le_mur' });
 const rosterPlayer = profile({ nickname: 'dans_le_roster' });
+const archived = profile({ nickname: 'archive_du_mur' });
 let entryId: string;
 
 beforeAll(async () => {
   pg = await freshDb();
   entryId = (await rpc(pg, as.admin, 'admin_add_avoid_entry', { p_profile: mur, p_reason: 'Motif interne', p_status: 'active' })).id;
   await rpc(pg, as.admin, 'admin_add_player', { p_profile: rosterPlayer, p_group: 'team' });
+  await rpc(pg, as.admin, 'admin_add_avoid_entry', { p_profile: archived, p_reason: 'Motif archivé', p_status: 'archived' });
 });
 
 describe('Mur des lamentations', () => {
-  it('un visiteur ne peut ni lister le Mur ni lire ses tables', async () => {
-    expect(await errorCode(rpc(pg, as.anon, 'list_avoid_entries'))).toBe('forbidden');
-    await expect(sqlAs(pg, as.anon, 'select * from avoid_list_entries')).rejects.toThrow(/permission denied/);
+  it('un visiteur voit la Banlist active, jamais les archives ni les motifs', async () => {
+    const list = await rpc(pg, as.anon, 'list_avoid_entries');
+    expect(list.map((e: { profile: { nickname: string } }) => e.profile.nickname)).toEqual(['sur_le_mur']);
+    expect(JSON.stringify(list)).not.toContain('Motif');
+    expect(await rpc(pg, as.anon, 'list_avoid_entries', { p_status: 'archived' })).toEqual([]);
+    expect(await rpc(pg, as.anon, 'list_avoid_entries', { p_status: 'all' })).toHaveLength(1);
     await expect(sqlAs(pg, as.anon, 'select * from avoid_list_private_notes')).rejects.toThrow(/permission denied/);
-    // Profil présent uniquement sur le Mur : invisible pour un visiteur.
-    const rows = await sqlAs(pg, as.anon, 'select nickname from faceit_profiles');
-    expect(rows.map((r) => r.nickname)).toEqual(['dans_le_roster']);
+    // Profils publics : roster + Banlist active. Un profil seulement archivé reste invisible.
+    const rows = await sqlAs(pg, as.anon, 'select nickname from faceit_profiles order by nickname');
+    expect(rows.map((r) => r.nickname)).toEqual(['dans_le_roster', 'sur_le_mur']);
   });
-  it('un compte connecté SANS rôle est traité comme un visiteur', async () => {
-    expect(await errorCode(rpc(pg, as.noRole, 'list_avoid_entries'))).toBe('forbidden');
-    expect(await sqlAs(pg, as.noRole, 'select * from avoid_list_entries')).toHaveLength(0);
+  it('un compte connecté SANS rôle voit la même chose qu’un visiteur', async () => {
+    expect(await rpc(pg, as.noRole, 'list_avoid_entries', { p_status: 'all' })).toHaveLength(1);
+    expect(await sqlAs(pg, as.noRole, 'select * from avoid_list_entries')).toHaveLength(1);
   });
   it('un compte sans rôle ne lit jamais les motifs', async () => {
     expect(await sqlAs(pg, as.noRole, 'select * from avoid_list_private_notes')).toHaveLength(0);
@@ -56,8 +61,10 @@ describe('Mur des lamentations', () => {
   });
   it('l’admin lit les motifs', async () => {
     const list = await rpc(pg, as.admin, 'admin_list_avoid_entries', { p_status: 'all' });
-    expect(list[0].reason).toBe('Motif interne');
-    expect(list[0].addedBy).toBe('Admin local');
+    const entry = list.find((e: { profile: { nickname: string } }) => e.profile.nickname === 'sur_le_mur');
+    expect(entry.reason).toBe('Motif interne');
+    expect(entry.addedBy).toBe('Admin local');
+    expect(await rpc(pg, as.admin, 'list_avoid_entries', { p_status: 'archived' })).toHaveLength(1);
   });
 });
 

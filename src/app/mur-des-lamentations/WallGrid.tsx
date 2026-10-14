@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useId, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Avatar } from '@/components/ui/Avatar';
-import { DemoTag, Level, ProfileFreshness } from '@/components/ui/badges';
+import { DemoTag, Level } from '@/components/ui/badges';
 import { FaceitLink } from '@/components/ui/FaceitLink';
 import { Icon } from '@/components/ui/Icon';
 import { useFlip } from '@/components/ui/useFlip';
@@ -20,8 +20,9 @@ const SORTS: { value: Sort; label: string }[] = [
 const NEW_FOR_MS = 3 * 24 * 3600_000;
 
 /**
- * Briques du Mur (membres uniquement) : recherche par pseudo, tri, et réordonnancement animé.
- * `now` vient du serveur : le ruban « Nouveau » est identique au rendu serveur et client.
+ * Banlist publique en affiches « WANTED » : recherche par pseudo, tri, réordonnancement animé.
+ * Aucun motif n'est jamais transmis ici. `now` vient du serveur : le ruban « Nouveau » est
+ * identique au rendu serveur et client.
  */
 export function WallGrid({ entries, isAdmin, now }: { entries: AvoidEntry[]; isAdmin: boolean; now: string }) {
   const searchId = useId();
@@ -49,7 +50,7 @@ export function WallGrid({ entries, isAdmin, now }: { entries: AvoidEntry[]; isA
         <div className={styles.counter} aria-live="polite">
           <b>{entries.length}</b>
           <span>
-            {entries.length > 1 ? 'joueurs sur le Mur' : 'joueur sur le Mur'}
+            {entries.length > 1 ? 'joueurs recherchés' : 'joueur recherché'}
             {q.trim() ? ` · ${visible.length} trouvé${visible.length > 1 ? 's' : ''}` : ''}
           </span>
         </div>
@@ -77,15 +78,15 @@ export function WallGrid({ entries, isAdmin, now }: { entries: AvoidEntry[]; isA
         </div>
         {isAdmin ? (
           <Link className={`btn btn-steel btn-sm ${styles.manageAll}`} href="/admin/mur">
-            <Icon name="edit" /> Gérer le Mur
+            <Icon name="edit" /> Gérer la Banlist
           </Link>
         ) : null}
       </div>
 
       {entries.length === 0 ? (
         <div className={styles.empty}>
-          <strong>Le Mur est vide.</strong>
-          Personne n’y figure pour l’instant.{isAdmin ? ' Ajoute un profil depuis l’administration.' : ''}
+          <strong>Personne n’est recherché.</strong>
+          La Banlist est vide pour l’instant.{isAdmin ? ' Ajoute un profil depuis l’administration.' : ''}
         </div>
       ) : visible.length === 0 ? (
         <div className={styles.empty} role="status">
@@ -93,38 +94,32 @@ export function WallGrid({ entries, isAdmin, now }: { entries: AvoidEntry[]; isA
           Bonne nouvelle.
         </div>
       ) : (
-        <ul ref={listRef} className={styles.bricks} aria-label="Profils sur le Mur">
+        <ul ref={listRef} className={styles.posters} aria-label="Profils sur le Mur">
           {visible.map((e, i) => (
-            <li key={e.id} data-key={e.id} className={styles.brick} style={{ '--i': Math.min(i, 12) } as CSSProperties}>
+            <li key={e.id} data-key={e.id} className={styles.poster} style={{ '--i': Math.min(i, 12) } as CSSProperties}>
               {nowMs - Date.parse(e.addedAt) <= NEW_FOR_MS ? <span className={styles.tape}>Nouveau</span> : null}
-              <Avatar src={e.profile.avatarUrl} size={52} level={e.profile.cs2Level} />
-              <div className={styles.id}>
-                <b>{e.profile.nickname}</b>
-                <span className={styles.meta}>
-                  {e.profile.cs2Level !== null ? <Level level={e.profile.cs2Level} /> : null}
-                  {e.profile.cs2Elo !== null ? <span className={styles.elo}>{fmtInt(e.profile.cs2Elo)} ELO</span> : <span>ELO non fourni</span>}
-                  {e.isDemo ? <DemoTag /> : null}
-                </span>
-                <ProfileFreshness
-                  fetchedAt={e.profile.fetchedAt}
-                  lastError={e.profile.lastError}
-                  lastAttemptAt={e.profile.lastAttemptAt}
-                  staleAfterHours={72}
-                  now={new Date(nowMs)}
-                  quiet
-                />
+              <p className={styles.wanted} aria-hidden="true">
+                Wanted
+              </p>
+              <p className={styles.sought}>Recherché</p>
+              <div className={styles.mugshot}>
+                <Avatar src={e.profile.avatarUrl} size={96} shape="square" />
               </div>
-              <div className={styles.ft}>
-                <span className={styles.date}>Ajouté le {fmtDate(e.addedAt)}</span>
-                <span className={styles.links}>
-                  {isAdmin ? (
-                    <Link className={styles.manage} href={`/admin/mur?entree=${e.id}#entree-${e.id}`} aria-label={`Gérer ${e.profile.nickname}`}>
-                      Gérer
-                    </Link>
-                  ) : null}
-                  <FaceitLink nickname={e.profile.nickname} isDemo={e.profile.isDemo} className={styles.fl} />
-                </span>
-              </div>
+              <b className={styles.nick}>{e.profile.nickname}</b>
+              <span className={styles.meta}>
+                {e.profile.cs2Level !== null ? <Level level={e.profile.cs2Level} /> : null}
+                {e.profile.cs2Elo !== null ? <span className={styles.elo}>{fmtInt(e.profile.cs2Elo)} ELO</span> : <span>ELO non fourni</span>}
+                {e.isDemo ? <DemoTag /> : null}
+              </span>
+              <span className={styles.date}>Ajouté le {fmtDate(e.addedAt)}</span>
+              <span className={styles.links}>
+                <FaceitLink nickname={e.profile.nickname} isDemo={e.profile.isDemo} className={styles.fl} />
+                {isAdmin ? (
+                  <Link className={styles.manage} href={`/admin/mur?entree=${e.id}#entree-${e.id}`} aria-label={`Gérer ${e.profile.nickname}`}>
+                    Gérer
+                  </Link>
+                ) : null}
+              </span>
             </li>
           ))}
         </ul>

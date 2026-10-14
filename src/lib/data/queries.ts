@@ -12,6 +12,7 @@ import {
   utilitySchema,
   adminAvoidEntrySchema,
   avoidEntrySchema,
+  wallOfShameSchema,
   liveStateSchema,
   matchSchema,
   playerSchema,
@@ -36,9 +37,14 @@ export async function getPlayer(playerId: string) {
   return call(await getDb(), 'get_player', { p_player_id: playerId }, playerSchema.nullable());
 }
 
-/** Mur : la base refuse (LFE_FORBIDDEN) si la personne n'est pas membre. */
+/** Mur public : seules les entrées actives, jamais les notes internes. */
 export async function getAvoidEntries(status: AvoidStatus | 'all' = 'active') {
   return call(await getDb(), 'list_avoid_entries', { p_status: status }, z.array(avoidEntrySchema));
+}
+
+/** Wall of Shame des joueurs « team » sur les N derniers jours (30 par défaut). */
+export async function getWallOfShame(days = 30) {
+  return call(await getDb(), 'wall_of_shame', { p_days: days }, wallOfShameSchema);
 }
 
 export async function adminGetAvoidEntries(status: AvoidStatus | 'all' = 'all') {

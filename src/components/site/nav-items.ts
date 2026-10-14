@@ -9,8 +9,6 @@ export type NavItem = {
   tab?: boolean;
   /** 2 = rangé dans « Plus » sur les écrans moyens. */
   prio?: 1 | 2;
-  /** Réservé aux membres connectés. */
-  restricted?: boolean;
   /** Module pas encore disponible : la page l'explique. */
   soon?: boolean;
 };
@@ -23,7 +21,7 @@ export const NAV: NavItem[] = [
   { href: '/crosshairs', label: 'Crosshairs', prio: 2 },
   { href: '/stuffs', label: 'Stuffs', icon: 'nade', tab: true },
   { href: '/team', label: 'Joueurs', icon: 'users' },
-  { href: '/mur-des-lamentations', label: 'Mur', full: 'Mur des lamentations', icon: 'wall', prio: 2, restricted: true },
+  { href: '/mur-des-lamentations', label: 'Mur', full: 'Mur des lamentations', icon: 'wall', prio: 2 },
 ];
 
 export function isActive(pathname: string, href: string): boolean {

@@ -9,6 +9,7 @@ import {
   mapFromVoting,
   mapMatchStatus,
   matchRoomUrl,
+  playerStatsFromMatchStats,
   roundScoreFromHistory,
   roundScoreFromStats,
   unixToIso,
@@ -34,6 +35,8 @@ export type JobReport = {
 
 const PAUSE_MS = 150;
 const DETAILS_PER_PASS = 30;
+/** Fenêtre du Wall of Shame : l'historique et les stats joueurs couvrent les 30 derniers jours. */
+const WINDOW_DAYS = 30;
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const targetsSchema = z.array(
@@ -132,12 +135,15 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
   let fatal: string | null = null;
   try {
     const targets = await call(db, 'sync_match_targets', {}, z.array(z.object({ playerId: z.string(), faceitPlayerId: z.string() })));
-    const from = Math.floor(Date.now() / 1000) - 14 * 86400;
+    const tracked = new Set(targets.map((t) => t.faceitPlayerId.toLowerCase()));
+    const saveStats = (matchId: string, raw: unknown) =>
+      db.rpc('sync_save_player_stats', { p_faceit_match_id: matchId, p_stats: playerStatsFromMatchStats(raw, tracked) });
+    const from = Math.floor(Date.now() / 1000) - WINDOW_DAYS * 86400;
     const collected = new Map<string, Collected>();
     for (const t of targets) {
       const fid = t.faceitPlayerId.toLowerCase();
       try {
-        const history = await client.playerHistory(fid, { limit: 10, from });
+        const history = await client.playerHistory(fid, { limit: 30, from });
         for (const item of history.items) {
           const entry = collected.get(item.match_id) ?? { item, players: new Map() };
           entry.players.set(fid, factionOf(item, fid));
@@ -189,9 +195,11 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
           const match = await client.match(matchId);
           const map = mapFromVoting(match.voting);
           let score: { faction1: number; faction2: number } | null = null;
+          let rawStats: unknown = undefined;
           if (mapMatchStatus(match.status) === 'finished') {
             try {
-              score = roundScoreFromStats(await client.matchStats(matchId), {
+              rawStats = await client.matchStats(matchId);
+              score = roundScoreFromStats(rawStats, {
                 faction1: match.teams?.faction1?.faction_id ?? null,
                 faction2: match.teams?.faction2?.faction_id ?? null,
               });
@@ -218,9 +226,30 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
               players: [],
             },
           });
+          if (rawStats !== undefined) await saveStats(matchId, rawStats);
         } catch (err) {
           if (err instanceof DbError) throw err;
           console.warn(`[sync] détails du match ${matchId} indisponibles : ${errorCode(err)}`);
+          if (err instanceof FaceitError && err.kind === 'rate_limited') break;
+        }
+        await pause(client.mode === 'fixtures' ? 0 : PAUSE_MS);
+      }
+
+      // Stats individuelles (Wall of Shame) des matchs terminés récents déjà détaillés.
+      const needStats = await call(
+        db,
+        'sync_matches_needing_player_stats',
+        { p_days: WINDOW_DAYS, p_limit: DETAILS_PER_PASS },
+        z.array(z.string()),
+      );
+      for (const matchId of needStats) {
+        try {
+          await saveStats(matchId, await client.matchStats(matchId));
+        } catch (err) {
+          if (err instanceof DbError) throw err;
+          // Stats inexistantes pour ce match : on le marque lu, sans aucune ligne.
+          if (err instanceof FaceitError && err.kind === 'not_found') await saveStats(matchId, null);
+          else console.warn(`[sync] stats du match ${matchId} indisponibles : ${errorCode(err)}`);
           if (err instanceof FaceitError && err.kind === 'rate_limited') break;
         }
         await pause(client.mode === 'fixtures' ? 0 : PAUSE_MS);

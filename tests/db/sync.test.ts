@@ -63,5 +63,9 @@ describe('synchronisation des matchs', () => {
     expect(finished.every((m: { mapKey: string | null; score: unknown }) => m.mapKey && m.score)).toBe(true);
     const cancelled = matches.filter((m: { status: string }) => m.status === 'cancelled');
     expect(cancelled.every((m: { players: { result: string }[] }) => m.players.every((p) => p.result === 'cancelled'))).toBe(true);
+    // Stats individuelles (Wall of Shame) : une ligne par joueur suivi et par match terminé détaillé.
+    const [row] = await sqlAs<{ n: number }>(pg, as.service, 'select count(*)::int as n from match_player_stats');
+    expect(row!.n).toBeGreaterThan(0);
+    expect(await rpc(pg, as.service, 'sync_matches_needing_player_stats', {})).toEqual([]);
   });
 });

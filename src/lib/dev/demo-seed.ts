@@ -186,6 +186,15 @@ export function buildDemoSql(now: Date = new Date()): string {
     for (let j = 0; j < count; j++) {
       const p = team[(start + j) % team.length]!;
       out.push(`insert into public.match_players (match_id, player_id, faction) values (${q(id)}, ${q(playerId(p.n))}, 'faction1') on conflict do nothing;`);
+      // Stats individuelles FICTIVES (Wall of Shame), déterministes et indépendantes de r().
+      if (!cancelled && !unknown) {
+        const h = (i + 1) * 7919 + p.n * 104729;
+        out.push(
+          `insert into public.match_player_stats (match_id, player_id, kills, deaths, headshots_pct, adr, won)
+           values (${q(id)}, ${q(playerId(p.n))}, ${4 + (h % 23)}, ${7 + ((h >> 3) % 17)}, ${18 + ((h >> 5) % 48)}, ${45 + ((h >> 7) % 70)}.${h % 10}, ${win})
+           on conflict do nothing;`,
+        );
+      }
     }
   }
   out.push(

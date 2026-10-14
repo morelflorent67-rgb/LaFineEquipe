@@ -97,6 +97,26 @@ function fixtureMatches(now: Date) {
 export type FixtureResponse = { status: number; body: unknown; retryAfter: number | null };
 
 /** Imite les routes de la Data API v4 utilisées par le site. */
+/** Stats individuelles FICTIVES et déterministes (même forme texte que la vraie API). */
+function fixtureStats(players: { player_id: string; nickname?: string }[], matchId: string, won: boolean) {
+  return players.map((pl) => {
+    let h = 0;
+    for (const c of pl.player_id + matchId) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const kills = 4 + (h % 24);
+    return {
+      player_id: pl.player_id,
+      nickname: pl.nickname,
+      player_stats: {
+        Kills: String(kills),
+        Deaths: String(6 + ((h >> 5) % 20)),
+        'Headshots %': String(15 + ((h >> 9) % 55)),
+        ADR: (40 + ((h >> 13) % 80) + ((h >> 3) % 10) / 10).toFixed(1),
+        Result: won ? '1' : '0',
+      },
+    };
+  });
+}
+
 export function fixtureRequest(path: string, query: Record<string, string>, now = new Date()): FixtureResponse {
   const ok = (body: unknown): FixtureResponse => ({ status: 200, body, retryAfter: null });
   const notFound: FixtureResponse = { status: 404, body: { errors: [{ message: 'not found' }] }, retryAfter: null };
@@ -163,8 +183,8 @@ export function fixtureRequest(path: string, query: Record<string, string>, now 
           match_id: match.match_id,
           round_stats: { Map: match._map, Score: w ? '13 / 8' : '9 / 13' },
           teams: [
-            { team_id: 'f1', team_stats: { 'Final Score': w ? '13' : '9' } },
-            { team_id: 'f2', team_stats: { 'Final Score': w ? '8' : '13' } },
+            { team_id: 'f1', team_stats: { 'Final Score': w ? '13' : '9' }, players: fixtureStats(match.teams.faction1.players, match.match_id, w) },
+            { team_id: 'f2', team_stats: { 'Final Score': w ? '8' : '13' }, players: fixtureStats(match.teams.faction2.players, match.match_id, !w) },
           ],
         },
       ],

@@ -56,6 +56,39 @@ export const adminAvoidEntrySchema = avoidEntrySchema.extend({
 });
 export type AdminAvoidEntry = z.infer<typeof adminAvoidEntrySchema>;
 
+/** Wall of Shame : classement calculé en base à partir des stats de match FACEIT réelles. */
+export const shameRowSchema = z.object({
+  player: z.object({
+    playerId: z.string(),
+    nickname: z.string(),
+    avatarUrl: z.string().nullable(),
+    cs2Level: z.number().int().nullable(),
+    isDemo: z.boolean(),
+  }),
+  value: z.number(),
+  matches: z.number().int(),
+  match: z
+    .object({ mapName: z.string().nullable(), finishedAt: isoDate.nullable(), faceitUrl: z.string(), isDemo: z.boolean() })
+    .optional(),
+});
+export type ShameRow = z.infer<typeof shameRowSchema>;
+export const shameCategoryKeys = ['touriste', 'passoire', 'myope', 'pacifiste', 'chatNoir'] as const;
+export type ShameCategoryKey = (typeof shameCategoryKeys)[number];
+export const wallOfShameSchema = z.object({
+  days: z.number().int(),
+  computedAt: isoDate,
+  matchesCounted: z.number().int(),
+  playersCounted: z.number().int(),
+  categories: z.object({
+    touriste: z.array(shameRowSchema),
+    passoire: z.array(shameRowSchema),
+    myope: z.array(shameRowSchema),
+    pacifiste: z.array(shameRowSchema),
+    chatNoir: z.array(shameRowSchema),
+  }),
+});
+export type WallOfShame = z.infer<typeof wallOfShameSchema>;
+
 export const faceitUsageSchema = z.object({
   player: z.object({ id: z.string(), active: z.boolean(), group: rosterGroupSchema }).nullable(),
   avoid: z.object({ id: z.string(), status: avoidStatusSchema }).nullable(),

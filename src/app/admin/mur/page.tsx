@@ -21,8 +21,8 @@ export default async function AdminMurPage({ searchParams }: { searchParams: Pro
         <div>
           <h1>Mur des lamentations</h1>
           <p>
-            Liste interne de la team. Ce n’est pas une sanction FACEIT. Les membres voient pseudo, avatar, niveau et date
-            d’ajout ; le motif reste réservé aux administrateurs.
+            Banlist publique de la team. Ce n’est pas une sanction FACEIT. Tout le monde voit pseudo, avatar, niveau, ELO et
+            date d’ajout des entrées actives ; la note interne reste réservée à l’administrateur.
           </p>
           <div className={styles.stats}>
             <span>

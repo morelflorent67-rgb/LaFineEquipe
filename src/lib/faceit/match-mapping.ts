@@ -121,3 +121,64 @@ export function roundScoreFromStats(
   const b = score(factionIds.faction2);
   return a === null || b === null ? null : { faction1: a, faction2: b };
 }
+
+export type PlayerMatchStats = {
+  faceitPlayerId: string;
+  kills: number;
+  deaths: number;
+  headshotsPct: number;
+  adr: number | null;
+  won: boolean | null;
+};
+
+const playerStatsSchema = z.object({
+  rounds: z.array(
+    z.object({
+      teams: z.array(
+        z.object({
+          players: z
+            .array(z.object({ player_id: z.string(), player_stats: z.record(z.string(), z.unknown()).optional() }))
+            .optional(),
+        }),
+      ),
+    }),
+  ),
+});
+
+const num = (raw: unknown, min: number, max: number): number | null => {
+  const n = typeof raw === 'string' && raw.trim() !== '' ? Number(raw) : typeof raw === 'number' ? raw : NaN;
+  return Number.isFinite(n) && n >= min && n <= max ? n : null;
+};
+
+/**
+ * Stats individuelles d'un BO1 (/matches/{id}/stats), pour les joueurs demandés uniquement.
+ * Clés constatées le 14/10/2026 sur un vrai match CS2 : « Kills », « Deaths », « Headshots % »,
+ * « ADR », « Result » (« 1 » = victoire), toutes en texte. Un joueur dont Kills, Deaths ou
+ * Headshots % manquent est ignoré : aucune valeur n'est devinée.
+ */
+export function playerStatsFromMatchStats(stats: unknown, faceitPlayerIds: ReadonlySet<string>): PlayerMatchStats[] {
+  const parsed = playerStatsSchema.safeParse(stats);
+  if (!parsed.success || parsed.data.rounds.length !== 1) return [];
+  const out: PlayerMatchStats[] = [];
+  for (const team of parsed.data.rounds[0]!.teams) {
+    for (const p of team.players ?? []) {
+      const id = p.player_id.toLowerCase();
+      if (!faceitPlayerIds.has(id)) continue;
+      const s = p.player_stats ?? {};
+      const kills = num(s['Kills'], 0, 200);
+      const deaths = num(s['Deaths'], 0, 200);
+      const headshotsPct = num(s['Headshots %'], 0, 100);
+      if (kills === null || deaths === null || headshotsPct === null || !Number.isInteger(kills) || !Number.isInteger(deaths)) continue;
+      const result = s['Result'];
+      out.push({
+        faceitPlayerId: id,
+        kills,
+        deaths,
+        headshotsPct,
+        adr: num(s['ADR'], 0, 1000),
+        won: result === '1' ? true : result === '0' ? false : null,
+      });
+    }
+  }
+  return out;
+}

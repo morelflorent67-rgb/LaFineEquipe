@@ -1,5 +1,17 @@
 # Livraisons
 
+## Livraison 12 — 14/10/2026 : Mur des lamentations public (Banlist + Wall of Shame)
+
+- **Page publique** `/mur-des-lamentations`, sans connexion. Banlist à gauche, Wall of Shame à droite ; colonnes empilées sous 1 100 px. La page reste non indexée par les moteurs de recherche, car elle affiche des pseudos de joueurs extérieurs.
+- **Banlist** : affiches « WANTED / Recherché » (avatar, pseudo, niveau, ELO, date d'ajout, lien FACEIT), recherche, tri et compteur. Seules les entrées actives sont publiques ; les archives et les notes internes restent réservées à l'admin, en base (RLS, migration 1600) comme dans l'application. Le texte rappelle que ce n'est pas une sanction FACEIT.
+- **Wall of Shame** : calculé en base (`wall_of_shame`) sur les 30 derniers jours, joueurs **Team** actifs uniquement, 3 lauréats maximum par catégorie : Le Touriste (moins de kills sur un match), La Passoire (plus de morts sur un match), Le Myope (pire moyenne de HS %), Le Pacifiste (plus faible ADR moyen), Le Chat noir (pire taux de victoire). Il faut au moins 3 matchs pour les moyennes. Les valeurs sont reprises telles quelles de `/matches/{id}/stats`, sans estimation.
+- **Synchro** : l'historique couvre désormais 30 jours (30 matchs par joueur et par passe). Les stats individuelles des matchs terminés sont enregistrées dans `match_player_stats`, 30 matchs au plus par passe. Un match sans stats est marqué « lu » pour ne pas être redemandé.
+- **Vérifications** : TypeScript, lint, **138 tests unitaires/base**, **35 parcours navigateur**. Captures inspectées à 390 et 1 440 px, sans débordement horizontal.
+
+## Livraison 11 — 14/10/2026 : compte d'administration unique
+
+- Connexion avec l'identifiant « admin » (traduit côté serveur en `LFE_ADMIN_EMAIL`) ; seul le rôle `admin` existe (migration 1500) ; plus de bouton de connexion dans l'en-tête pour les visiteurs.
+
 ## Livraison 10 — 13/10/2026 : maps en couleur au survol, cartes joueurs et presets pros
 
 - **Stuffs** : images grisées au repos, couleurs et luminosité d'origine au survol/focus clavier, transition courte. Équivalent au toucher pendant l'appui ; animations réduites respectées.

@@ -2,7 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { acceptAvatarUrl } from './avatar';
 import { FaceitError } from './errors';
 import { faceitProfileUrl, parseFaceitInput, shortFaceitId } from './input';
-import { mapFromVoting, mapMatchStatus, matchRoomUrl, roundScoreFromHistory, roundScoreFromStats, unixToIso } from './match-mapping';
+import {
+  mapFromVoting,
+  mapMatchStatus,
+  matchRoomUrl,
+  playerStatsFromMatchStats,
+  roundScoreFromHistory,
+  roundScoreFromStats,
+  unixToIso,
+} from './match-mapping';
 import { toProfileInput } from './profile';
 import { playerSchema } from './schemas';
 
@@ -165,5 +173,39 @@ describe('playerSchema', () => {
       games: { cs2: { skill_level: 10, faceit_elo: 2600, region: 'EU' }, clash_royale: { skill_level: 'n/a', faceit_elo: 1.5 } },
     });
     expect(parsed.games?.cs2?.faceit_elo).toBe(2600);
+  });
+});
+
+describe('playerStatsFromMatchStats (forme constatée le 14/10/2026)', () => {
+  const A = 'aaaaaaaa-0000-4000-8000-000000000001';
+  const B = 'bbbbbbbb-0000-4000-8000-000000000002';
+  const stats = {
+    rounds: [
+      {
+        teams: [
+          {
+            players: [
+              { player_id: A.toUpperCase(), player_stats: { Kills: '9', Deaths: '11', 'Headshots %': '44', ADR: '65.1', Result: '1' } },
+              { player_id: 'inconnu', player_stats: { Kills: '30', Deaths: '5', 'Headshots %': '60', ADR: '120', Result: '1' } },
+            ],
+          },
+          { players: [{ player_id: B, player_stats: { Kills: '3', Deaths: '18', 'Headshots %': '0', Result: '0' } }] },
+        ],
+      },
+    ],
+  };
+  it('extrait seulement les joueurs suivis, avec les valeurs telles quelles', () => {
+    expect(playerStatsFromMatchStats(stats, new Set([A, B]))).toEqual([
+      { faceitPlayerId: A, kills: 9, deaths: 11, headshotsPct: 44, adr: 65.1, won: true },
+      { faceitPlayerId: B, kills: 3, deaths: 18, headshotsPct: 0, adr: null, won: false },
+    ]);
+  });
+  it('ignore un joueur aux stats incomplètes ou absurdes, et toute forme inattendue', () => {
+    const broken = { rounds: [{ teams: [{ players: [{ player_id: A, player_stats: { Kills: 'x', Deaths: '2', 'Headshots %': '10' } }] }] }] };
+    expect(playerStatsFromMatchStats(broken, new Set([A]))).toEqual([]);
+    const absurd = { rounds: [{ teams: [{ players: [{ player_id: A, player_stats: { Kills: '5', Deaths: '2', 'Headshots %': '140' } }] }] }] };
+    expect(playerStatsFromMatchStats(absurd, new Set([A]))).toEqual([]);
+    expect(playerStatsFromMatchStats({ rounds: [] }, new Set([A]))).toEqual([]);
+    expect(playerStatsFromMatchStats(null, new Set([A]))).toEqual([]);
   });
 });

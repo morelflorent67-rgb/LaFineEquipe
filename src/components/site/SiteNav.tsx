@@ -23,7 +23,7 @@ function LivePill({ live }: { live: NavLive }) {
   );
 }
 
-function MoreMenu({ pathname, viewer }: { pathname: string; viewer: NavViewer }) {
+function MoreMenu({ pathname }: { pathname: string }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -80,11 +80,7 @@ function MoreMenu({ pathname, viewer }: { pathname: string; viewer: NavViewer })
             <li key={n.href}>
               <Link href={n.href} aria-current={isActive(pathname, n.href) ? 'page' : undefined}>
                 {n.full ?? n.label}
-                {n.restricted && viewer.role === 'visitor' ? (
-                  <small>
-                    <Icon name="lock" className={styles.lock} /> team
-                  </small>
-                ) : n.soon ? (
+                {n.soon ? (
                   <small>bientôt</small>
                 ) : null}
               </Link>
@@ -118,15 +114,12 @@ export function SiteNav({ viewer, live }: { viewer: NavViewer; live: NavLive }) 
                 title={n.full}
               >
                 {n.label}
-                {n.restricted && viewer.role === 'visitor' ? (
-                  <Icon name="lock" className={styles.lock} title="Réservé à la team" />
-                ) : null}
               </Link>
             </li>
           ))}
         </ul>
       </nav>
-      <MoreMenu pathname={pathname} viewer={viewer} />
+      <MoreMenu pathname={pathname} />
       <div className={styles.tools}>
         <LivePill live={live} />
         {viewer.role === 'admin' ? (
@@ -191,11 +184,7 @@ export function MobileTabBar({ viewer, live }: { viewer: NavViewer; live: NavLiv
               <li key={n.href}>
                 <Link href={n.href} aria-current={isActive(pathname, n.href) ? 'page' : undefined}>
                   {n.full ?? n.label}
-                  {n.restricted && viewer.role === 'visitor' ? (
-                    <small>
-                      <Icon name="lock" className={styles.lock} /> réservé à la team
-                    </small>
-                  ) : n.soon ? (
+                  {n.soon ? (
                     <small>bientôt disponible</small>
                   ) : null}
                 </Link>
