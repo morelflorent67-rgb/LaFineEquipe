@@ -35,7 +35,7 @@ describe('Clips : persistance et droits', () => {
     expect(c).toMatchObject({ id, player: { id: playerId }, map: { slug: 'mirage' } });
     await save({ id, title: 'Modifié', published: false });
     expect(await rpc(pg, as.anon, 'list_clips', { p_include_drafts: true })).toEqual([]);
-    expect(await sqlAs(pg, as.member, 'select * from clips')).toEqual([]);
+    expect(await sqlAs(pg, as.noRole, 'select * from clips')).toEqual([]);
     expect(await rpc(pg, as.admin, 'list_clips', { p_include_drafts: true })).toHaveLength(1);
     await rpc(pg, as.admin, 'admin_delete_clip', { p_id: id });
     expect(await rpc(pg, as.admin, 'list_clips', { p_include_drafts: true })).toEqual([]);
@@ -54,17 +54,17 @@ describe('Clips : persistance et droits', () => {
   });
   it('refuse les mutations aux visiteurs et membres, même via SQL direct', async () => {
     const { id } = await save();
-    for (const who of [as.anon, as.member, as.noRole]) {
+    for (const who of [as.anon, as.noRole]) {
       expect(await errorCode(rpc(pg, who, 'admin_save_clip', { p: base }))).toBe('forbidden');
       expect(await errorCode(rpc(pg, who, 'admin_delete_clip', { p_id: id }))).toBe('forbidden');
     }
-    await sqlAs(pg, as.member, "update clips set title='Pirate'");
-    await sqlAs(pg, as.member, 'delete from clips');
+    await sqlAs(pg, as.noRole, "update clips set title='Pirate'");
+    await sqlAs(pg, as.noRole, 'delete from clips');
     expect((await rpc(pg, as.anon, 'list_clips'))[0].title).toBe(base.title);
     await expect(
       sqlAs(
         pg,
-        as.member,
+        as.noRole,
         "insert into clips (title,provider,external_id,source_url,recorded_on) values ('Pirate','youtube','abcdefghijk','https://www.youtube.com/watch?v=abcdefghijk','2026-10-13')",
       ),
     ).rejects.toThrow();

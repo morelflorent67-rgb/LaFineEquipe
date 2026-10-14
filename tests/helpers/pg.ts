@@ -8,13 +8,11 @@ export async function freshDb(): Promise<PGlite> {
 }
 
 export const ADMIN = '00000000-0000-4000-8000-00000000a001';
-export const MEMBER = '00000000-0000-4000-8000-00000000a002';
 export const NO_ROLE = '00000000-0000-4000-8000-00000000a003';
 
 export const as = {
   anon: { pgRole: 'anon', userId: null } as LocalIdentity,
   admin: { pgRole: 'authenticated', userId: ADMIN } as LocalIdentity,
-  member: { pgRole: 'authenticated', userId: MEMBER } as LocalIdentity,
   noRole: { pgRole: 'authenticated', userId: NO_ROLE } as LocalIdentity,
   service: { pgRole: 'service_role', userId: null } as LocalIdentity,
 };

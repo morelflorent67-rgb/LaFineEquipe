@@ -18,6 +18,7 @@ const ROOT = process.cwd();
 const SHIM = path.join(ROOT, 'supabase', 'local', 'shim.sql');
 const MIGRATIONS_DIR = path.join(ROOT, 'supabase', 'migrations');
 const ACCOUNTS = path.join(ROOT, 'supabase', 'local', 'accounts.sql');
+const ACCOUNTS_SINGLE_ADMIN = path.join(ROOT, 'supabase', 'local', 'accounts-single-admin.sql');
 // Base locale de développement uniquement (refusée en production) : rien à embarquer au déploiement.
 export const LOCAL_DATA_DIR = process.env.LFE_LOCAL_DATA_DIR
   ? path.resolve(/*turbopackIgnore: true*/ ROOT, process.env.LFE_LOCAL_DATA_DIR)
@@ -29,6 +30,7 @@ async function migrationFiles(): Promise<{ name: string; file: string }[]> {
     { name: '00000000000000_local_shim', file: SHIM },
     ...names.map((n) => ({ name: n.replace(/\.sql$/, ''), file: path.join(MIGRATIONS_DIR, n) })),
     { name: '99999999999999_local_accounts', file: ACCOUNTS },
+    { name: '99999999999999_local_accounts_single_admin', file: ACCOUNTS_SINGLE_ADMIN },
   ];
 }
 

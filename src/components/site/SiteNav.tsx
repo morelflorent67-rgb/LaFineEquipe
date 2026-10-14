@@ -9,7 +9,7 @@ import { signOutAction } from '@/app/actions/auth';
 import { NAV, isActive } from './nav-items';
 import styles from './SiteNav.module.css';
 
-export type NavViewer = { role: 'visitor' | 'member' | 'admin'; signedIn: boolean; label: string | null };
+export type NavViewer = { role: 'visitor' | 'admin'; signedIn: boolean; label: string | null };
 export type NavLive = { kind: 'unavailable' | 'uncertain' | 'none' | 'live' | 'error'; count: number };
 
 function LivePill({ live }: { live: NavLive }) {
@@ -142,12 +142,7 @@ export function SiteNav({ viewer, live }: { viewer: NavViewer; live: NavLive }) 
               Déconnexion
             </button>
           </form>
-        ) : (
-          <Link className={`${styles.toolBtn} ${styles.hideMobile}`} href={`/connexion?suite=${encodeURIComponent(pathname)}`}>
-            <Icon name="lock" />
-            Connexion team
-          </Link>
-        )}
+        ) : null}
       </div>
     </header>
   );
@@ -225,7 +220,7 @@ export function MobileTabBar({ viewer, live }: { viewer: NavViewer; live: NavLiv
                 </form>
               ) : (
                 <Link href={`/connexion?suite=${encodeURIComponent(pathname)}`}>
-                  Connexion team <small>membres et admins</small>
+                  Connexion admin <small>réservée à l’administrateur</small>
                 </Link>
               )}
             </li>

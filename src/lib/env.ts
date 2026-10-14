@@ -16,6 +16,7 @@ const raw = z.object({
   FACEIT_MODE: z.enum(['live', 'fixtures']).default('live'),
   CRON_SECRET: z.string().optional(),
   SITE_URL: z.string().optional(),
+  LFE_ADMIN_EMAIL: z.string().optional(),
 });
 
 export type ServerEnv = {
@@ -24,6 +25,8 @@ export type ServerEnv = {
   faceit: { apiKey: string | null; mode: 'live' | 'fixtures' };
   cronSecret: string | null;
   siteUrl: string;
+  /** E-mail Supabase du compte unique « admin » (la connexion se fait avec l'identifiant admin). */
+  adminEmail: string | null;
 };
 
 export class ConfigError extends Error {
@@ -71,6 +74,7 @@ export function getServerEnv(): ServerEnv {
     faceit: { apiKey: blank(e.FACEIT_API_KEY), mode: e.FACEIT_MODE },
     cronSecret: blank(e.CRON_SECRET),
     siteUrl: blank(e.SITE_URL) ?? 'http://localhost:3000',
+    adminEmail: blank(e.LFE_ADMIN_EMAIL)?.toLowerCase() ?? null,
   };
   return cached;
 }

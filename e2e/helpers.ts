@@ -1,8 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 
 /** Connexion avec un compte LOCAL de test (mode local uniquement). */
-export async function loginAs(page: Page, who: 'admin' | 'membre' | 'sans-role') {
-  const label = { admin: /Admin local/, membre: /Membre local/, 'sans-role': /sans-role@local\.test/ }[who];
+export async function loginAs(page: Page, who: 'admin' | 'sans-role') {
+  const label = { admin: /Admin local/, 'sans-role': /sans-role@local\.test/ }[who];
   await page.goto('/connexion');
   await page.getByRole('button', { name: label }).click();
   await page.waitForURL((url) => !url.pathname.startsWith('/connexion'));

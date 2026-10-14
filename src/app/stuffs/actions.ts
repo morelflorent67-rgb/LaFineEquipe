@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { requireMember } from '@/lib/auth/guards';
+import { requireAdmin } from '@/lib/auth/guards';
 import { getDb } from '@/lib/db';
 import { failure, type ActionResult } from '@/lib/actions/result';
 
@@ -12,10 +12,10 @@ const reportSchema = z.object({
   path: z.string().regex(/^\/stuffs\/[a-z0-9-]+\/[a-z0-9-]+$/),
 });
 
-/** Un membre signale qu'une fiche ne fonctionne plus (ex. après une mise à jour CS2). */
+/** L'admin signale qu'une fiche ne fonctionne plus (ex. après une mise à jour CS2). */
 export async function reportUtilityAction(input: z.input<typeof reportSchema>): Promise<ActionResult> {
   try {
-    await requireMember();
+    await requireAdmin();
     const d = reportSchema.parse(input);
     await (await getDb()).rpc('report_utility', { p_utility_id: d.utilityId, p_note: d.note || null });
     revalidatePath(d.path);

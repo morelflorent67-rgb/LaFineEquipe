@@ -6,7 +6,7 @@ import { getLocalPg } from '@/lib/db/local-pg';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { LOCAL_SESSION_COOKIE, verifyLocalSession } from './local-session';
 
-export type Role = 'visitor' | 'member' | 'admin';
+export type Role = 'visitor' | 'admin';
 
 /**
  * Qui consulte la page. Le rôle vient TOUJOURS de la base (table profiles), jamais du navigateur.
@@ -21,7 +21,7 @@ export type Viewer = {
 
 export const VISITOR: Viewer = { role: 'visitor', signedIn: false, userId: null, label: null };
 
-const asRole = (value: unknown): Role => (value === 'admin' || value === 'member' ? value : 'visitor');
+const asRole = (value: unknown): Role => (value === 'admin' ? value : 'visitor');
 
 export const getViewer = cache(async (): Promise<Viewer> => {
   const env = getServerEnv();
@@ -51,5 +51,4 @@ export const getViewer = cache(async (): Promise<Viewer> => {
   return { role: asRole(role), signedIn: true, userId: claims.sub, label: email };
 });
 
-export const isMember = (v: Viewer) => v.role === 'member' || v.role === 'admin';
 export const isAdmin = (v: Viewer) => v.role === 'admin';

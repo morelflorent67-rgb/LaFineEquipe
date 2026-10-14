@@ -7,7 +7,7 @@ import { ReportButton, ShareButton, TrainingMode, VideoEmbed } from '@/component
 import styles from '@/components/stuffs/fiche.module.css';
 import { DemoTag, StateBlock } from '@/components/ui/badges';
 import { Icon } from '@/components/ui/Icon';
-import { getViewer, isMember } from '@/lib/auth/viewer';
+import { getViewer, isAdmin } from '@/lib/auth/viewer';
 import { getMaps, getUtilityDetail, settle } from '@/lib/data/queries';
 import { mapCoverUrl, mediaUrl } from '@/lib/media';
 import { fmtDate } from '@/lib/format';
@@ -140,7 +140,7 @@ export default async function StuffPage({ params, searchParams }: Props) {
             }}
           />
           <ShareButton path={canonical} />
-          {isMember(viewer) && u.status === 'published' ? (
+          {isAdmin(viewer) && u.status === 'published' ? (
             <ReportButton utilityId={u.id} path={canonical} already={myOpenReport} />
           ) : null}
           {viewer.role === 'admin' ? (

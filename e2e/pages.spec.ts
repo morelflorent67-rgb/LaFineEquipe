@@ -65,8 +65,8 @@ test.describe('Stuffs', () => {
     await expect(page.getByText('Map introuvable')).toBeVisible();
   });
 
-  test('un membre peut signaler une fiche « à revérifier »', async ({ page }) => {
-    await loginAs(page, 'membre');
+  test('l’admin peut signaler une fiche « à revérifier »', async ({ page }) => {
+    await loginAs(page, 'admin');
     await page.goto('/stuffs/mirage/exemple-smoke-mid-1');
     await page.getByRole('button', { name: 'Signaler « à revérifier »' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Signaler' }).click();

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getServerEnv } from '@/lib/env';
 import { getLocalPg } from '@/lib/db/local-pg';
+import { resolveAdminEmail } from '@/lib/auth/admin-login';
 import { LOCAL_SESSION_COOKIE, signLocalSession } from '@/lib/auth/local-session';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -18,25 +19,36 @@ function safeNext(value: unknown): string {
 export type SignInState = { error: string | null };
 
 const credentials = z.object({
-  email: z.email({ error: 'Adresse e-mail invalide.' }).max(200),
+  identifier: z.string().trim().min(1, { error: 'Identifiant requis.' }).max(60),
   password: z.string().min(1, { error: 'Mot de passe requis.' }).max(200),
 });
 
+// Message volontairement générique : ne révèle ni l'identifiant attendu ni l'existence du compte.
+const BAD_CREDENTIALS = 'Identifiant ou mot de passe incorrect.';
+
+/** Connexion du compte unique « admin » (Supabase Auth, aucune inscription possible). */
 export async function signInAction(_prev: SignInState, form: FormData): Promise<SignInState> {
   const env = getServerEnv();
-  if (env.backend !== 'supabase') return { error: 'La connexion par e-mail nécessite Supabase.' };
-  const parsed = credentials.safeParse({ email: form.get('email'), password: form.get('password') });
+  if (env.backend !== 'supabase') return { error: 'La connexion par mot de passe nécessite Supabase.' };
+  if (!env.adminEmail) return { error: 'Connexion admin non configurée : LFE_ADMIN_EMAIL manquant côté serveur.' };
+  const parsed = credentials.safeParse({ identifier: form.get('identifier'), password: form.get('password') });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Saisie invalide.' };
+  const email = resolveAdminEmail(parsed.data.identifier, env.adminEmail);
+  if (!email) return { error: BAD_CREDENTIALS };
+
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) {
-    // Message volontairement générique : ne révèle pas si le compte existe.
-    return { error: 'Identifiants incorrects ou compte non confirmé.' };
+  const { error } = await supabase.auth.signInWithPassword({ email, password: parsed.data.password });
+  if (error) return { error: BAD_CREDENTIALS };
+  // Le rôle vient de la table profiles : un compte authentifié sans rôle admin est refusé.
+  const { data: role } = await supabase.rpc('app_role');
+  if (role !== 'admin') {
+    await supabase.auth.signOut();
+    return { error: 'Ce compte n’a pas le rôle administrateur (table profiles).' };
   }
   redirect(safeNext(form.get('suite')));
 }
 
-/** Connexion du mode LOCAL de développement (comptes fictifs, aucun mot de passe). */
+/** Connexion du mode LOCAL de développement (comptes de test, aucun mot de passe). */
 export async function localSignInAction(form: FormData): Promise<void> {
   const env = getServerEnv();
   if (env.backend !== 'local') throw new Error('Connexion locale indisponible.');

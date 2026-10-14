@@ -67,7 +67,7 @@ test('clips : brouillon privé, publication, doublon, filtres, lecteur et suppre
   await expect(page.getByRole('link', { name: 'Clip modifié e2e' })).toHaveCount(0);
 });
 
-test('clips : galerie et formulaire utilisables sur mobile, membres sans accès admin', async ({ page }) => {
+test('clips : galerie et formulaire utilisables sur mobile, compte sans rôle sans accès admin', async ({ page }) => {
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/clips');
@@ -81,7 +81,7 @@ test('clips : galerie et formulaire utilisables sur mobile, membres sans accès 
   await expectNoHorizontalOverflow(page);
   await page.screenshot({ path: 'test-results/clips-admin-mobile.png', fullPage: true });
   await logout(page);
-  await loginAs(page, 'membre');
+  await loginAs(page, 'sans-role');
   await page.goto('/admin/clips');
   await expect(page.getByText('Accès réservé aux administrateurs')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Nouveau clip' })).toHaveCount(0);

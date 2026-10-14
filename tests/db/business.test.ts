@@ -17,8 +17,8 @@ describe('Mur : cycle de vie complet', () => {
     expect(await errorCode(rpc(pg, as.admin, 'admin_add_avoid_entry', { p_profile: { ...p, nickname: 'cible_renommee' } }))).toBe('duplicate');
 
     await rpc(pg, as.admin, 'admin_update_avoid_entry', { p_entry_id: id, p_reason: 'Raison', p_status: 'archived' });
-    expect(await rpc(pg, as.member, 'list_avoid_entries', { p_status: 'active' })).toHaveLength(0);
-    expect(await rpc(pg, as.member, 'list_avoid_entries', { p_status: 'archived' })).toHaveLength(1);
+    expect(await rpc(pg, as.admin, 'list_avoid_entries', { p_status: 'active' })).toHaveLength(0);
+    expect(await rpc(pg, as.admin, 'list_avoid_entries', { p_status: 'archived' })).toHaveLength(1);
 
     await rpc(pg, as.admin, 'admin_update_avoid_entry', { p_entry_id: id, p_reason: '', p_status: 'active' });
     const [entry] = await rpc(pg, as.admin, 'admin_list_avoid_entries', { p_status: 'all' });
@@ -32,11 +32,11 @@ describe('Mur : cycle de vie complet', () => {
     expect(await sqlAs(pg, as.service, 'select 1 from faceit_profiles where faceit_player_id = $1', [p.faceitPlayerId])).toHaveLength(0);
   });
 
-  it('ajouter au Mur ne crée ni joueur du classement, ni relevé ELO, ni accès membre', async () => {
+  it('ajouter au Mur ne crée ni joueur du classement, ni relevé ELO, ni compte', async () => {
     await rpc(pg, as.admin, 'admin_add_avoid_entry', { p_profile: profile() });
     expect(await sqlAs(pg, as.service, 'select * from players')).toHaveLength(0);
     expect(await sqlAs(pg, as.service, 'select * from elo_snapshots')).toHaveLength(0);
-    expect(await sqlAs(pg, as.service, 'select * from profiles')).toHaveLength(2); // seuls les comptes locaux de test
+    expect(await sqlAs(pg, as.service, 'select * from profiles')).toHaveLength(1); // seul le compte admin local de test
   });
 
   it('supprimer du Mur un joueur aussi présent au roster conserve son profil', async () => {
@@ -252,13 +252,14 @@ describe('Stuffs', () => {
     expect(await rpc(pg, as.anon, 'list_utilities', { p_map_slug: 'inconnue' })).toBeNull();
   });
 
-  it('signalement : membres seulement, un seul ouvert par personne, clôturé par la vérification', async () => {
+  it('signalement : admin seulement, un seul ouvert à la fois, clôturé par la vérification', async () => {
     const { id } = await rpc(pg, as.admin, 'admin_save_utility', {
       p: { mapSlug: 'mirage', slug: 's', title: 'Smoke S', side: 'T', grenade: 'smoke', originName: 'A', targetName: 'B', technique: 'static', difficulty: 'easy', status: 'published', steps: [], tags: [] },
     });
     expect(await errorCode(rpc(pg, as.anon, 'report_utility', { p_utility_id: id }))).toBe('forbidden');
-    await rpc(pg, as.member, 'report_utility', { p_utility_id: id, p_note: 'ne passe plus' });
-    expect(await errorCode(rpc(pg, as.member, 'report_utility', { p_utility_id: id }))).toBe('duplicate');
+    expect(await errorCode(rpc(pg, as.noRole, 'report_utility', { p_utility_id: id }))).toBe('forbidden');
+    await rpc(pg, as.admin, 'report_utility', { p_utility_id: id, p_note: 'ne passe plus' });
+    expect(await errorCode(rpc(pg, as.admin, 'report_utility', { p_utility_id: id }))).toBe('duplicate');
     expect((await rpc(pg, as.anon, 'get_utility', { p_map_slug: 'mirage', p_slug: 's' })).utility.openReports).toBe(1);
     await rpc(pg, as.admin, 'admin_mark_utility_verified', { p_utility_id: id });
     const after = await rpc(pg, as.anon, 'get_utility', { p_map_slug: 'mirage', p_slug: 's' });
@@ -321,7 +322,7 @@ describe('Maps et carte tactique', () => {
     const { id: pos } = await rpc(pg, as.admin, 'admin_save_position', { p: { mapSlug: 'mirage', name: 'Spawn T', x: 12.5, y: 80 } });
     const { id: other } = await rpc(pg, as.admin, 'admin_save_position', { p: { mapSlug: 'dust2', name: 'Long', x: 50, y: 50 } });
     expect(await errorCode(rpc(pg, as.admin, 'admin_save_position', { p: { mapSlug: 'mirage', name: 'Hors carte', x: 120, y: 5 } }))).toBe('invalid');
-    expect(await errorCode(rpc(pg, as.member, 'admin_save_position', { p: { mapSlug: 'mirage', name: 'Pirate', x: 1, y: 1 } }))).toBe('forbidden');
+    expect(await errorCode(rpc(pg, as.noRole, 'admin_save_position', { p: { mapSlug: 'mirage', name: 'Pirate', x: 1, y: 1 } }))).toBe('forbidden');
 
     // Position d'une autre map refusée ; impact sans l'une des coordonnées refusé.
     expect(await errorCode(rpc(pg, as.admin, 'admin_link_utility', { p_utility_id: fiche, p_position_id: other, p_landing_x: null, p_landing_y: null }))).toBe('invalid');

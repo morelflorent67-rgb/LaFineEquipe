@@ -1,6 +1,6 @@
 # LaFineEquipe
 
-Site communautaire de la team CS2 LaFineEquipe : ELO Run FACEIT, matchs, joueurs, clips, crosshairs, stuffs par map et Mur des lamentations (réservé aux membres), avec une administration privée.
+Site communautaire de la team CS2 LaFineEquipe : ELO Run FACEIT, matchs, joueurs, clips, crosshairs, stuffs par map et Mur des lamentations, avec une administration privée (compte unique « admin »).
 
 - **Stack** : Next.js 16 (App Router), React 19, TypeScript strict, Tailwind 4, Radix (base accessible des composants), Supabase (Postgres, Auth, Storage, RLS), Zod, Vitest, Playwright.
 - **Identité visuelle** : Forge. Référence à valider : `design/forge-v2-final/` (voir [docs/forge-v2-final.md](docs/forge-v2-final.md)) ; l'ancienne maquette `design/forge-v2/` est figée.
@@ -37,7 +37,7 @@ tests/, e2e/          tests base de données + unitaires (Vitest), parcours navi
 docs/                 mise en route, faisabilité FACEIT, livraisons
 ```
 
-Toutes les lectures et écritures passent par des fonctions SQL soumises à la RLS, avec les droits de la personne connectée. Le rôle (admin, membre) est lu en base et vérifié côté serveur à chaque action. Les clés FACEIT et Supabase « secret » ne sont jamais envoyées au navigateur.
+Toutes les lectures et écritures passent par des fonctions SQL soumises à la RLS, avec les droits de la personne connectée. Le rôle admin (compte unique) est lu en base et vérifié côté serveur à chaque action. Les clés FACEIT et Supabase « secret » ne sont jamais envoyées au navigateur.
 
 ## Contrôles
 

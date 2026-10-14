@@ -54,10 +54,10 @@ describe('Crosshairs', () => {
 
   it('un membre ne peut ni créer, ni vérifier, ni supprimer ; l’admin peut', async () => {
     const { id } = await save({});
-    expect(await errorCode(rpc(pg, as.member, 'admin_save_crosshair', { p: { label: 'Pirate', shareCode: CODE, published: true } }))).toBe('forbidden');
-    expect(await errorCode(rpc(pg, as.member, 'admin_verify_crosshair', { p_id: id, p_game_version: 'x' }))).toBe('forbidden');
+    expect(await errorCode(rpc(pg, as.noRole, 'admin_save_crosshair', { p: { label: 'Pirate', shareCode: CODE, published: true } }))).toBe('forbidden');
+    expect(await errorCode(rpc(pg, as.noRole, 'admin_verify_crosshair', { p_id: id, p_game_version: 'x' }))).toBe('forbidden');
     expect(await errorCode(rpc(pg, as.anon, 'admin_delete_crosshair', { p_id: id }))).toBe('forbidden');
-    await sqlAs(pg, as.member, `update crosshairs set label = 'pirate'`);
+    await sqlAs(pg, as.noRole, `update crosshairs set label = 'pirate'`);
     expect((await rpc(pg, as.anon, 'list_crosshairs'))[0].label).toBe('Classique');
 
     await rpc(pg, as.admin, 'admin_verify_crosshair', { p_id: id, p_game_version: 'build test' });

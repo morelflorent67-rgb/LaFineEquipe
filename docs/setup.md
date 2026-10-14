@@ -54,7 +54,7 @@ En mode local avec `FACEIT_MODE=live`, les profils réels sont enregistrés dans
 ## 3. Créer le projet Supabase
 
 1. Crée un projet sur https://supabase.com, région Europe (Paris ou Francfort).
-2. **Créer les tables et les règles d'accès.** Dans **SQL Editor**, exécute un par un, dans l'ordre, les fichiers de `supabase/migrations/` (0100 → 1400). N'exécute ni `supabase/local/*`, ni `cron.sql` à cette étape.
+2. **Créer les tables et les règles d'accès.** Dans **SQL Editor**, exécute un par un, dans l'ordre, les fichiers de `supabase/migrations/` (0100 → 1500). N'exécute ni `supabase/local/*`, ni `cron.sql` à cette étape.
    Alternative en ligne de commande :
    ```bash
    npx supabase link --project-ref TON_REF
@@ -66,20 +66,22 @@ En mode local avec `FACEIT_MODE=live`, les profils réels sont enregistrés dans
    - laisse **Email** activé ;
    - **désactive** « Allow new users to sign up ».
    Même si les inscriptions restaient ouvertes, un compte sans rôle n'a aucun accès. Les fermer évite tout de même les comptes parasites.
-4. **Créer les comptes.** Dans **Authentication › Users › Add user › Create new user**, saisis l'e-mail et le mot de passe, et coche *Auto Confirm User*.
-5. **Attribuer les rôles** dans SQL Editor, en remplaçant l'e-mail :
+4. **Créer le compte admin unique.** Dans **Authentication › Users › Add user › Create new user** : saisis une adresse e-mail que tu contrôles (elle sert aussi à réinitialiser le mot de passe), choisis toi-même le mot de passe (long, unique, jamais écrit dans un chat ni dans le code) et coche *Auto Confirm User*. Il n'y a qu'un seul compte : pas de comptes membres.
+5. **Lui donner le rôle admin** dans SQL Editor, en remplaçant l'e-mail :
    ```sql
    insert into public.profiles (user_id, role, display_name)
-   select id, 'admin', 'Flo' from auth.users where email = 'ton-email@exemple.fr';
+   select id, 'admin', 'Admin' from auth.users where email = 'ton-email@exemple.fr';
    ```
-   Utilise `'member'` à la place de `'admin'` pour un membre : il voit le Mur, mais ni l'administration ni les motifs.
+   Seul le rôle `admin` existe (la base refuse toute autre valeur).
 6. **Récupérer les clés** dans **Project Settings › API Keys** et les reporter dans `.env.local` :
    ```
    LFE_DATA_BACKEND=supabase
    NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
    SUPABASE_SECRET_KEY=sb_secret_…
+   LFE_ADMIN_EMAIL=ton-email@exemple.fr
    ```
+   `LFE_ADMIN_EMAIL` est l'e-mail du compte créé à l'étape 4 : sur `/connexion`, tu tapes l'identifiant **admin** et ton mot de passe, le serveur fait la correspondance. Supabase limite d'office les tentatives de connexion répétées.
    La clé publishable est publique par nature. La clé **secret** reste côté serveur : elle ne sert qu'à la synchronisation.
 7. Relance `npm run dev`, connecte-toi sur `/connexion`, puis ajoute un joueur et une entrée au Mur.
 

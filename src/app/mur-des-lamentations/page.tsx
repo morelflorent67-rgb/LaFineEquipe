@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/Icon';
 import { StateBlock } from '@/components/ui/badges';
-import { getViewer, isAdmin, isMember } from '@/lib/auth/viewer';
+import { getViewer, isAdmin } from '@/lib/auth/viewer';
 import { getAvoidEntries, settle } from '@/lib/data/queries';
 import { WallGrid } from './WallGrid';
 import styles from './wall.module.css';
@@ -39,7 +39,7 @@ export default async function MurPage() {
   const viewer = await getViewer();
 
   // Contrôle serveur : un visiteur ne reçoit AUCUNE donnée du Mur (et la base le refuse aussi).
-  if (!isMember(viewer)) {
+  if (!isAdmin(viewer)) {
     return (
       <div className={styles.page}>
         <Hero />
@@ -48,16 +48,16 @@ export default async function MurPage() {
             <Icon name="lock" />
           </span>
           <h2 className="h2" id="gate-h">
-            Réservé à la team
+            Réservé à l’administrateur
           </h2>
           {viewer.signedIn ? (
-            <p>Ton compte est connecté mais n’a pas encore le rôle membre. Demande à un administrateur de l’autoriser.</p>
+            <p>Ce compte n’a pas le rôle administrateur : il voit le site comme un visiteur.</p>
           ) : (
-            <p>Connecte-toi avec ton compte de la team pour voir le Mur. Aucune donnée n’est envoyée aux visiteurs.</p>
+            <p>Pour l’instant, seul l’administrateur voit le Mur. Aucune donnée n’est envoyée aux visiteurs.</p>
           )}
           {viewer.signedIn ? null : (
             <Link className="btn btn-red" href="/connexion?suite=/mur-des-lamentations">
-              <Icon name="lock" /> Connexion team
+              <Icon name="lock" /> Connexion admin
             </Link>
           )}
         </section>

@@ -9,8 +9,17 @@ export function SignInForm({ suite }: { suite: string }) {
     <form action={action} style={{ display: 'grid', gap: 16, maxWidth: 420 }}>
       <input type="hidden" name="suite" value={suite} />
       <div className="field">
-        <label htmlFor="email">Adresse e-mail</label>
-        <input id="email" name="email" type="email" className="input" autoComplete="email" required />
+        <label htmlFor="identifier">Identifiant</label>
+        <input
+          id="identifier"
+          name="identifier"
+          type="text"
+          className="input"
+          autoComplete="username"
+          autoCapitalize="none"
+          spellCheck={false}
+          required
+        />
       </div>
       <div className="field">
         <label htmlFor="password">Mot de passe</label>

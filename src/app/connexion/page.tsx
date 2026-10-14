@@ -7,9 +7,9 @@ import { localSignInAction, signOutAction } from '@/app/actions/auth';
 import { Icon } from '@/components/ui/Icon';
 import { SignInForm } from './SignInForm';
 
-export const metadata: Metadata = { title: 'Connexion team', robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: 'Connexion admin', robots: { index: false, follow: false } };
 
-const roleLabel = { admin: 'Administrateur', member: 'Membre', visitor: 'Aucun rôle (accès visiteur)' } as const;
+const roleLabel = { admin: 'Administrateur', visitor: 'Aucun rôle (accès visiteur)' } as const;
 
 export default async function ConnexionPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
@@ -32,12 +32,12 @@ export default async function ConnexionPage({ searchParams }: { searchParams: Pr
     <>
       <header className="page-head">
         <p className="kicker">
-          <Icon name="spk" className="spk" /> Espace team
+          <Icon name="spk" className="spk" /> Administration
         </p>
         <h1 className="h1">Connexion</h1>
         <p className="lede">
-          Réservée aux membres et administrateurs de LaFineEquipe. Les visiteurs peuvent consulter tout le reste du site
-          sans compte.
+          Réservée à l’administrateur de LaFineEquipe (identifiant « admin »). Tout le site se consulte sans compte : il
+          n’y a pas d’inscription.
         </p>
       </header>
       <section className="sec" style={{ display: 'grid', gap: 24 }}>
@@ -46,7 +46,7 @@ export default async function ConnexionPage({ searchParams }: { searchParams: Pr
             <strong>Connecté : {viewer.label}</strong>
             <span>Rôle : {roleLabel[viewer.role]}</span>
             {viewer.role === 'visitor' ? (
-              <span>Ce compte n’a pas encore été autorisé par un administrateur : il voit le site comme un visiteur.</span>
+              <span>Ce compte n’a pas le rôle administrateur : il voit le site comme un visiteur.</span>
             ) : null}
             <div className="actions">
               <Link className="btn btn-steel btn-sm" href={suite}>
@@ -65,8 +65,8 @@ export default async function ConnexionPage({ searchParams }: { searchParams: Pr
           <div className="state unavailable">
             <strong>Mode local : comptes de test</strong>
             <span>
-              Sans Supabase, la connexion utilise ces comptes fictifs de la base locale (aucun mot de passe). Ce choix
-              n’existe pas en ligne.
+              Sans Supabase, la connexion utilise ces comptes de test de la base locale (aucun mot de passe). En ligne,
+              seul le formulaire identifiant « admin » + mot de passe existe.
             </span>
             <div className="actions">
               {localAccounts.map((a) => (
@@ -74,7 +74,7 @@ export default async function ConnexionPage({ searchParams }: { searchParams: Pr
                   <input type="hidden" name="userId" value={a.id} />
                   <input type="hidden" name="suite" value={suite} />
                   <button className="btn btn-steel btn-sm" type="submit">
-                    {a.display_name ?? a.email} · {a.role ? roleLabel[a.role as 'admin' | 'member'] : 'sans rôle'}
+                    {a.display_name ?? a.email} · {a.role === 'admin' ? roleLabel.admin : 'sans rôle'}
                   </button>
                 </form>
               ))}

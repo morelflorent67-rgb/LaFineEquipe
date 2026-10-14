@@ -20,7 +20,7 @@ export function SiteFooter({ signedIn, isAdmin }: { signedIn: boolean; isAdmin: 
           <Link href="/team">Joueurs</Link>
           <Link href="/mur-des-lamentations">Mur des lamentations</Link>
           {isAdmin ? <Link href="/admin">Espace admin</Link> : null}
-          {signedIn ? null : <Link href="/connexion">Connexion team</Link>}
+          {signedIn ? null : <Link href="/connexion">Connexion admin</Link>}
         </nav>
       </div>
     </footer>

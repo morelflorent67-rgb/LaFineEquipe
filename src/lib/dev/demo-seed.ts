@@ -8,7 +8,6 @@
  */
 
 const ADMIN = '00000000-0000-4000-8000-00000000a001';
-const MEMBER = '00000000-0000-4000-8000-00000000a002';
 const fid = (n: number) => `d0000000-0000-4000-8000-${n.toString().padStart(12, '0')}`;
 const av = (n: number) => `/dev-fixtures/avatar-${n.toString().padStart(2, '0')}.svg`;
 
@@ -243,7 +242,7 @@ export function buildDemoSql(now: Date = new Date()): string {
      from public.maps m where m.slug = 'mirage';`,
   );
   out.push(
-    `insert into public.utility_reports (utility_id, reported_by, note) values (${q(stuffIds[1]!)}, ${q(MEMBER)}, 'Exemple fictif : ne passe plus depuis la mise à jour.');`,
+    `insert into public.utility_reports (utility_id, reported_by, note) values (${q(stuffIds[1]!)}, ${q(ADMIN)}, 'Exemple fictif : ne passe plus depuis la mise à jour.');`,
   );
 
   // ---------- Crosshairs (codes de démonstration : forme valide, contenu inventé) ----------
