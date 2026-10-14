@@ -97,13 +97,13 @@ export function WallGrid({ entries, isAdmin, now }: { entries: AvoidEntry[]; isA
         <ul ref={listRef} className={styles.posters} aria-label="Profils sur le Mur">
           {visible.map((e, i) => (
             <li key={e.id} data-key={e.id} className={styles.poster} style={{ '--i': Math.min(i, 12) } as CSSProperties}>
-              {nowMs - Date.parse(e.addedAt) <= NEW_FOR_MS ? <span className={styles.tape}>Nouveau</span> : null}
               <p className={styles.wanted} aria-hidden="true">
                 Wanted
               </p>
               <p className={styles.sought}>Recherché</p>
               <div className={styles.mugshot}>
-                <Avatar src={e.profile.avatarUrl} size={96} shape="square" />
+                <Avatar src={e.profile.avatarUrl} size={140} shape="square" className={styles.photo} />
+                {nowMs - Date.parse(e.addedAt) <= NEW_FOR_MS ? <span className={styles.tape}>Nouveau</span> : null}
               </div>
               <b className={styles.nick}>{e.profile.nickname}</b>
               <span className={styles.meta}>

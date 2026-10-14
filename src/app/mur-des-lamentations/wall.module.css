@@ -141,8 +141,10 @@
 /* Affiches « WANTED » : papier clair, encre sombre, légère inclinaison alternée. */
 .posters {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 22px 18px;
+  /* Largeur mini d'affiche : le texte (WANTED, date) garde toujours sa place, même en très grand écran. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 215px), 1fr));
+  justify-items: center;
+  gap: 26px 20px;
   margin: 0;
   padding: 6px 0 0;
   list-style: none;
@@ -151,10 +153,14 @@
   --tilt: -1.2deg;
   --ink: #2a1a12;
   position: relative;
+  container-type: inline-size;
   display: grid;
   justify-items: center;
+  align-content: start;
   gap: 8px;
-  padding: 16px 14px 14px;
+  width: 100%;
+  max-width: 280px;
+  padding: 18px 14px 16px;
   background:
     radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.35), transparent 60%),
     linear-gradient(180deg, #ebdfc6, #d9c7a4);
@@ -215,7 +221,8 @@
 }
 .wanted {
   margin: 4px 0 0;
-  font: 900 34px/0.9 var(--f);
+  /* Taille proportionnelle à l'affiche (cqi) : le mot tient toujours sur le papier. */
+  font: 900 clamp(22px, 15cqi, 38px) / 0.9 var(--f);
   font-stretch: 125%;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -230,15 +237,20 @@
   text-transform: uppercase;
 }
 .mugshot {
+  position: relative;
   margin-top: 4px;
   padding: 4px;
   background: #fff;
   box-shadow: 0 0 0 2px var(--ink);
 }
+/* La photo grandit avec l'affiche (Avatar fixe sa taille en style en ligne, d'où !important). */
+.photo {
+  --s: clamp(92px, 50cqi, 136px) !important;
+}
 .nick {
   max-width: 100%;
   overflow: hidden;
-  font: 900 19px/1.15 var(--f);
+  font: 900 clamp(15px, 8cqi, 20px) / 1.15 var(--f);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -261,7 +273,7 @@
   font-variant-numeric: tabular-nums;
 }
 .date {
-  font: 600 11px/1.2 var(--mono);
+  font: 600 clamp(9.5px, 4.8cqi, 11.5px) / 1.3 var(--mono);
   color: #4a3628;
 }
 .links {
@@ -295,10 +307,11 @@
   width: 13px;
   height: 13px;
 }
+/* Ruban « Nouveau » collé en travers du coin de la photo : il ne cache jamais le titre. */
 .tape {
   position: absolute;
-  right: -6px;
-  top: 12px;
+  right: -18px;
+  bottom: 10px;
   z-index: 1;
   padding: 3px 8px;
   background: var(--brand-hi);
@@ -306,7 +319,7 @@
   font: 800 10px/1 var(--f);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transform: rotate(6deg);
+  transform: rotate(-10deg);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 .empty {
@@ -484,17 +497,11 @@
 }
 @container site (max-width: 560px) {
   .posters {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
     gap: 18px 12px;
-  }
-  .wanted {
-    font-size: 26px;
   }
   .poster {
     padding: 14px 10px 12px;
-  }
-  .date {
-    font-size: 10px;
   }
   .crack {
     display: none;
