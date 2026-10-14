@@ -24,6 +24,11 @@ const base = {
 const save = (p: Record<string, unknown> = {}) =>
   rpc(pg, as.admin, 'admin_save_clip', { p: { ...base, ...p } });
 describe('Clips : persistance et droits', () => {
+  it('un clip joué sur une map masquée garde son image et son nom (comme les matchs)', async () => {
+    await save({ mapSlug: 'cache' });
+    const [c] = await rpc(pg, as.anon, 'list_clips');
+    expect(c.map).toMatchObject({ slug: 'cache', name: 'Cache' });
+  });
   it('enregistre un clip Allstar au format actuel (aussi utilisé pour les vidéos FACEIT)', async () => {
     const id = '6acfe91ee1f3fb185cd52b11';
     await save({ provider: 'allstar', externalId: id, sourceUrl: `https://allstar.gg/clip/${id}` });
