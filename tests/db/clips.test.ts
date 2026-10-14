@@ -24,6 +24,13 @@ const base = {
 const save = (p: Record<string, unknown> = {}) =>
   rpc(pg, as.admin, 'admin_save_clip', { p: { ...base, ...p } });
 describe('Clips : persistance et droits', () => {
+  it('enregistre un clip Allstar au format actuel (aussi utilisé pour les vidéos FACEIT)', async () => {
+    const id = '6acfe91ee1f3fb185cd52b11';
+    await save({ provider: 'allstar', externalId: id, sourceUrl: `https://allstar.gg/clip/${id}` });
+    const [c] = await rpc(pg, as.anon, 'list_clips');
+    expect(c).toMatchObject({ provider: 'allstar', sourceUrl: `https://allstar.gg/clip/${id}` });
+    expect(await errorCode(save({ provider: 'allstar', externalId: id, sourceUrl: 'https://allstar.gg.evil.test/clip/' + id }))).toBe('invalid');
+  });
   it('publie, modifie, dépublie et supprime un clip avec ses relations', async () => {
     const { id: playerId } = await rpc(pg, as.admin, 'admin_add_player', {
       p_profile: profile(),
