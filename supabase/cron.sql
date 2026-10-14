@@ -8,13 +8,21 @@
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
--- 2. Adresse du site et secret partagé, stockés chiffrés dans Supabase Vault.
---    Remplace les deux valeurs ENTRE APOSTROPHES dans l'éditeur SQL, puis exécute.
+-- 2. Adresse du site et secret partagé, stockés chiffrés dans Supabase Vault (relançable :
+--    met à jour un secret existant). Remplace les deux valeurs ENTRE APOSTROPHES, puis exécute.
 --    CRON_SECRET = exactement la même valeur que la variable CRON_SECRET du site (Netlify).
-select vault.create_secret('https://fineequipe.com', 'lfe_site_url');
-select vault.create_secret('REMPLACE-PAR-TON-CRON_SECRET', 'lfe_cron_secret');
+do $$
+declare v_id uuid;
+begin
+  select id into v_id from vault.secrets where name = 'lfe_site_url';
+  if v_id is null then perform vault.create_secret('https://fineequipe.com', 'lfe_site_url');
+  else perform vault.update_secret(v_id, 'https://fineequipe.com'); end if;
+  select id into v_id from vault.secrets where name = 'lfe_cron_secret';
+  if v_id is null then perform vault.create_secret('REMPLACE-PAR-TON-CRON_SECRET', 'lfe_cron_secret');
+  else perform vault.update_secret(v_id, 'REMPLACE-PAR-TON-CRON_SECRET'); end if;
+end $$;
 
--- 3. Deux tâches toutes les 5 minutes, chacune dans sa propre requête : Netlify coupe une requête
+-- 3. Deux tâches toutes les 5 minutes (re-planifier un même nom le remplace), chacune dans sa propre requête : Netlify coupe une requête
 --    après ~30 s (constaté le 14/10/2026). Profils + ELO d'un côté, matchs + stats de l'autre.
 select cron.schedule(
   'lfe-sync-profiles',
