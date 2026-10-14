@@ -12,9 +12,9 @@ Construire un site web en français, moderne et responsive, destiné à une team
 5. Bibliothèque de crosshairs CS2.
 6. Bibliothèque de stuffs (smokes, flashes, molotovs, HE) map par map.
 7. Administration privée sans modification manuelle du code.
-8. Mur des lamentations : liste interne de joueurs FACEIT à éviter, réservée aux membres de la team.
+8. Mur des lamentations : page publique avec la Banlist (joueurs FACEIT à éviter, gérée par l'admin) et le Wall of Shame (stats « honteuses » automatiques des joueurs de la team, pour rire entre amis).
 
-Public : membres de la team, amis, visiteurs. Navigation et textes en français. Le site doit fonctionner sans connexion pour les visiteurs ; seuls l'administration et le Mur des lamentations (membres) nécessitent une authentification.
+Public : membres de la team, amis, visiteurs. Navigation et textes en français. Le site doit fonctionner sans connexion pour les visiteurs ; seule l'administration nécessite une authentification (décision du 14/10/2026 : plus de comptes membres).
 
 ## 2. Expérience visuelle / UX
 
@@ -26,7 +26,7 @@ Victoire / défaite : V vert, D rouge, toujours avec la lettre ou un libellé (j
 
 Animations : CSS, View Transitions et Web Animations du navigateur, transformations GPU légères, aucune animation continue inutile, `prefers-reduced-motion` respecté, aucune fonction dépendante du seul survol, interactions tactiles prévues. Une animation ne modifie jamais artificiellement une valeur affichée. Pas de bibliothèque d'animation supplémentaire sans besoin démontré.
 
-Menu proposé : Accueil | ELO Run | Matchs LIVE | Clips | Crosshairs | Stuffs | Team | Mur (membres). Bouton administration pour l'admin authentifié uniquement.
+Menu proposé : Accueil | ELO Run | Matchs LIVE | Clips | Crosshairs | Stuffs | Team | Mur. Bouton administration pour l'admin authentifié uniquement.
 
 L'accueil affiche : accès prioritaires (matchs en cours, ELO Run, stuffs) visibles dès le premier écran sur mobile, résumé du classement permanent, nombre de matchs en cours **seulement si leur statut est vérifié**, derniers matchs, derniers clips publiés, raccourcis vers maps/stuffs, et lien vers le profil FACEIT des joueurs. Hero réduit sur mobile.
 
@@ -39,7 +39,7 @@ L'accueil affiche : accès prioritaires (matchs en cours, ELO Run, stuffs) visib
 - Intégration FACEIT exclusivement côté serveur via la Data API v4 officielle.
 - Tâches planifiées fiables (Supabase scheduled functions ou cron de l'hébergeur), pas un `setInterval` dans le navigateur comme unique source de synchronisation.
 - Vitest pour logique métier, Playwright pour scénarios critiques, ESLint/formatage/typecheck.
-- Déploiement envisagé : Vercel + Supabase, à confirmer.
+- Déploiement décidé le 14/10/2026 : site sur **Netlify**, base/auth/stockage sur **Supabase**, domaine **fineequipe.com** chez OVH (DNS à pointer vers Netlify). Dépôt GitHub public : https://github.com/morelflorent67-rgb/LaFineEquipe.
 
 Ne multiplie pas inutilement les frameworks. Propose une alternative seulement s'il y a une incompatibilité prouvée.
 
@@ -115,13 +115,15 @@ Gestion éditoriale : ajout/modification/suppression/publication depuis admin, u
 
 ### 5.7 Administration
 
-Supabase Auth pour les administrateurs. Un seul admin initial est suffisant, extensible à rôles. Vérification serveur de session/rôle sur chaque route d'écriture et RLS ; service role jamais exposé au navigateur. Panel : joueurs (classement permanent), Mur des lamentations, clips, crosshairs, maps (images, ordre, visibilité), positions de la carte tactique, stuffs, jobs/état synchronisation. Formulaires validés côté serveur ; toasts/états explicites ; confirmation suppression ; journal minimal des erreurs d'import.
+Supabase Auth avec un **compte unique** d'identifiant `admin` (décision du 14/10/2026) : aucune inscription, mot de passe défini par le propriétaire lui-même (jamais dans un chat ni dans le code). Vérification serveur de session/rôle sur chaque route d'écriture et RLS ; service role jamais exposé au navigateur. Panel : joueurs (classement permanent), Mur des lamentations, clips, crosshairs, maps (images, ordre, visibilité), positions de la carte tactique, stuffs, jobs/état synchronisation. Formulaires validés côté serveur ; toasts/états explicites ; confirmation suppression ; journal minimal des erreurs d'import.
 
 ### 5.8 Mur des lamentations
 
-Page `/mur-des-lamentations` : liste **interne** de joueurs FACEIT avec lesquels la team ne souhaite plus jouer. Ce n'est pas une sanction FACEIT et cela ne doit jamais être présenté ainsi. La page affiche le pseudo, l'avatar et le lien FACEIT, le niveau et l'ELO s'ils sont disponibles, la date d'ajout, une recherche par pseudo et un compteur, dans une mise en page Forge propre à la page.
+Page `/mur-des-lamentations`, **publique** (décision du 14/10/2026), en deux parties :
+- **Banlist** (à gauche) : joueurs FACEIT avec lesquels la team ne souhaite plus jouer, présentés en affiches « WANTED / Recherché » (pseudo, avatar, lien FACEIT, niveau et ELO s'ils sont disponibles, date d'ajout), recherche et compteur. Ce n'est pas une sanction FACEIT et cela ne doit jamais être présenté ainsi.
+- **Wall of Shame** (à droite) : classement automatique, sur les **30 derniers jours**, de statistiques « honteuses » des seuls joueurs **Team** du roster (au plus 5 catégories aux surnoms drôles), calculé à partir des statistiques de match FACEIT réellement renvoyées. Les joueurs concernés sont d'accord ; ton de chambrage amical, jamais d'insulte.
 
-Visibilité : réservée aux **membres connectés** (décision du 12/10/2026), appliquée côté serveur et par RLS ; un visiteur ne reçoit aucune donnée. Administration : ajout par pseudo ou URL avec vérification du profil avant confirmation, doublons refusés par identifiant FACEIT, archivage et retrait, note interne facultative visible des **seuls admins**. Jamais de motif ni d'accusation nominative publiés. L'ajout au Mur ne donne aucun accès et n'ajoute le joueur ni au classement ni au roster.
+Visibilité : publique ; seules les notes internes restent réservées à l'admin (serveur + RLS). Administration de la Banlist : ajout par pseudo ou URL avec vérification du profil avant confirmation, doublons refusés par identifiant FACEIT, archivage et retrait, note interne facultative visible des **seuls admins**. Jamais de motif ni d'accusation nominative publiés. L'ajout au Mur ne donne aucun accès et n'ajoute le joueur ni au classement ni au roster.
 
 ## 6. Modèle de données minimal proposé
 
@@ -144,7 +146,7 @@ Adapter le SQL au vrai besoin sans sur-ingénierie ; prévoir migrations, contra
 
 Pages publiques : `/`, `/elo-run`, `/matches`, `/clips`, `/crosshairs`, `/stuffs`, `/stuffs/[mapSlug]`, `/team`, `/players/[playerId]`.
 
-Membres : `/mur-des-lamentations`.
+Le Mur `/mur-des-lamentations` est public depuis le 14/10/2026.
 
 Privées : `/admin`, `/admin/players`, `/admin/mur`, `/admin/clips`, `/admin/crosshairs`, `/admin/maps`, `/admin/stuffs`, `/admin/sync`.
 
@@ -182,7 +184,7 @@ V1 clips par liens admin, tri et filtres, embeds sûrs. Ajouter la synchronisati
 
 - Le visiteur consulte toutes les pages sans compte ; mobile utilisable et aucun overflow horizontal.
 - L'admin ajoute un joueur FACEIT, voit un profil correctement résolu, et le joueur apparaît immédiatement au classement à son ELO actuel avec une progression de 0.
-- Le Mur des lamentations n'envoie aucune donnée à un visiteur et les notes internes ne sortent jamais pour un non-admin.
+- Le Mur des lamentations est public, mais les notes internes ne sortent jamais pour un non-admin ; le Wall of Shame ne montre que des stats FACEIT réelles des joueurs Team sur 30 jours.
 - L'ELO Run affiche **source, horodatage et delta exact** à partir d'une base stockée.
 - Les matchs en cours reflètent un statut vérifié, sinon une incertitude explicite ; plusieurs membres dans une même game = une seule carte de match.
 - L'admin ajoute un stuff à une map, lui associe un type et un média, le publie ; la recherche/filtres et la page map le retrouvent ; s'il est rattaché à une position, la carte tactique l'affiche.
