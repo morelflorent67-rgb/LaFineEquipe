@@ -16,15 +16,16 @@ describe('Sources des clips', () => {
     ])
       expect(parseClipSource(url)).toEqual(expected);
   });
-  it('normalise Twitch et garde Allstar comme lien externe', () => {
+  it('normalise Twitch et Allstar (ancien et nouveau format) ; Allstar reste un lien externe', () => {
     expect(parseClipSource('https://www.twitch.tv/player/clip/SomeClip-Ab12?tt=1')?.sourceUrl).toBe(
       'https://clips.twitch.tv/SomeClip-Ab12',
     );
     expect(parseClipSource('https://twitch.tv/videos/12345')?.externalId).toBe('video:12345');
-    expect(
-      parseClipSource('https://www.allstar.gg/clip?clip=abcdef123456abcdef123456&utm=x')?.sourceUrl,
-    ).toBe('https://allstar.gg/clip?clip=abcdef123456abcdef123456');
-    expect(clipEmbedUrl('https://allstar.gg/clip?clip=abcdef123456abcdef123456', 'example.com')).toBeNull();
+    const expected = { provider: 'allstar', externalId: '6a359b3b407ff13d680ea1ec', sourceUrl: 'https://allstar.gg/clip/6a359b3b407ff13d680ea1ec' };
+    expect(parseClipSource('https://allstar.gg/clip/6a359b3b407ff13d680ea1ec')).toEqual(expected);
+    expect(parseClipSource('https://www.allstar.gg/clip/6A359B3B407FF13D680EA1EC/?utm_source=share')).toEqual(expected);
+    expect(parseClipSource('https://allstar.gg/clip?clip=6a359b3b407ff13d680ea1ec&utm=x')).toEqual(expected);
+    expect(clipEmbedUrl('https://allstar.gg/clip/6a359b3b407ff13d680ea1ec', 'example.com')).toBeNull();
   });
   it.each([
     'http://youtube.com/watch?v=M7lc1UVf-VE',
@@ -38,6 +39,9 @@ describe('Sources des clips', () => {
     'https://twitch.tv/somechannel',
     'https://clips.twitch.tv/embed?clip=Hello',
     'https://allstar.gg/redirect?url=bad',
+    'https://allstar.gg/clip/pas-un-identifiant',
+    'https://allstar.gg.evil.test/clip/6a359b3b407ff13d680ea1ec',
+    'https://allstar.gg/iframe?clip=6a359b3b407ff13d680ea1ec',
     'https://faceit.com/fr/players/demo',
   ])('refuse les liens non pris en charge : %s', (u) => expect(parseClipSource(u)).toBeNull());
   it('construit le parent Twitch et interdit un parent injecté', () => {

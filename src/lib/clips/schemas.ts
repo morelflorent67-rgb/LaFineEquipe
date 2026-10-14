@@ -11,7 +11,7 @@ export const clipInputSchema = z
       .max(2048)
       .refine(
         (s) => !!parseClipSource(s),
-        'Lien vidéo non reconnu. Utilise YouTube, un clip/une vidéo Twitch ou un lien de clip Allstar.',
+        'Lien vidéo non reconnu. Utilise YouTube, un clip/une vidéo Twitch ou un lien de clip Allstar (allstar.gg/clip/…).',
       ),
     playerId: z.uuid().nullable(),
     mapSlug: z

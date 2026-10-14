@@ -88,7 +88,7 @@ export function ClipEditor({
           ) : (
             <span>
               {url ? 'Lien vidéo non reconnu. ' : ''}Formats : YouTube (watch, Shorts, youtu.be), Twitch (clip
-              ou vidéo), Allstar (/clip?clip=…). Les liens FACEIT ne sont pas pris en charge à cette étape.
+              ou vidéo), Allstar (allstar.gg/clip/… ou /clip?clip=…). Les liens FACEIT ne sont pas encore pris en charge.
             </span>
           )}
         </div>
@@ -149,8 +149,8 @@ export function ClipEditor({
         </label>
         <label className={styles.check}>
           <input type="checkbox" name="embedAllowed" defaultChecked={clip?.embedAllowed ?? false} />
-          J’ai vérifié que la vidéo autorise la lecture intégrée (YouTube / Twitch). Allstar restera un lien
-          externe.
+          J’ai vérifié que la vidéo autorise la lecture intégrée (YouTube / Twitch). Allstar reste pour l’instant un
+          lien externe.
         </label>
         <label className={styles.check}>
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
