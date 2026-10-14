@@ -13,11 +13,14 @@ afterEach(() => vi.unstubAllEnvs());
 describe('référencement et origines publiques', () => {
   it('active uniquement le site public de production configuré', () => {
     expect(seoConfig(production)).toEqual({ origin: 'https://lfe.example.com', indexable: true });
+    expect(seoConfig({ ...production, VERCEL_ENV: undefined, CONTEXT: 'production' }).indexable).toBe(true);
     for (const patch of [
       { NODE_ENV: 'development' },
       { LFE_DATA_BACKEND: 'local' },
       { FACEIT_MODE: 'fixtures' },
       { VERCEL_ENV: 'preview' },
+      { CONTEXT: 'deploy-preview' },
+      { CONTEXT: 'branch-deploy' },
       { SITE_URL: '' },
     ]) {
       expect(seoConfig({ ...production, ...patch }).indexable).toBe(false);

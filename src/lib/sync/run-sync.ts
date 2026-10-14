@@ -37,6 +37,11 @@ const PAUSE_MS = 150;
 const DETAILS_PER_PASS = 30;
 /** Fenêtre du Wall of Shame : l'historique et les stats joueurs couvrent les 30 derniers jours. */
 const WINDOW_DAYS = 30;
+/**
+ * Budget d'un passage de matchs : Netlify coupe une requête après 60 s. Au-delà de ce budget,
+ * les détails et stats restants sont laissés au passage suivant (5 min plus tard).
+ */
+const MATCHES_BUDGET_MS = 40_000;
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const targetsSchema = z.array(
@@ -129,6 +134,7 @@ function factionOf(item: FaceitHistoryItem, faceitPlayerId: string): string | nu
 
 export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient = createFaceitClient()): Promise<JobReport> {
   const runId = await begin(db, 'matches', trigger);
+  const deadline = Date.now() + MATCHES_BUDGET_MS;
   if (!runId) return { job: 'matches', status: 'skipped', ok: 0, failed: 0, message: 'Une synchronisation des matchs est déjà en cours.' };
   let ok = 0;
   let failed = 0;
@@ -191,6 +197,7 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
     if (!fatal) {
       const pending = await call(db, 'sync_matches_needing_details', { p_limit: DETAILS_PER_PASS }, z.array(z.string()));
       for (const matchId of pending) {
+        if (Date.now() > deadline) break;
         try {
           const match = await client.match(matchId);
           const map = mapFromVoting(match.voting);
@@ -243,6 +250,7 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
         z.array(z.string()),
       );
       for (const matchId of needStats) {
+        if (Date.now() > deadline) break;
         try {
           await saveStats(matchId, await client.matchStats(matchId));
         } catch (err) {

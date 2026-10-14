@@ -44,12 +44,13 @@ export function getServerEnv(): ServerEnv {
     throw new ConfigError(parsed.error.issues.map((i) => i.message).join(' '));
   }
   const e = parsed.data;
-  const onVercel = Boolean(process.env.VERCEL);
+  // Hébergement en ligne (Netlify, ou Vercel par le passé) : interdit les modes de développement.
+  const hosted = Boolean(process.env.NETLIFY || process.env.VERCEL);
 
-  if (e.LFE_DATA_BACKEND === 'local' && onVercel) {
+  if (e.LFE_DATA_BACKEND === 'local' && hosted) {
     throw new ConfigError('Le mode de données « local » est réservé au développement : utilise « supabase » en ligne.');
   }
-  if (e.FACEIT_MODE === 'fixtures' && (onVercel || e.LFE_DATA_BACKEND === 'supabase')) {
+  if (e.FACEIT_MODE === 'fixtures' && (hosted || e.LFE_DATA_BACKEND === 'supabase')) {
     throw new ConfigError('FACEIT_MODE=fixtures (profils fictifs) est interdit avec Supabase ou en production.');
   }
 

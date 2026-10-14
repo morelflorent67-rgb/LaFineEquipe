@@ -13,7 +13,7 @@ export const PUBLIC_PATHS = [
   '/team',
 ] as const;
 
-type SeoEnvironment = Partial<Record<'SITE_URL' | 'NODE_ENV' | 'VERCEL_ENV' | 'LFE_DATA_BACKEND' | 'FACEIT_MODE', string>>;
+type SeoEnvironment = Partial<Record<'SITE_URL' | 'NODE_ENV' | 'VERCEL_ENV' | 'CONTEXT' | 'LFE_DATA_BACKEND' | 'FACEIT_MODE', string>>;
 
 /** Pas d'URL absolue inventée ; le propriétaire configure son origine publique dans SITE_URL. */
 export function seoConfig(env: SeoEnvironment = process.env) {
@@ -48,7 +48,9 @@ export function seoConfig(env: SeoEnvironment = process.env) {
     env.NODE_ENV === 'production' &&
     env.LFE_DATA_BACKEND === 'supabase' &&
     env.FACEIT_MODE !== 'fixtures' &&
-    (!env.VERCEL_ENV || env.VERCEL_ENV === 'production');
+    (!env.VERCEL_ENV || env.VERCEL_ENV === 'production') &&
+    // Netlify : seules les mises en production sont indexables (pas les aperçus de branche).
+    (!env.CONTEXT || env.CONTEXT === 'production');
   return { origin, indexable };
 }
 

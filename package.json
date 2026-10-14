@@ -18,7 +18,8 @@
     "check": "npm run typecheck && npm run lint && npm run test",
     "faceit:check": "tsx --conditions=react-server scripts/faceit-check.ts",
     "sync": "tsx --conditions=react-server scripts/sync.ts",
-    "local:reset": "tsx --conditions=react-server scripts/local-reset.ts"
+    "local:reset": "tsx --conditions=react-server scripts/local-reset.ts",
+    "transfer": "tsx scripts/transfer-to-supabase.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.8",

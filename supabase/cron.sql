@@ -10,8 +10,8 @@ create extension if not exists pg_net;
 
 -- 2. Adresse du site et secret partagé, stockés chiffrés dans Supabase Vault.
 --    Remplace les deux valeurs ENTRE APOSTROPHES dans l'éditeur SQL, puis exécute.
---    CRON_SECRET = exactement la même valeur que la variable CRON_SECRET du site (Vercel).
-select vault.create_secret('https://REMPLACE-PAR-TON-SITE.vercel.app', 'lfe_site_url');
+--    CRON_SECRET = exactement la même valeur que la variable CRON_SECRET du site (Netlify).
+select vault.create_secret('https://fineequipe.com', 'lfe_site_url');
 select vault.create_secret('REMPLACE-PAR-TON-CRON_SECRET', 'lfe_cron_secret');
 
 -- 3. Profils + ELO + matchs toutes les 5 minutes (classement permanent ; ~20 appels FACEIT par passage
