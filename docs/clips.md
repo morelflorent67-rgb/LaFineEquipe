@@ -3,7 +3,7 @@
 ## Publier un clip
 
 1. Ouvrir **Admin → Clips → Nouveau clip**.
-2. Coller un lien YouTube, Twitch ou Allstar. La prévisualisation reconnaît le format et nettoie le lien ; elle ne vérifie pas que la vidéo existe ou est publique.
+2. Coller un lien YouTube, Twitch, Allstar ou une vidéo FACEIT. La prévisualisation reconnaît le format et nettoie le lien ; elle ne vérifie pas que la vidéo existe ou est publique.
 3. Renseigner titre, date et, si souhaité, joueur, map et description.
 4. Vérifier la vidéo sur sa plateforme. Cocher l'autorisation de lecture intégrée seulement si elle est disponible ; confirmer l'accord du joueur et les droits de partage avant publication.
 5. Enregistrer en brouillon ou publier. Un brouillon est réservé aux administrateurs, y compris lors d'un accès direct à la base avec un rôle public ou membre.
@@ -16,7 +16,7 @@ Les visiteurs filtrent par joueur, map, titre/pseudo et dates ; les filtres rest
 
 - **YouTube** : liens watch, youtu.be, Shorts, live et embed reconnus. Lecteur chargé uniquement après clic, sans lecture automatique. [Paramètres officiels](https://developers.google.com/youtube/player_parameters).
 - **Twitch** : clips et vidéos enregistrées, avec paramètre `parent` construit à partir du domaine de la page. Le lecteur exige HTTPS et une largeur minimale de 400 px : en local HTTP ou sur petit écran, un lien externe est proposé. [Documentation officielle](https://dev.twitch.tv/docs/embed/video-and-clips/).
-- **Allstar** : lien de partage `allstar.gg/clip/<id>` (format actuel, constaté le 14/10/2026) ou ancien `/clip?clip=<id>`, identifiant hexadécimal de 24 caractères. Ouvert sur la plateforme (lien externe). Un lecteur `allstar.gg/iframe?clip=<id>` existe (repéré via l'oEmbed, aucune interdiction d'intégration dans ses en-têtes) mais il s'affichait vide lors du test du 14/10/2026 : à revérifier avec un vrai clip de la team avant de l'activer. Aucun import automatique : [l'API partenaire est gratuite mais soumise à inscription et approbation](https://developer.allstar.gg/).
+- **Allstar** : lien de partage `allstar.gg/clip/<id>` (format actuel, constaté le 14/10/2026) ou ancien `/clip?clip=<id>`, identifiant hexadécimal de 24 caractères. Les **vidéos FACEIT** (`faceit.com/<langue>/players/<pseudo>/videos/<id>`) sont des clips Allstar : même identifiant, enregistrées comme clip Allstar. Lecture intégrée via le lecteur `allstar.gg/iframe?clip=<id>` (exposé par Allstar pour l'oEmbed, vérifié avec un vrai clip de la team le 14/10/2026) ; il affiche d'abord la demande de consentement aux cookies d'Allstar.
 - **FACEIT** : liens clips non pris en charge tant qu'un format et une intégration fiables ne sont pas validés. Aucun endpoint de clips inventé.
 
 Les URL sont limitées à des hôtes précis en HTTPS et reconstruites côté serveur. Aucune récupération de miniature, de vidéo ou de HTML externe. La disponibilité des vidéos, les restrictions géographiques et les droits d'intégration restent contrôlés par les plateformes. Le lien externe reste accessible si un lecteur refuse la vidéo.

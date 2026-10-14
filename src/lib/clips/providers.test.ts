@@ -16,7 +16,7 @@ describe('Sources des clips', () => {
     ])
       expect(parseClipSource(url)).toEqual(expected);
   });
-  it('normalise Twitch et Allstar (ancien et nouveau format) ; Allstar reste un lien externe', () => {
+  it('normalise Twitch, Allstar (ancien et nouveau format) et les vidéos FACEIT ; lecteur Allstar intégré', () => {
     expect(parseClipSource('https://www.twitch.tv/player/clip/SomeClip-Ab12?tt=1')?.sourceUrl).toBe(
       'https://clips.twitch.tv/SomeClip-Ab12',
     );
@@ -25,7 +25,18 @@ describe('Sources des clips', () => {
     expect(parseClipSource('https://allstar.gg/clip/6a359b3b407ff13d680ea1ec')).toEqual(expected);
     expect(parseClipSource('https://www.allstar.gg/clip/6A359B3B407FF13D680EA1EC/?utm_source=share')).toEqual(expected);
     expect(parseClipSource('https://allstar.gg/clip?clip=6a359b3b407ff13d680ea1ec&utm=x')).toEqual(expected);
-    expect(clipEmbedUrl('https://allstar.gg/clip/6a359b3b407ff13d680ea1ec', 'example.com')).toBeNull();
+    expect(clipEmbedUrl('https://allstar.gg/clip/6a359b3b407ff13d680ea1ec', 'example.com')).toBe(
+      'https://allstar.gg/iframe?clip=6a359b3b407ff13d680ea1ec',
+    );
+    // Lien constaté le 14/10/2026 : la « vidéo » FACEIT a le même identifiant que le clip Allstar.
+    expect(parseClipSource('https://www.faceit.com/en/players/db_/videos/6acfa6e4f9dd919bc3364e1b')).toEqual({
+      provider: 'allstar',
+      externalId: '6acfa6e4f9dd919bc3364e1b',
+      sourceUrl: 'https://allstar.gg/clip/6acfa6e4f9dd919bc3364e1b',
+    });
+    expect(parseClipSource('https://allstar.gg/clip/6acfc50e99d1eaf085159f55?ref=64aaba889f46fd1506af7b39')?.externalId).toBe(
+      '6acfc50e99d1eaf085159f55',
+    );
   });
   it.each([
     'http://youtube.com/watch?v=M7lc1UVf-VE',
@@ -43,6 +54,8 @@ describe('Sources des clips', () => {
     'https://allstar.gg.evil.test/clip/6a359b3b407ff13d680ea1ec',
     'https://allstar.gg/iframe?clip=6a359b3b407ff13d680ea1ec',
     'https://faceit.com/fr/players/demo',
+    'https://www.faceit.com/en/players/db_/videos/pas-un-id',
+    'https://www.faceit.com.evil.test/en/players/db_/videos/6acfa6e4f9dd919bc3364e1b',
   ])('refuse les liens non pris en charge : %s', (u) => expect(parseClipSource(u)).toBeNull());
   it('construit le parent Twitch et interdit un parent injecté', () => {
     const u = new URL(clipEmbedUrl('https://clips.twitch.tv/SomeClip', 'lfe.example.com')!);

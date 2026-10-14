@@ -27,7 +27,7 @@ export function ClipCard({
   const focus = useReturnFocus();
   const source = parseClipSource(clip.sourceUrl);
   const label = PROVIDER_LABELS[clip.provider];
-  const canEmbed = clip.embedAllowed && clip.provider !== 'allstar' && !clip.isDemo;
+  const canEmbed = clip.embedAllowed && !clip.isDemo;
   return (
     <article className={styles.card}>
       <div className={styles.visual}>

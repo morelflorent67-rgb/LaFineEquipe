@@ -37,8 +37,15 @@ export function parseClipSource(input: string): ClipSource | null {
     if (id && host.endsWith('twitch.tv') && id !== 'embed')
       return { provider: 'twitch', externalId: id, sourceUrl: `https://clips.twitch.tv/${id}` };
     // Allstar : ancien format « /clip?clip=<id> » et format actuel « /clip/<id> » (constaté le 14/10/2026).
+    // Les « vidéos » d'un profil FACEIT (faceit.com/<langue>/players/<pseudo>/videos/<id>) sont des clips
+    // Allstar : même identifiant, lu par le lecteur Allstar (vérifié le 14/10/2026 sur un clip de la team).
     if (['allstar.gg', 'www.allstar.gg'].includes(host)) {
       id = /^\/clip\/?$/.test(u.pathname) ? u.searchParams.get('clip') : (u.pathname.match(/^\/clip\/([a-fA-F0-9]{24})\/?$/)?.[1] ?? null);
+    }
+    if (['faceit.com', 'www.faceit.com'].includes(host)) {
+      id = u.pathname.match(/^\/[a-z]{2}(?:-[a-z]{2})?\/players\/[^/]{1,64}\/videos\/([a-fA-F0-9]{24})\/?$/)?.[1] ?? null;
+    }
+    if (['allstar.gg', 'www.allstar.gg', 'faceit.com', 'www.faceit.com'].includes(host)) {
       if (id && /^[a-fA-F0-9]{24}$/.test(id)) {
         id = id.toLowerCase();
         return { provider: 'allstar', externalId: id, sourceUrl: `https://allstar.gg/clip/${id}` };
@@ -55,8 +62,9 @@ export function clipEmbedUrl(sourceUrl: string, parent: string): string | null {
   const s = parseClipSource(sourceUrl);
   if (!s) return null;
   if (s.provider === 'youtube') return `https://www.youtube.com/embed/${s.externalId}?autoplay=0`;
-  // Allstar : lecteur « allstar.gg/iframe?clip=… » repéré le 14/10/2026 mais pas encore vérifié avec un vrai
-  // clip (rendu vide en test) → lien externe uniquement tant que ce n'est pas confirmé.
+  // Lecteur intégrable d'Allstar (exposé par Allstar pour l'oEmbed), vérifié le 14/10/2026 avec un vrai clip.
+  // Il affiche d'abord sa propre demande de consentement aux cookies.
+  if (s.provider === 'allstar') return `https://allstar.gg/iframe?clip=${s.externalId}`;
   if (s.provider !== 'twitch' || !/^[a-zA-Z0-9.-]+$/.test(parent)) return null;
   const video = s.externalId.startsWith('video:');
   const u = new URL(video ? 'https://player.twitch.tv/' : 'https://clips.twitch.tv/embed');

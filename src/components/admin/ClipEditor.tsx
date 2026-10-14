@@ -77,7 +77,7 @@ export function ClipEditor({
             <>
               <strong>
                 {PROVIDER_LABELS[source.provider]} ·{' '}
-                {source.provider === 'allstar' ? 'Lien externe' : 'Lecteur intégré possible'}
+                Lecteur intégré possible
               </strong>
               <p>{source.sourceUrl}</p>
               <small>
@@ -88,7 +88,7 @@ export function ClipEditor({
           ) : (
             <span>
               {url ? 'Lien vidéo non reconnu. ' : ''}Formats : YouTube (watch, Shorts, youtu.be), Twitch (clip
-              ou vidéo), Allstar (allstar.gg/clip/… ou /clip?clip=…). Les liens FACEIT ne sont pas encore pris en charge.
+              ou vidéo), Allstar (allstar.gg/clip/…) et vidéos FACEIT (faceit.com/…/players/…/videos/…, des clips Allstar).
             </span>
           )}
         </div>
@@ -149,8 +149,8 @@ export function ClipEditor({
         </label>
         <label className={styles.check}>
           <input type="checkbox" name="embedAllowed" defaultChecked={clip?.embedAllowed ?? false} />
-          J’ai vérifié que la vidéo autorise la lecture intégrée (YouTube / Twitch). Allstar reste pour l’instant un
-          lien externe.
+          J’ai vérifié que la vidéo autorise la lecture intégrée (YouTube, Twitch, Allstar/FACEIT). Le lien vers la
+          plateforme reste toujours affiché.
         </label>
         <label className={styles.check}>
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
