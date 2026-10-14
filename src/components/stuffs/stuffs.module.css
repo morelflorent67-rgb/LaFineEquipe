@@ -626,7 +626,8 @@
   height: 100%;
   object-fit: cover;
   transform: scale(1.03);
-  transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: grayscale(0.7) brightness(0.7);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease;
 }
 .mtile::before {
   content: '';
@@ -711,6 +712,14 @@
 .mtile:hover img,
 .mtile:focus-visible img {
   transform: scale(1.1);
+  filter: grayscale(0) brightness(1);
+}
+@media (hover: none) {
+  .mtile:active img { filter: grayscale(0) brightness(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mtile img, .mtName, .mtBar { transition: none; }
+  .mtile:hover img, .mtile:focus-visible img { transform: none; }
 }
 .mtile:hover .mtName,
 .mtile:focus-visible .mtName {

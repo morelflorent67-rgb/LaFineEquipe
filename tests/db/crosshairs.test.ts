@@ -14,6 +14,12 @@ const save = (p: Record<string, unknown>) =>
   rpc(pg, as.admin, 'admin_save_crosshair', { p: { label: 'Classique', shareCode: CODE, preview: PREVIEW, published: true, ...p } });
 
 describe('Crosshairs', () => {
+  it('enregistre le code récent intact sans le déclarer vérifié en jeu', async () => {
+    const code = 'CSH2Rx7cGRU5apQ4VSnZwjsr9RyLEiOrCAaVYWYvW6dz7H';
+    await save({ shareCode: code });
+    expect((await rpc(pg, as.anon, 'list_crosshairs'))[0]).toMatchObject({ shareCode: code, verifiedAt: null });
+    expect(await errorCode(save({ shareCode: `CS${'a'.repeat(127)}` }))).toBe('invalid');
+  });
   it('publié visible de tous, brouillon réservé aux admins, avec joueur et map', async () => {
     const { id: playerId } = await rpc(pg, as.admin, 'admin_add_player', { p_profile: profile({ nickname: 'tireur' }), p_group: 'team' });
     await save({ playerId, mapSlug: 'mirage', verifiedAt: '2026-10-04', gameVersion: 'build 30/09' });

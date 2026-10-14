@@ -12,7 +12,7 @@ const ITEMS = [
   { href: '/admin/stuffs', label: 'Stuffs' },
   { href: '/admin/crosshairs', label: 'Crosshairs' },
   { href: '/admin/sync', label: 'Synchronisation' },
-  { href: '/admin/clips', label: 'Clips', soon: true },
+  { href: '/admin/clips', label: 'Clips' },
 ];
 
 export function AdminSideNav() {
@@ -27,7 +27,6 @@ export function AdminSideNav() {
             <li key={it.href}>
               <Link href={it.href} aria-current={current ? 'page' : undefined}>
                 {it.label}
-                {it.soon ? <small>bientôt</small> : null}
               </Link>
             </li>
           );

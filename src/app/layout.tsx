@@ -8,6 +8,7 @@ import { ConfigError, getServerEnv } from '@/lib/env';
 import { getViewer } from '@/lib/auth/viewer';
 import { getLiveStateRow, settle } from '@/lib/data/queries';
 import { deriveLiveState } from '@/lib/domain/live';
+import { seoConfig, SITE_DESCRIPTION } from '@/lib/seo';
 import './globals.css';
 
 const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo', display: 'swap' });
@@ -15,7 +16,8 @@ const martian = Martian_Mono({ subsets: ['latin'], variable: '--font-martian', d
 
 export const metadata: Metadata = {
   title: { default: 'LaFineEquipe', template: '%s · LaFineEquipe' },
-  description: 'Le QG de LaFineEquipe : ELO Run FACEIT, matchs, stuffs CS2 et la team.',
+  description: SITE_DESCRIPTION,
+  robots: { index: seoConfig().indexable, follow: seoConfig().indexable },
 };
 
 export const viewport: Viewport = {

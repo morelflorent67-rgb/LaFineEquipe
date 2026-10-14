@@ -162,6 +162,7 @@ export function RankingBoard({
                     </span>
                     {r.group === 'guest' ? <span className={`tag ${styles.podTag}`}>Guest</span> : null}
                     <Avatar src={r.avatarUrl} size={i === 0 ? 112 : 86} level={r.level} />
+                    <Level level={r.level} />
                     <span className={styles.nm}>{r.nickname}</span>
                     {mode === 'elo' ? (
                       <>

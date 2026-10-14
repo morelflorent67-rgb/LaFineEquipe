@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
+import { publicMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { GrenadeIcon, SideBadge, VerificationNote } from '@/components/stuffs/StuffCard';
 import { ReportButton, ShareButton, TrainingMode, VideoEmbed } from '@/components/stuffs/FicheClient';
@@ -28,15 +30,17 @@ type Props = {
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
-async function load(mapSlug: string, stuffSlug: string) {
+const load = cache(async (mapSlug: string, stuffSlug: string) => {
   if (!SLUG.test(mapSlug) || !SLUG.test(stuffSlug)) return { ok: true as const, data: null };
   return settle(getUtilityDetail(mapSlug, stuffSlug));
-}
+});
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { mapSlug, stuffSlug } = await params;
   const res = await load(mapSlug, stuffSlug);
-  return { title: res.ok && res.data ? `${res.data.utility.title} · ${res.data.utility.mapName}` : 'Stuff' };
+  if (!res.ok || !res.data || res.data.utility.status !== 'published' || res.data.utility.isDemo) return { title: 'Stuff', robots: { index: false, follow: false } };
+  const u = res.data.utility;
+  return publicMetadata(`${u.title} · ${u.mapName}`, u.description || `${GRENADE_LABEL[u.grenade]} sur ${u.mapName} : de ${u.originName} vers ${u.targetName}. Placement et technique de lancer de LaFineEquipe.`, `/stuffs/${encodeURIComponent(mapSlug)}/${encodeURIComponent(stuffSlug)}`);
 }
 
 export default async function StuffPage({ params, searchParams }: Props) {

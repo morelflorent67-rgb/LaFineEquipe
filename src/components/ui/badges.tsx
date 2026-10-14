@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 import type { MatchResult } from '@/lib/domain/schemas';
 import { fmtDateTime, fmtInt, fmtSigned } from '@/lib/format';
 import { Icon } from './Icon';
@@ -62,16 +63,16 @@ export function Delta({ value, className = '' }: { value: number | null; classNa
 }
 
 export function Level({ level }: { level: number | null }) {
-  if (level === null) {
+  if (level === null || !Number.isInteger(level) || level < 1 || level > 10) {
     return (
-      <span className="lvl none" title="Niveau CS2 non fourni par FACEIT" aria-label="Niveau CS2 non fourni">
+      <span className="lvl none" role="img" title="Niveau CS2 non fourni par FACEIT" aria-label="Niveau CS2 non fourni">
         –
       </span>
     );
   }
   return (
-    <span className={`lvl${level === 10 ? ' top' : ''}`} aria-label={`Niveau FACEIT ${level}`} title={`Niveau ${level}`}>
-      {level}
+    <span className="lvl" role="img" aria-label={`Niveau FACEIT ${level}`} title={`Niveau FACEIT ${level}`}>
+      <Image src={`/faceit/levels/${level}.png`} alt="" width={38} height={38} unoptimized />
     </span>
   );
 }

@@ -1,0 +1,122 @@
+.hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 28px;
+  border-bottom: 1px solid var(--line);
+  background: radial-gradient(ellipse at 0 0, #40101366, transparent 65%);
+}
+.identity {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+.identity h1 {
+  overflow-wrap: anywhere;
+  font-size: clamp(32px, 5vw, 76px);
+}
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+}
+.jump {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.jump a {
+  min-height: 44px;
+}
+.overview {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+  gap: 32px;
+  align-items: start;
+}
+.numbers {
+  margin: 0;
+  display: grid;
+  gap: 22px;
+  padding: 26px;
+  border-left: 3px solid var(--brand-hi);
+  background: linear-gradient(130deg, #271315, #111113);
+}
+.numbers dt {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.numbers dd {
+  margin: 0;
+  font: 750 clamp(26px, 3vw, 40px)/1.15 var(--f);
+}
+.numbers small {
+  display: block;
+  font: 400 12px/1.7 var(--mono);
+  color: var(--muted);
+  margin-top: 6px;
+}
+.chart {
+  min-width: 0;
+  padding: 20px;
+  background: #111113;
+  border-top: 1px solid var(--line);
+}
+.chart h3 {
+  margin: 0 0 14px;
+}
+.back {
+  margin-bottom: 12px;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+.section {
+  scroll-margin-top: calc(var(--nav-h) + 20px);
+}
+@media (max-width: 760px) {
+  .overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .hero {
+    gap: 18px;
+  }
+  .numbers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 20px 14px;
+  }
+  .numbers dd {
+    font-size: 24px;
+  }
+  .chart {
+    padding: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero > span {
+    width: 88px;
+    height: 88px;
+  }
+  .jump a {
+    flex: 1 1 calc(50% - 10px);
+    justify-content: center;
+  }
+  .numbers {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .numbers > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+  }
+}

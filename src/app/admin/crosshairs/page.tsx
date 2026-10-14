@@ -6,6 +6,7 @@ import { DemoTag, StateBlock } from '@/components/ui/badges';
 import { Icon } from '@/components/ui/Icon';
 import { crosshairStatus } from '@/lib/crosshairs';
 import { getCrosshairs, settle } from '@/lib/data/queries';
+import proCrosshairs from '@/lib/pro-crosshairs.json';
 
 export const metadata = { title: 'Admin · Crosshairs' };
 
@@ -19,8 +20,9 @@ export default async function AdminCrosshairsPage() {
         <div>
           <h1>Crosshairs</h1>
           <p>
-            Presets des joueurs : code de partage contrôlé dans sa forme, aperçu indicatif saisi à la main, date de test en jeu. Les
-            codes validés avant les mises à jour CS2 de fin septembre 2026 sont signalés « à revérifier ».
+            Presets des joueurs : code de partage contrôlé dans sa forme, aperçu indicatif saisi à la main,
+            date de test en jeu. Les codes validés avant les mises à jour CS2 de fin septembre 2026 sont
+            signalés « à revérifier ».
           </p>
           <div className={styles.stats}>
             <span>
@@ -57,14 +59,39 @@ export default async function AdminCrosshairsPage() {
                   borderTop: i ? '1px solid var(--line)' : undefined,
                 }}
               >
-                <span style={{ display: 'grid', placeItems: 'center', width: 44, height: 44, background: '#0b0b0c', border: '1px solid var(--line)' }}>
-                  {c.preview ? <CrosshairPreview preview={c.preview} size={40} label={`Aperçu de ${c.label}`} /> : null}
+                <span
+                  style={{
+                    display: 'grid',
+                    placeItems: 'center',
+                    width: 44,
+                    height: 44,
+                    background: '#0b0b0c',
+                    border: '1px solid var(--line)',
+                  }}
+                >
+                  {proCrosshairs.some((p) => p.code === c.shareCode) ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- image locale liée au code
+                    <img
+                      src={proCrosshairs.find((p) => p.code === c.shareCode)!.image}
+                      alt={`Visuel de ${c.label}`}
+                      width={44}
+                      height={44}
+                      style={{ imageRendering: 'pixelated' }}
+                    />
+                  ) : c.preview ? (
+                    <CrosshairPreview preview={c.preview} size={40} label={`Aperçu de ${c.label}`} />
+                  ) : null}
                 </span>
-                <Link href={`/admin/crosshairs/${c.id}`} style={{ fontWeight: 700, minWidth: 0, overflowWrap: 'anywhere' }}>
+                <Link
+                  href={`/admin/crosshairs/${c.id}`}
+                  style={{ fontWeight: 700, minWidth: 0, overflowWrap: 'anywhere' }}
+                >
                   {c.label}
                 </Link>
                 <span className="muted">{c.player?.nickname ?? 'Sans joueur'}</span>
-                <span className={`chip ${c.published ? 'ok' : 'unknown'}`}>{c.published ? 'Publié' : 'Brouillon'}</span>
+                <span className={`chip ${c.published ? 'ok' : 'unknown'}`}>
+                  {c.published ? 'Publié' : 'Brouillon'}
+                </span>
                 <CrosshairStatus c={c} />
                 {c.isDemo ? <DemoTag /> : null}
               </li>

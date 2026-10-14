@@ -1,4 +1,8 @@
 import Link from 'next/link';
+import { publicMetadata, SITE_DESCRIPTION } from '@/lib/seo';
+import { ClipCard } from '@/components/clips/ClipCard';
+import clipStyles from '@/components/clips/clips.module.css';
+import { getClips } from '@/lib/data/queries';
 import type { CSSProperties } from 'react';
 import { HeroParallax } from '@/components/home/HeroParallax';
 import { MatchList, teamResult } from '@/components/match/MatchList';
@@ -6,7 +10,15 @@ import { liveSummary } from '@/components/match/LiveStatus';
 import { Avatar } from '@/components/ui/Avatar';
 import { Delta, ResultBadge, StateBlock } from '@/components/ui/badges';
 import { Icon } from '@/components/ui/Icon';
-import { getLiveStateRow, getMapCovers, getMaps, getRecentMatches, getRefreshStatus, getRoster, settle } from '@/lib/data/queries';
+import {
+  getLiveStateRow,
+  getMapCovers,
+  getMaps,
+  getRecentMatches,
+  getRefreshStatus,
+  getRoster,
+  settle,
+} from '@/lib/data/queries';
 import { deriveLiveState } from '@/lib/domain/live';
 import type { MapInfo, Match } from '@/lib/domain/schemas';
 import { rankingRows } from '@/lib/elo/board';
@@ -16,15 +28,17 @@ import { mapCoverUrl } from '@/lib/media';
 import styles from './home.module.css';
 
 const rv = (i: number) => ({ 'data-rv': '', style: { '--i': i } as CSSProperties });
+export const metadata = publicMetadata('LaFineEquipe', SITE_DESCRIPTION, '/');
 
 export default async function HomePage() {
-  const [liveRow, matchesRes, rosterRes, mapsRes, refreshRes, coversRes] = await Promise.all([
+  const [liveRow, matchesRes, rosterRes, mapsRes, refreshRes, coversRes, clipsRes] = await Promise.all([
     settle(getLiveStateRow()),
     settle(getRecentMatches(8)),
     settle(getRoster()),
     settle(getMaps()),
     settle(getRefreshStatus()),
     settle(getMapCovers()),
+    settle(getClips()),
   ]);
   const live = liveRow.ok ? deriveLiveState(liveRow.data) : null;
   const roster = rosterRes.ok ? rosterRes.data : [];
@@ -40,7 +54,10 @@ export default async function HomePage() {
   const lastAt = lastMatch ? (lastMatch.finishedAt ?? lastMatch.startedAt) : null;
   const lastCover = lastMatch?.mapKey ? covers[lastMatch.mapKey] : undefined;
   const lastScore = lastMatch ? scoreOf(lastMatch) : null;
-  const stripCovers = maps.map((m) => mapCoverUrl(m)).filter((u): u is string => Boolean(u)).slice(0, 4);
+  const stripCovers = maps
+    .map((m) => mapCoverUrl(m))
+    .filter((u): u is string => Boolean(u))
+    .slice(0, 4);
 
   return (
     <>
@@ -64,7 +81,8 @@ export default async function HomePage() {
             </span>
           </h1>
           <p className={styles.lede}>
-            Le QG de la team : <strong>classement ELO permanent</strong>, matchs FACEIT et <strong>stuffs map par map</strong>.
+            Le QG de la team : <strong>classement ELO permanent</strong>, matchs FACEIT et{' '}
+            <strong>stuffs map par map</strong>.
           </p>
           <div className={styles.ctas}>
             <Link className="btn btn-red" href="/elo-run">
@@ -88,7 +106,11 @@ export default async function HomePage() {
 
         <nav className={styles.prio} aria-label="Accès prioritaires">
           {live?.kind === 'live' || live?.kind === 'none' ? (
-            <Link className={`${styles.pt} ${styles.ptLive}`} href="/matches#en-cours" style={{ '--i': 0 } as CSSProperties}>
+            <Link
+              className={`${styles.pt} ${styles.ptLive}`}
+              href="/matches#en-cours"
+              style={{ '--i': 0 } as CSSProperties}
+            >
               <span className={styles.t}>
                 <span className={styles.lbl}>Matchs en cours</span>
                 <span className={styles.main}>
@@ -104,7 +126,11 @@ export default async function HomePage() {
               <Icon name="arrow" className={styles.go} />
             </Link>
           ) : (
-            <Link className={`${styles.pt} ${styles.ptLive}`} href="#derniers-matchs" style={{ '--i': 0 } as CSSProperties}>
+            <Link
+              className={`${styles.pt} ${styles.ptLive}`}
+              href="#derniers-matchs"
+              style={{ '--i': 0 } as CSSProperties}
+            >
               {lastCover ? (
                 <span className={styles.ptBg} aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -117,7 +143,9 @@ export default async function HomePage() {
                   <>
                     <span className={styles.main}>
                       {lastResult !== 'mixed' ? <ResultBadge result={lastResult} large /> : null}
-                      <span className={styles.big}>{mapLabel(lastMatch.mapKey, lastMatch.mapName) ?? 'Map inconnue'}</span>
+                      <span className={styles.big}>
+                        {mapLabel(lastMatch.mapKey, lastMatch.mapName) ?? 'Map inconnue'}
+                      </span>
                       {lastScore ? (
                         <span className={styles.score}>
                           {lastScore.us}
@@ -142,12 +170,18 @@ export default async function HomePage() {
               <Icon name="arrow" className={styles.go} />
             </Link>
           )}
-          <Link className={`${styles.pt} ${styles.ptElo}`} href="/elo-run" style={{ '--i': 1 } as CSSProperties}>
+          <Link
+            className={`${styles.pt} ${styles.ptElo}`}
+            href="/elo-run"
+            style={{ '--i': 1 } as CSSProperties}
+          >
             <span className={styles.rankMark} aria-hidden="true">
               1
             </span>
             <span className={styles.t}>
-              <span className={styles.lbl}>ELO Run · n°1{lastSync ? ` · synchro ${fmtAgo(lastSync)}` : ''}</span>
+              <span className={styles.lbl}>
+                ELO Run · n°1{lastSync ? ` · synchro ${fmtAgo(lastSync)}` : ''}
+              </span>
               {leader ? (
                 <>
                   <span className={styles.main}>
@@ -155,7 +189,9 @@ export default async function HomePage() {
                     <span className={styles.big}>{leader.nickname}</span>
                   </span>
                   <span className={styles.sub}>
-                    <b className={styles.eloBig}>{leader.currentElo !== null ? fmtInt(leader.currentElo) : '—'}</b>
+                    <b className={styles.eloBig}>
+                      {leader.currentElo !== null ? fmtInt(leader.currentElo) : '—'}
+                    </b>
                     <span>ELO</span>
                     <Delta value={leader.delta} />
                     <span>depuis l’ajout</span>
@@ -172,7 +208,11 @@ export default async function HomePage() {
             </span>
             <Icon name="arrow" className={styles.go} />
           </Link>
-          <Link className={`${styles.pt} ${styles.ptStuffs}`} href="/stuffs" style={{ '--i': 2 } as CSSProperties}>
+          <Link
+            className={`${styles.pt} ${styles.ptStuffs}`}
+            href="/stuffs"
+            style={{ '--i': 2 } as CSSProperties}
+          >
             <span className={styles.ptStrip} aria-hidden="true">
               {stripCovers.map((src) => (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -237,8 +277,8 @@ export default async function HomePage() {
               Qui est devant ?
             </h2>
             <p className={styles.runLede} {...rv(2)}>
-              Pas de saison ni de remise à zéro. Chaque joueur entre au classement à son vrai ELO FACEIT dès que l’admin
-              l’ajoute, avec une progression qui démarre à zéro.
+              Pas de saison ni de remise à zéro. Chaque joueur entre au classement à son vrai ELO FACEIT dès
+              que l’admin l’ajoute, avec une progression qui démarre à zéro.
             </p>
             <div className={styles.runMeta} {...rv(3)}>
               <span>
@@ -256,7 +296,9 @@ export default async function HomePage() {
           {!rosterRes.ok ? (
             <StateBlock kind="error" title="Classement momentanément indisponible" />
           ) : board.length === 0 ? (
-            <StateBlock title="Personne au classement pour l’instant">Les joueurs ajoutés par l’admin y entrent à leur ELO actuel.</StateBlock>
+            <StateBlock title="Personne au classement pour l’instant">
+              Les joueurs ajoutés par l’admin y entrent à leur ELO actuel.
+            </StateBlock>
           ) : (
             <ol className={styles.mini} aria-label="Top 5 par ELO actuel">
               {board.slice(0, 5).map((r, i) => (
@@ -288,6 +330,33 @@ export default async function HomePage() {
             </ol>
           )}
         </div>
+      </section>
+
+      <section className="sec" aria-labelledby="clips-h">
+        <div className="sec-h">
+          <div>
+            <p className="kicker">Les rounds à revoir</p>
+            <h2 className="h2" id="clips-h">
+              Derniers clips
+            </h2>
+          </div>
+          <Link href="/clips" className="link">
+            Tous les clips →
+          </Link>
+        </div>
+        {!clipsRes.ok ? (
+          <StateBlock kind="error" title="Clips momentanément indisponibles" />
+        ) : clipsRes.data.length ? (
+          <ul className={clipStyles.grid}>
+            {clipsRes.data.slice(0, 3).map((c) => (
+              <li key={c.id}>
+                <ClipCard clip={c} cover={c.map ? mapCoverUrl(c.map) : null} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="muted">Les premiers highlights apparaîtront ici dès leur publication par la team.</p>
+        )}
       </section>
 
       <section className="sec" aria-labelledby="stuffs-h">
@@ -338,11 +407,19 @@ function MapCard({ map }: { map: MapInfo }) {
     <Link className={styles.mcard} href={`/stuffs/${map.slug}`}>
       {cover ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={cover} alt="" loading="lazy" decoding="async" style={{ viewTransitionName: `map-${map.slug}` }} />
+        <img
+          src={cover}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          style={{ viewTransitionName: `map-${map.slug}` }}
+        />
       ) : null}
       <span className={styles.cap}>
         <span className={styles.mname}>{map.name}</span>
-        <span className={styles.ct}>{map.counts.total === 0 ? 'Aucun stuff' : pluralize(map.counts.total, 'stuff', 'stuffs')}</span>
+        <span className={styles.ct}>
+          {map.counts.total === 0 ? 'Aucun stuff' : pluralize(map.counts.total, 'stuff', 'stuffs')}
+        </span>
       </span>
       <span className={styles.bar} />
     </Link>

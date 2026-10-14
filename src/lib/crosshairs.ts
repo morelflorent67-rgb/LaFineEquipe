@@ -6,6 +6,11 @@ import type { CrosshairPreview } from '@/lib/domain/schemas';
  * Même règle que la contrainte SQL (migration 1100).
  */
 export const SHARE_CODE = /^CSGO(-[ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789]{5}){5}$/;
+/** Codes CS… observés après septembre 2026 : chaîne opaque alphanumérique bornée.
+ * Ce contrôle de saisie n'est PAS un décodeur ni une validation du contenu binaire.
+ * Voir docs/crosshairs-pro.md ; les anciens codes restent stockables sans conversion.
+ */
+export const MODERN_SHARE_CODE = /^CS[A-Za-z0-9]{38,126}$/;
 
 /** Mises à jour CS2 des 22–30/09/2026 : réglages et codes de partage modifiés. */
 export const CODES_CHANGED_ON = '2026-09-30';
@@ -17,7 +22,7 @@ export function normalizeShareCode(input: string): string {
 }
 
 export function isShareCode(input: string): boolean {
-  return SHARE_CODE.test(input);
+  return SHARE_CODE.test(input) || MODERN_SHARE_CODE.test(input);
 }
 
 /** Validé après la mise à jour = à jour ; avant = à revérifier ; jamais = non vérifié. */

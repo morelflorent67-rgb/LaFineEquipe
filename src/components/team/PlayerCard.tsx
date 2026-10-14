@@ -13,7 +13,10 @@ export function PlayerCard({ player, results }: { player: Player; results: Recen
   return (
     <li className={`${styles.card} ${player.group === 'guest' ? styles.guest : ''}`}>
       <div className={styles.media}>
+        <span className={styles.watermark} aria-hidden="true">{p.nickname}</span>
+        <span className={styles.orbit} aria-hidden="true" />
         <Avatar src={p.avatarUrl} size={128} level={p.cs2Level} />
+        <span className={styles.signature} aria-hidden="true">LFE / COUNTER-STRIKE 2</span>
       </div>
       <div className={styles.body}>
         <div className={styles.tags}>
@@ -40,6 +43,7 @@ export function PlayerCard({ player, results }: { player: Player; results: Recen
           </div>
         </dl>
         <div className={styles.series}>
+          <span className={styles.seriesLabel}>Derniers matchs</span>
           <Series
             results={results.map((r) => ({
               result: r.result,
@@ -47,6 +51,7 @@ export function PlayerCard({ player, results }: { player: Player; results: Recen
             }))}
           />
         </div>
+        <span className={styles.explore} aria-hidden="true">Explorer le profil <span>↗</span></span>
         <div className={styles.foot}>
           <ProfileFreshness
             fetchedAt={p.fetchedAt}

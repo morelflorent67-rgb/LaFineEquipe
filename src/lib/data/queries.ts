@@ -3,6 +3,7 @@ import { unstable_rethrow } from 'next/navigation';
 import { z } from 'zod';
 import { call, getDb } from '@/lib/db';
 import { mapCoversByKey } from '@/lib/media';
+import { clipSchema } from '@/lib/clips/schemas';
 import {
   catalogSchema,
   crosshairSchema,
@@ -106,6 +107,10 @@ export async function getUtilityDetail(mapSlug: string, slug: string) {
 
 export async function getCrosshairs(includeDrafts = false) {
   return call(await getDb(), 'list_crosshairs', { p_include_drafts: includeDrafts }, z.array(crosshairSchema));
+}
+
+export async function getClips(includeDrafts = false) {
+  return call(await getDb(), 'list_clips', { p_include_drafts: includeDrafts }, z.array(clipSchema));
 }
 
 export async function adminGetUtilities() {

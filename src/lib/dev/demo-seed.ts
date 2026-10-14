@@ -261,12 +261,21 @@ export function buildDemoSql(now: Date = new Date()): string {
     );
   });
 
+  // Clips fictifs : aucun lecteur ni lien externe activé pour ces exemples.
+  ['Exemple · Le clutch impossible', 'Exemple · Trois ouvertures', 'Exemple · Le dernier round'].forEach(
+    (title, i) => {
+      const videoId = `DEMOclip00${i}`;
+      out.push(`insert into public.clips (title, provider, external_id, source_url, player_id, map_id, recorded_on, description, consent_confirmed, is_published, is_demo)
+      values (${q(title)}, 'youtube', ${q(videoId)}, ${q(`https://www.youtube.com/watch?v=${videoId}`)}, ${q(playerId(i + 1))},
+      (select id from public.maps where slug = ${q(i === 1 ? 'inferno' : 'mirage')}), ${q(`2026-10-${12 - i}`)}, 'Exemple fictif de présentation, aucune vidéo réelle associée.', true, true, true);`);
+    },
+  );
   return out.join('\n');
 }
 
 /** Tables vidées par une réinitialisation locale (les comptes locaux sont conservés). */
 export const RESET_SQL = `
-  truncate table public.crosshairs, public.utility_reports, public.utilities, public.map_positions, public.match_players, public.matches,
+  truncate table public.clips, public.crosshairs, public.utility_reports, public.utilities, public.map_positions, public.match_players, public.matches,
     public.elo_snapshots, public.sync_failures, public.sync_runs,
     public.avoid_list_private_notes, public.avoid_list_entries, public.players, public.faceit_profiles restart identity cascade;
   update public.live_detection set source = 'none', verified_at = null, verification_note = null where id = 1;

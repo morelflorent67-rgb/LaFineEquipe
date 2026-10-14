@@ -50,7 +50,7 @@ Tant qu'une piste n'est pas validée par un test réel, `live_detection.source =
 
 ## Clips
 
-FACEIT n'a pas d'endpoint public de clips, et l'API Allstar exige un accès partenaire. La V1 prévue est l'ajout de liens par un admin : rien n'est importé automatiquement.
+Aucun endpoint de clips n'a été identifié dans la Data API officielle utilisée ici, et l'API Allstar exige un accès partenaire. La V1 est désormais disponible par ajout de liens YouTube/Twitch/Allstar depuis l'administration : rien n'est importé automatiquement. Les liens clips FACEIT restent non pris en charge. Voir [les formats, lecteurs et limites vérifiés](clips.md).
 
 ## Suivi
 

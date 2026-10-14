@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { publicMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { PlayerCard } from '@/components/team/PlayerCard';
 import styles from '@/components/team/PlayerCard.module.css';
@@ -7,7 +8,7 @@ import { Icon } from '@/components/ui/Icon';
 import { getViewer } from '@/lib/auth/viewer';
 import { getRecentResults, getRoster, settle } from '@/lib/data/queries';
 
-export const metadata: Metadata = { title: 'Joueurs' };
+export const metadata: Metadata = publicMetadata('Joueurs', 'Découvre les joueurs de LaFineEquipe, leurs profils FACEIT, leur progression ELO et leurs contenus publiés.', '/team');
 
 export default async function TeamPage() {
   const viewer = await getViewer();

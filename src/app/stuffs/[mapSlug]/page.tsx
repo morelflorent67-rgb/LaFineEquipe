@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
+import { publicMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { MapStrip } from '@/components/stuffs/MapStrip';
 import { GrenadeIcon } from '@/components/stuffs/StuffCard';
@@ -17,10 +19,13 @@ type Props = {
 };
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const loadCatalog = cache((slug: string) => SLUG.test(slug) ? settle(getCatalog(slug)) : Promise.resolve({ ok: true as const, data: null }));
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { mapSlug } = await params;
-  return { title: `Stuffs ${mapSlug}` };
+  const res = await loadCatalog(mapSlug);
+  if (!res.ok || !res.data || !res.data.map.active) return { title: 'Stuffs', robots: { index: false, follow: false } };
+  return publicMetadata(`Stuffs ${res.data.map.name}`, `Les stuffs de LaFineEquipe sur ${res.data.map.name} : filtres par grenade et camp, placements et carte tactique.`, `/stuffs/${encodeURIComponent(mapSlug)}`);
 }
 
 export default async function MapStuffsPage({ params, searchParams }: Props) {
@@ -28,7 +33,7 @@ export default async function MapStuffsPage({ params, searchParams }: Props) {
   const sp = await searchParams;
   const viewer = await getViewer();
   const [catalogRes, mapsRes] = await Promise.all([
-    SLUG.test(mapSlug) ? settle(getCatalog(mapSlug)) : Promise.resolve({ ok: true as const, data: null }),
+    loadCatalog(mapSlug),
     settle(getMaps()),
   ]);
   const maps = (mapsRes.ok ? mapsRes.data : []).map((m) => ({ ...m, coverUrl: mapCoverUrl(m) }));

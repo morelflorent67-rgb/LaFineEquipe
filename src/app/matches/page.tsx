@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { publicMetadata } from '@/lib/seo';
 import { LiveBlock } from '@/components/match/LiveStatus';
 import { MatchList } from '@/components/match/MatchList';
 import { StateBlock } from '@/components/ui/badges';
@@ -7,7 +8,7 @@ import { getLiveStateRow, getMapCovers, getRecentMatches, getSyncStatus, settle 
 import { deriveLiveState } from '@/lib/domain/live';
 import { fmtDateTime } from '@/lib/format';
 
-export const metadata: Metadata = { title: 'Matchs' };
+export const metadata: Metadata = publicMetadata('Matchs', 'Les derniers matchs FACEIT des joueurs de LaFineEquipe : maps, résultats et liens vers les salles de match.', '/matches');
 
 export default async function MatchesPage() {
   const [liveRow, matchesRes, syncRes, mapsRes] = await Promise.all([

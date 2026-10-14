@@ -21,18 +21,20 @@
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 18px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .card {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   min-width: 0;
   height: 100%;
-  background: linear-gradient(180deg, #19191c, #111113);
+  background: linear-gradient(155deg, #1b1b20, #0e0e11);
+  border-radius: 3px 18px 3px 3px;
+  overflow: hidden;
   border: 1px solid var(--line);
   transition:
     transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -47,9 +49,9 @@
   position: relative;
   display: grid;
   place-items: center;
-  aspect-ratio: 16 / 9;
+  height: 164px;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 45%, #1b1b1f, #0b0b0c 70%);
+  background: #0d1214;
 }
 .prev img {
   position: absolute;
@@ -67,6 +69,92 @@
   position: relative;
   width: 120px;
   height: 120px;
+}
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 18px 14px;
+}
+.cardTop h3 {
+  margin: 0;
+  font: 800 23px/1.1 var(--f);
+  overflow-wrap: anywhere;
+}
+.pro {
+  font: 650 10px/1 var(--mono);
+  letter-spacing: 0.15em;
+  color: var(--silver);
+  border-left: 2px solid var(--brand-hi);
+  padding-left: 8px;
+}
+.prev .sourceImage,
+.card:hover .prev .sourceImage {
+  inset: auto;
+  width: 264px;
+  height: 264px;
+  object-fit: contain;
+  transform: none;
+  image-rendering: pixelated;
+  transition: none;
+}
+.details {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  min-width: 0;
+}
+.details summary {
+  cursor: pointer;
+  min-height: 36px;
+  display: list-item;
+  font: 500 12px/1.5 var(--f);
+  color: var(--muted);
+}
+.details[open] > :not(summary) {
+  margin-bottom: 12px;
+}
+.details :global(.chip) {
+  white-space: normal;
+  line-height: 1.5;
+}
+.fullCode {
+  display: block;
+  overflow-wrap: anywhere;
+  font: 500 11px/1.6 var(--mono);
+  color: var(--silver);
+}
+.code.compactCode {
+  border: none;
+}
+.code.compactCode button {
+  width: 100%;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid #ffffff20;
+  background: #ffffff08;
+}
+.code.compactCode button:hover {
+  background: var(--brand-hi);
+}
+.code.compactCode button[data-done] {
+  background: var(--win);
+}
+.importHelp {
+  margin-top: 32px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.importHelp summary {
+  cursor: pointer;
+  padding: 10px 0 18px;
+  font-weight: 650;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card:hover,
+  .card:focus-within {
+    transform: none;
+  }
 }
 .ind {
   position: absolute;
@@ -127,6 +215,7 @@
   color: var(--silver);
 }
 .notes {
+  overflow-wrap: anywhere;
   margin: 0;
   font-size: 14px;
   color: var(--muted);
@@ -216,6 +305,35 @@
 }
 @container site (max-width: 560px) {
   .grid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .cardTop {
+    padding: 14px 10px 12px;
+    gap: 4px;
+  }
+  .cardTop h3 {
+    font-size: 17px;
+  }
+  .pro {
+    font-size: 8px;
+    letter-spacing: 0;
+    padding-left: 4px;
+  }
+  .prev {
+    height: 136px;
+  }
+  .body {
+    padding: 10px;
+  }
+  .code.compactCode button {
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  .details summary {
+    font-size: 11px;
+  }
+  .ind {
+    font-size: 8px;
   }
 }

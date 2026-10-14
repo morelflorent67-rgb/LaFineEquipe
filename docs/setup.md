@@ -54,7 +54,7 @@ En mode local avec `FACEIT_MODE=live`, les profils réels sont enregistrés dans
 ## 3. Créer le projet Supabase
 
 1. Crée un projet sur https://supabase.com, région Europe (Paris ou Francfort).
-2. **Créer les tables et les règles d'accès.** Dans **SQL Editor**, exécute un par un, dans l'ordre, les fichiers de `supabase/migrations/` (0100 → 1100). N'exécute ni `supabase/local/*`, ni `cron.sql` à cette étape.
+2. **Créer les tables et les règles d'accès.** Dans **SQL Editor**, exécute un par un, dans l'ordre, les fichiers de `supabase/migrations/` (0100 → 1400). N'exécute ni `supabase/local/*`, ni `cron.sql` à cette étape.
    Alternative en ligne de commande :
    ```bash
    npx supabase link --project-ref TON_REF
@@ -95,6 +95,16 @@ Une mise en ligne rend le site public. Fais-la toi-même quand tu es prêt :
    ```
 4. Après le premier déploiement, exécute `supabase/cron.sql` dans SQL Editor, avec ton adresse et le même `CRON_SECRET`.
 5. Vérifie dans Admin › Synchronisation que les passages apparaissent toutes les 5 minutes.
+
+### Référencement et partage des liens
+
+`SITE_URL` doit être l'origine publique HTTPS, par exemple `https://ton-vrai-domaine.fr`, sans chemin ni paramètres. Les pages publiques l'utilisent pour leur lien canonique et le logo original dans les aperçus de partage. Sans origine publique valide, aucune URL absolue n'est inventée.
+
+L'indexation est activée seulement en compilation/exécution de production, avec Supabase, sans profils fictifs, et hors aperçu Vercel. En local et sur les aperçus, les pages indiquent `noindex`, `robots.txt` interdit l'exploration et le sitemap est vide. Redéploie après une modification de la configuration : certaines métadonnées sont calculées au chargement des modules.
+
+Le sitemap contient les sept entrées publiques principales : accueil, ELO Run, matchs, clips, crosshairs, stuffs et joueurs. Les fiches détaillées restent découvrables via leurs liens publics ; elles ne sont pas encore listées individuellement dans le sitemap. Le Mur, la connexion et l'administration restent non indexables et ne publient pas d'aperçu nominatif. Les règles robots ne remplacent pas l'authentification et la RLS déjà en place.
+
+Après la mise en ligne, contrôler `/robots.txt`, `/sitemap.xml` et l'aperçu d'un lien sur la plateforme de partage souhaitée. Les plateformes peuvent conserver leur propre cache : les métadonnées du site ne garantissent pas un rafraîchissement immédiat de l'aperçu.
 
 ## Commandes
 

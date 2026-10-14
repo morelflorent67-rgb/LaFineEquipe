@@ -1,6 +1,6 @@
 # LaFineEquipe
 
-Site communautaire de la team CS2 LaFineEquipe : ELO Run FACEIT, matchs, joueurs, stuffs par map et Mur des lamentations (réservé aux membres), avec une administration privée.
+Site communautaire de la team CS2 LaFineEquipe : ELO Run FACEIT, matchs, joueurs, clips, crosshairs, stuffs par map et Mur des lamentations (réservé aux membres), avec une administration privée.
 
 - **Stack** : Next.js 16 (App Router), React 19, TypeScript strict, Tailwind 4, Radix (base accessible des composants), Supabase (Postgres, Auth, Storage, RLS), Zod, Vitest, Playwright.
 - **Identité visuelle** : Forge. Référence à valider : `design/forge-v2-final/` (voir [docs/forge-v2-final.md](docs/forge-v2-final.md)) ; l'ancienne maquette `design/forge-v2/` est figée.
@@ -28,6 +28,7 @@ npm run dev
 src/app/              pages (Accueil, ELO Run, Matchs, Joueurs, Stuffs, Mur, Admin…) et actions serveur
 src/components/       composants Forge (Avatar unique, badges V/D, navigation, ELO, stuffs, admin)
 src/lib/faceit/       client FACEIT serveur, validation des réponses, import de profils, jeu d'essai
+src/lib/clips/        validation des liens vidéo et adaptateurs YouTube / Twitch / Allstar
 src/lib/db/           accès aux données : Supabase en ligne, PostgreSQL embarqué (PGlite) en local
 src/lib/elo/          classement, progression, historique journalier (testés)
 src/lib/sync/         synchronisation FACEIT mutualisée (profils, ELO, matchs)

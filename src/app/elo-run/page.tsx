@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { publicMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { RankingBoard } from '@/components/elo/RankingBoard';
 import { RefreshControl } from '@/components/elo/RefreshControl';
@@ -9,7 +10,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getEloHistory, getRecentResults, getRefreshStatus, getRoster, settle } from '@/lib/data/queries';
 import { rankingRows } from '@/lib/elo/board';
 
-export const metadata: Metadata = { title: 'ELO Run' };
+export const metadata: Metadata = publicMetadata('ELO Run', 'Le classement permanent de LaFineEquipe : ELO FACEIT, progression depuis l’ajout et historique des relevés enregistrés.', '/elo-run');
 
 /**
  * Classement ELO permanent : pas de saison ni de remise à zéro. Chaque joueur actif du roster est

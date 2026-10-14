@@ -652,7 +652,8 @@ a.flLink:hover {
     grid-template-columns: 28px 42px minmax(0, 1fr) auto;
     grid-template-areas:
       'rk av who elo'
-      'rk av ser dl';
+      'rk av lvl dl'
+      'rk av ser ser';
     gap: 6px 12px;
     padding: 12px 14px;
   }
@@ -671,10 +672,12 @@ a.flLink:hover {
   .elo {
     grid-area: elo;
   }
-  .lvl,
   .fl,
   .added {
     display: none;
+  }
+  .lvl {
+    grid-area: lvl;
   }
   .row .dl {
     grid-area: dl;

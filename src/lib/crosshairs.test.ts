@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { crosshairStatus, isShareCode, normalizeShareCode, previewRects } from './crosshairs';
 
 describe('crosshairs', () => {
+  it('conserve les codes récents observés sans conversion et refuse les saisies dangereuses ou excessives', () => {
+    for (const code of ['CSH2Rx7cGRU5apQ4VSnZwjsr9RyLEiOrCAaVYWYvW6dz7H', 'CSyyzoL6p5V6viP9XbXtuCmROKZpkeYRZPY6wiOTjxnRcU', 'CSXPrh2QWCP87DYZqQ57oGar2mdCr7UwXKadAYmwi37QSb']) {
+      expect(isShareCode(code)).toBe(true);
+      expect(normalizeShareCode(` ${code}\n`)).toBe(code);
+    }
+    for (const code of ['CSabc', `CS${'a'.repeat(127)}`, `CS${'a'.repeat(40)}<script>`, `CS${'a'.repeat(40)}-`]) {
+      expect(isShareCode(code)).toBe(false);
+    }
+  });
   it('contrôle la forme du code de partage sans rien supposer de plus', () => {
     expect(isShareCode('CSGO-ABCDE-FGHJK-LMNOP-QRSTU-VWXYZ')).toBe(true);
     expect(isShareCode('CSGO-ABCDE-FGHJK-LMNOP-QRSTU')).toBe(false);

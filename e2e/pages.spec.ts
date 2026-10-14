@@ -82,7 +82,7 @@ test.describe('Matchs et accueil', () => {
     await expect(page.locator('main ol > li').first()).toBeVisible();
     // Accueil : sans source validée, aucune mention de match en cours, seulement le dernier match terminé.
     await page.goto('/');
-    await expect(page.getByText('Dernier match', { exact: true })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Accès prioritaires' }).getByRole('link', { name: /^Dernier match/ })).toBeVisible();
     await expect(page.getByText('Matchs en cours')).toHaveCount(0);
     await expect(page.locator('main .live')).toHaveCount(0);
   });

@@ -14,7 +14,7 @@ const inputSchema = z.object({
   shareCode: z
     .string()
     .transform(normalizeShareCode)
-    .refine(isShareCode, 'Code de partage invalide : attendu CSGO-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx.'),
+    .refine(isShareCode, 'Code attendu : CS… (format récent) ou CSGO-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx (ancien).'),
   playerId: z.uuid().nullish(),
   notes: z.string().trim().max(280, 'Notes : 280 caractères maximum.').optional(),
   preview: crosshairPreviewSchema.nullable(),

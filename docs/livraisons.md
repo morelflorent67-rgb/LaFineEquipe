@@ -1,5 +1,44 @@
 # Livraisons
 
+## Livraison 10 — 13/10/2026 : maps en couleur au survol, cartes joueurs et presets pros
+
+- **Stuffs** : images grisées au repos, couleurs et luminosité d'origine au survol/focus clavier, transition courte. Équivalent au toucher pendant l'appui ; animations réduites respectées.
+- **Joueurs** : nouvelle composition des cartes du roster, pseudo en filigrane, cadre anguleux autour de l'avatar, reflet au survol, lien de profil plus visible. Statistiques réelles inchangées, V/D et badges officiels conservés ; version compacte mobile.
+- **Crosshairs** : ZywOo, donk et NiKo ajoutés dans la vraie base locale via l'administration, avec code source intact et aperçu SVG indicatif. Sources et dates dans les notes ; aucun compte pro ajouté au roster. Aucune validation en jeu prétendue. Détails et limites : [crosshairs-pro.md](crosshairs-pro.md).
+- **Compatibilité** : migration 1400 pour accepter les codes récents opaques CS… en plus des anciens CSGO ; contrôles de saisie identiques serveur/SQL, sans décodage ou conversion, sans changement de droits. Le site ne prétend pas valider le contenu binaire des codes.
+- **Vérifications** : TypeScript, lint, **126 tests unitaires/base**, **18 parcours navigateur**, compilation de production réussis. Inspection de captures desktop/mobile ; survol, focus clavier, mouvement réduit et débordements contrôlés sur les trois pages à 360/390/768/1440 px. Import dans CS2 restant à tester par la team.
+
+## Livraison 9 — 13/10/2026 : référencement et partage des pages
+
+- **Pages publiques** : titres, descriptions et métadonnées de partage propres à chaque page, profil joueur et fiche de stuff. Le logo original sert d'image de partage lorsque le domaine public est configuré. URL canonique sans les filtres du catalogue.
+- **Indexation** : `robots.txt` et sitemap des sept pages publiques principales. Le mode local, les démonstrations et les previews restent en `noindex` ; activation uniquement en production Supabase avec une origine HTTPS valide dans `SITE_URL`. Le Mur, la connexion et l'administration ne publient ni aperçu personnalisé ni URL canonique et restent exclus de l'indexation. Les protections serveur et RLS restent indispensables et inchangées.
+- **Configuration** : procédure dans [setup.md](setup.md) et exemples sans secrets dans `.env.example`. Aucun déploiement effectué ; le rendu des aperçus sur les réseaux sociaux sera à vérifier après mise en ligne. Le sitemap ne liste pas encore les pages individuelles de joueurs, maps et stuffs, accessibles par les liens du site.
+- **Vérifications** : `npm run check` réussi (TypeScript, ESLint, **124 tests**) ; **8 parcours navigateur ciblés** réussis (référencement, accès privés, profils) ; compilation de production réussie. Tests couvrant notamment les domaines invalides, le sitemap local vide et l'absence de métadonnées privées.
+
+## Livraison 8 — 13/10/2026 : badges de niveau FACEIT et écrans de secours
+
+- **Niveaux** : les dix PNG originaux du support officiel FACEIT remplacent les rectangles numérotés dans le composant partagé `Level`. Ronds et chiffres conservés, nom accessible « Niveau FACEIT X ». Valeur absente ou invalide : indicateur neutre, jamais de niveau inventé. Sources conservées dans `public/faceit/levels/SOURCES.md` ; fichiers locaux, environ 14 Ko au total.
+- **ELO Run** : badges ajoutés au podium ; niveau désormais visible dans les lignes du classement mobile, sans débordement. Les indicateurs V/D gardent leurs couleurs sémantiques.
+- **Finitions** : page 404 française avec retours accueil/classement et écran d'erreur de page avec bouton Réessayer (API `retry` de Next.js 16.3). Pas de message d'erreur technique affiché au visiteur. Cet écran couvre les erreurs sous le layout racine, pas les erreurs du layout lui-même.
+- **Vérifications** : TypeScript, ESLint et compilation de production réussis ; 29 parcours navigateur réussis. Chargement des PNG, visibilité des niveaux desktop/mobile, absence de débordement et navigation depuis la page 404 contrôlés. L'écran d'erreur générique est compilé mais aucune panne réelle n'a été provoquée sur la base de la team.
+
+## Livraison 7 — 13/10/2026 : fiches joueurs enrichies
+
+- **Profil joueur** : accès rapides Progression ELO / Matchs / Clips / Crosshairs, avatar réduit sur mobile, retour vers le roster.
+- **ELO** : valeur et date d'ajout, dernier ELO connu avec source et horodatage, delta exact, courbe existante réutilisée avec les relevés enregistrés. Aucun historique inventé ; états explicites si le joueur n'a pas de données CS2 ou si une lecture échoue.
+- **Contenus** : trois derniers clips publiés du joueur, lien vers la bibliothèque filtrée, crosshairs publiés et bouton de copie. Aucun brouillon affiché sur la fiche, même à un administrateur. Ces sections se rempliront automatiquement après les ajouts éditoriaux.
+- **Navigation** : badge « bientôt » retiré pour Crosshairs. Profil inexistant traité par `notFound()` avec page française et retour vers les joueurs. Titre et description de page propres au pseudo ; lecture du profil mutualisée entre métadonnées et page dans une même requête.
+- **Vérifications** : TypeScript et ESLint propres, compilation de production réussie ; quatre parcours ciblés Playwright réussis (Clips et Profils), dont séparation des contenus entre joueurs, absence de données CS2, profil inconnu, navigation clavier et mobile à 360/390/1440 px. Aucune modification de schéma ou des données de la team.
+
+## Livraison 6 — 13/10/2026 : bibliothèque de clips V1
+
+- **Page `/clips`** : présentation Forge, clip mis en avant, filtres joueur/map/titre/période et tri par date, conservés dans l'URL. Trois derniers clips publiés sur l'accueil.
+- **Admin → Clips** : ajout par lien YouTube, Twitch ou Allstar, joueur et map facultatifs, date, description, brouillon/publication, modification et suppression confirmée. Accord du joueur requis avant publication. Doublons refusés par identifiant de vidéo canonique.
+- **Lecture** : YouTube/Twitch à la demande si l'admin a vérifié l'intégration ; lien externe disponible. Twitch utilise le domaine courant et reste externe en HTTP local ou sur petit écran. Allstar reste externe. Aucun import automatique FACEIT ou Allstar.
+- **Base** : migration additive `20261013001300_clips.sql`, contraintes et RLS testées. Aucun brouillon accessible aux visiteurs ou aux membres. Données réelles conservées ; exemples de clips uniquement dans le jeu de démonstration.
+- **Vérifications** : TypeScript et ESLint sans erreur ; **109 tests Vitest**, **25 parcours Playwright** ; `npm run build` réussi. Captures galerie desktop/mobile et formulaire mobile. Le lecteur tiers est intercepté dans le test : aucune lecture réelle de vidéo n'est prétendue validée.
+- **Documentation** : [utilisation et limites des clips](clips.md). Prochaine étape pratique : publier les premiers liens de la team et vérifier leur lecture sur leurs plateformes. Pas de nouveau secret à configurer.
+
 ## Livraison 5 — 13/10/2026 : accueil sans « En ce moment », crosshairs V1
 
 - **Accueil** : la scène « En ce moment » est retirée (aucune source FACEIT fiable pour les matchs en cours). La première tuile affiche le dernier match terminé ; elle redeviendra « Matchs en cours » seulement si une source est validée un jour.

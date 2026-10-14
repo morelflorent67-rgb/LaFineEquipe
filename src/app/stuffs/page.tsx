@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { publicMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { GrenadeIcon } from '@/components/stuffs/StuffCard';
 import styles from '@/components/stuffs/stuffs.module.css';
@@ -9,7 +10,7 @@ import { getMaps, settle } from '@/lib/data/queries';
 import { mapCoverUrl } from '@/lib/media';
 import { GRENADE_LABEL, GRENADES } from '@/lib/stuffs';
 
-export const metadata: Metadata = { title: 'Stuffs' };
+export const metadata: Metadata = publicMetadata('Stuffs', 'La bibliothèque CS2 de LaFineEquipe : smokes, flashes, molotovs et HE par map, avec fiches de placement et carte tactique.', '/stuffs');
 
 export default async function StuffsPage() {
   const viewer = await getViewer();
