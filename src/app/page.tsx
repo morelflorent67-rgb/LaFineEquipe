@@ -23,7 +23,7 @@ import { deriveLiveState } from '@/lib/domain/live';
 import type { MapInfo, Match } from '@/lib/domain/schemas';
 import { rankingRows } from '@/lib/elo/board';
 import { faceitProfileUrl } from '@/lib/faceit/input';
-import { fmtAgo, fmtInt, mapLabel, pluralize } from '@/lib/format';
+import { fmtAgo, fmtInt, mapLabel, missingMapLabel, pluralize } from '@/lib/format';
 import { mapCoverUrl } from '@/lib/media';
 import styles from './home.module.css';
 
@@ -144,7 +144,7 @@ export default async function HomePage() {
                     <span className={styles.main}>
                       {lastResult !== 'mixed' ? <ResultBadge result={lastResult} large /> : null}
                       <span className={styles.big}>
-                        {mapLabel(lastMatch.mapKey, lastMatch.mapName) ?? 'Map inconnue'}
+                        {mapLabel(lastMatch.mapKey, lastMatch.mapName) ?? missingMapLabel(lastMatch)}
                       </span>
                       {lastScore ? (
                         <span className={styles.score}>

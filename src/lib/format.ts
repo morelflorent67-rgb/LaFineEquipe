@@ -50,4 +50,11 @@ export function mapLabel(mapKey: string | null, mapName: string | null): string 
   return base.charAt(0).toUpperCase() + base.slice(1);
 }
 
+/**
+ * Libellé quand la map manque : l'historique FACEIT ne la donne pas, elle arrive avec les détails
+ * du match au passage de synchro suivant (source encore « faceit_history »).
+ */
+export const missingMapLabel = (m: { status: string; source: string }) =>
+  m.status === 'cancelled' ? 'Annulé' : m.source === 'faceit_history' ? 'Map en attente' : 'Map inconnue';
+
 export const pluralize = (n: number, one: string, many: string) => `${fmtInt(n)} ${n > 1 ? many : one}`;

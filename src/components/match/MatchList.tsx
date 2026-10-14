@@ -2,7 +2,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { DemoTag, ResultBadge } from '@/components/ui/badges';
 import { Icon } from '@/components/ui/Icon';
 import type { Match, MatchResult } from '@/lib/domain/schemas';
-import { fmtDateTime, mapLabel } from '@/lib/format';
+import { fmtDateTime, mapLabel, missingMapLabel } from '@/lib/format';
 import styles from './MatchList.module.css';
 
 const MAP_IMAGES: Record<string, string> = {
@@ -55,7 +55,7 @@ export function MatchList({ matches, covers = {} }: { matches: Match[]; covers?:
               className={styles.mapc}
               style={cover ? { backgroundImage: `url(${cover})` } : undefined}
             >
-              {map ?? (m.status === 'cancelled' ? 'Annulé' : 'Map inconnue')}
+              {map ?? missingMapLabel(m)}
             </span>
             {score && typeof score.us === 'number' && typeof score.them === 'number' ? (
               <span className={styles.score} aria-label={`Score ${score.us} à ${score.them}`}>

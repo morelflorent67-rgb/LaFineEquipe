@@ -117,3 +117,12 @@ describe('contrôle du type réel des images', () => {
     expect(sniffImage(new Uint8Array([]))).toBeNull();
   });
 });
+
+describe('missingMapLabel', () => {
+  it('distingue une map pas encore récupérée d’une map réellement inconnue', async () => {
+    const { missingMapLabel } = await import('./format');
+    expect(missingMapLabel({ status: 'finished', source: 'faceit_history' })).toBe('Map en attente');
+    expect(missingMapLabel({ status: 'finished', source: 'faceit_match' })).toBe('Map inconnue');
+    expect(missingMapLabel({ status: 'cancelled', source: 'faceit_history' })).toBe('Annulé');
+  });
+});
