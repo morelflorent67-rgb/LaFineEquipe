@@ -31,6 +31,24 @@
       "port": 3100
     },
     {
+      "name": "lafineequipe-csnades",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "dev",
+        "--port",
+        "3200"
+      ],
+      "env": {
+        "LFE_DATA_BACKEND": "local",
+        "FACEIT_MODE": "fixtures",
+        "LFE_LOCAL_DATA_DIR": ".data/pglite-csnades",
+        "LFE_LOCAL_CRON": "off",
+        "NEXT_TELEMETRY_DISABLED": "1"
+      },
+      "port": 3200
+    },
+    {
       "name": "design-exploration",
       "runtimeExecutable": "python",
       "runtimeArgs": [

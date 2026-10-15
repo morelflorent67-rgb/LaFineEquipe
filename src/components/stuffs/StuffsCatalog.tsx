@@ -1,18 +1,21 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Icon } from '@/components/ui/Icon';
-import type { Grenade, MapPosition } from '@/lib/domain/schemas';
+import type { Grenade, MapInfo, MapPosition } from '@/lib/domain/schemas';
 import { applyFilters, catalogQuery, GRENADE_LABEL, GRENADES, type CatalogMode, type StuffFilters } from '@/lib/stuffs';
 import { GrenadeIcon, StuffCard, type UtilityView } from './StuffCard';
+import { RadarMap } from './RadarMap';
 import { TacticalMap } from './TacticalMap';
 import styles from './stuffs.module.css';
 
+const EMPTY: StuffFilters = { side: null, type: null, zone: null, q: '', beginner: false };
+
 /**
- * Catalogue d'une map, en deux modes qui partagent les mêmes filtres : bibliothèque (cartes)
- * et carte tactique. Filtres et mode vivent dans l'URL : un lien partagé ou le retour depuis
- * une fiche retrouve exactement la même vue.
+ * Catalogue d'une map, en deux modes qui partagent les mêmes filtres : la carte (points
+ * d'arrivée sur la vue aérienne, un type de grenade à la fois) et la grille. Filtres et mode
+ * vivent dans l'URL : un lien partagé ou le retour depuis une fiche retrouve la même vue.
  */
 export function StuffsCatalog({
   items,
@@ -22,6 +25,7 @@ export function StuffsCatalog({
   mapSlug,
   aerialUrl,
   positions,
+  radars,
   isAdmin,
 }: {
   items: UtilityView[];
@@ -31,12 +35,29 @@ export function StuffsCatalog({
   mapSlug: string;
   aerialUrl: string | null;
   positions: MapPosition[];
+  radars: MapInfo['radars'];
   isAdmin: boolean;
 }) {
   const pathname = usePathname();
   const searchId = useId();
   const [f, setF] = useState<StuffFilters>(initial);
   const [mode, setMode] = useState<CatalogMode>(initialMode);
+  const toolsRef = useRef<HTMLDivElement>(null);
+
+  // Hauteur de la barre de filtres collante : la carte et son panneau se calent juste dessous.
+  useEffect(() => {
+    const el = toolsRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const measure = () => root.style.setProperty('--stuffs-tools-h', `${el.offsetHeight}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--stuffs-tools-h');
+    };
+  }, []);
 
   function update(next: StuffFilters, nextMode: CatalogMode = mode) {
     setF(next);
@@ -45,30 +66,46 @@ export function StuffsCatalog({
     window.history.replaceState(null, '', `${pathname}${catalogQuery(next, nextMode)}`);
   }
 
-  const visible = useMemo(() => applyFilters(items, f), [items, f]);
+  const radarMode = mode === 'carte' && radars.length > 0;
+  // Sur la carte, un seul type de grenade à la fois (les smokes par défaut), comme des onglets.
+  const radarType: Grenade = f.type ?? 'smoke';
+  const visible = useMemo(() => applyFilters(items, radarMode ? { ...f, type: radarType } : f), [items, f, radarMode, radarType]);
   const zones = useMemo(() => [...new Set(items.map((u) => u.zone).filter((z): z is string => Boolean(z)))].sort(), [items]);
   const countBy = (g: Grenade) => applyFilters(items, { ...f, type: g }).length;
   const query = catalogQuery(f, mode);
-  const groups = useMemo(() => {
+  const groups = useMemo((): [string, UtilityView[]][] => {
+    // Sans zones (stuffs importés), une seule grille triée par point d'arrivée.
+    if (zones.length === 0) {
+      const sorted = [...visible].sort(
+        (a, b) => a.targetName.localeCompare(b.targetName, 'fr') || a.originName.localeCompare(b.originName, 'fr'),
+      );
+      return [['', sorted]];
+    }
     const map = new Map<string, UtilityView[]>();
     for (const u of visible) {
       const key = u.zone ?? 'Autres';
       map.set(key, [...(map.get(key) ?? []), u]);
     }
     return [...map.entries()];
-  }, [visible]);
-  const active = Boolean(f.side || f.type || f.zone || f.q.trim());
+  }, [visible, zones.length]);
+  const active = Boolean(f.side || f.type || f.zone || f.q.trim() || f.beginner);
+  const hasBeginner = items.some((u) => u.difficulty === 'easy');
+  const tabs: [CatalogMode, string, 'map' | 'grid'][] =
+    radars.length > 0
+      ? [
+          ['carte', 'Carte', 'map'],
+          ['bibliotheque', 'Grille', 'grid'],
+        ]
+      : [
+          ['bibliotheque', 'Bibliothèque', 'grid'],
+          ['carte', 'Carte tactique', 'map'],
+        ];
 
   return (
     <>
-      <div className={styles.tools} role="region" aria-label="Filtres des stuffs">
+      <div ref={toolsRef} className={styles.tools} role="region" aria-label="Filtres des stuffs">
         <div className={styles.modes} role="tablist" aria-label="Mode d’affichage">
-          {(
-            [
-              ['bibliotheque', 'Bibliothèque', 'grid'],
-              ['carte', 'Carte tactique', 'map'],
-            ] as const
-          ).map(([m, label, icon]) => (
+          {tabs.map(([m, label, icon]) => (
             <button
               key={m}
               type="button"
@@ -89,7 +126,7 @@ export function StuffsCatalog({
               }}
             >
               <Icon name={icon} /> {label}
-              {m === 'carte' && positions.length > 0 ? <span className={styles.modeCount}>{positions.length}</span> : null}
+              {m === 'carte' && radars.length === 0 && positions.length > 0 ? <span className={styles.modeCount}>{positions.length}</span> : null}
             </button>
           ))}
         </div>
@@ -115,13 +152,20 @@ export function StuffsCatalog({
                 key={g}
                 type="button"
                 className={styles.fchip}
-                aria-pressed={f.type === g}
-                onClick={() => update({ ...f, type: f.type === g ? null : g })}
+                aria-pressed={radarMode ? radarType === g : f.type === g}
+                onClick={() => update({ ...f, type: radarMode ? g : f.type === g ? null : g })}
               >
                 <GrenadeIcon grenade={g} /> {GRENADE_LABEL[g]} <em>{countBy(g)}</em>
               </button>
             ))}
           </div>
+          {hasBeginner ? (
+            <div className={styles.grp} role="group" aria-label="Niveau">
+              <button type="button" className={styles.fchip} aria-pressed={f.beginner} onClick={() => update({ ...f, beginner: !f.beginner })}>
+                Débutant
+              </button>
+            </div>
+          ) : null}
         </div>
         <div className={`${styles.toolsRow} ${styles.searchRow}`}>
           {zones.length > 0 ? (
@@ -156,17 +200,21 @@ export function StuffsCatalog({
             />
           </div>
           <span className={styles.count} aria-live="polite">
-            {visible.length} / {items.length} fiche{items.length > 1 ? 's' : ''}
+            {visible.length} / {items.length} stuff{items.length > 1 ? 's' : ''}
           </span>
           {active ? (
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => update({ side: null, type: null, zone: null, q: '' })}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => update(EMPTY)}>
               Réinitialiser
             </button>
           ) : null}
         </div>
       </div>
 
-      {mode === 'carte' ? (
+      {radarMode ? (
+        <div className={styles.lib} id="pane-carte" role="tabpanel" aria-labelledby="tab-carte">
+          <RadarMap mapName={mapName} radars={radars} items={visible} grenade={radarType} query={query} />
+        </div>
+      ) : mode === 'carte' ? (
         <div className={styles.lib} id="pane-carte" role="tabpanel" aria-labelledby="tab-carte">
           <TacticalMap
             mapName={mapName}
@@ -195,20 +243,22 @@ export function StuffsCatalog({
           <div className="state" role="status">
             <strong>Aucune fiche ne correspond aux filtres</strong>
             <div className="actions">
-              <button type="button" className="btn btn-steel btn-sm" onClick={() => update({ side: null, type: null, zone: null, q: '' })}>
+              <button type="button" className="btn btn-steel btn-sm" onClick={() => update(EMPTY)}>
                 Réinitialiser les filtres
               </button>
             </div>
           </div>
         ) : (
           groups.map(([zone, list]) => (
-            <section key={zone} aria-labelledby={`z-${zone}`}>
-              <div className={styles.zoneH}>
-                <h2 id={`z-${zone}`}>{zone}</h2>
-                <span className="mono">
-                  {list.length} fiche{list.length > 1 ? 's' : ''}
-                </span>
-              </div>
+            <section key={zone || 'tout'} aria-labelledby={zone ? `z-${zone}` : undefined} aria-label={zone ? undefined : `Stuffs de ${mapName}`}>
+              {zone ? (
+                <div className={styles.zoneH}>
+                  <h2 id={`z-${zone}`}>{zone}</h2>
+                  <span className="mono">
+                    {list.length} fiche{list.length > 1 ? 's' : ''}
+                  </span>
+                </div>
+              ) : null}
               <ul className={styles.grid}>
                 {list.map((u) => (
                   <li key={u.id}>

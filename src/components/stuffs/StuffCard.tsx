@@ -3,7 +3,7 @@ import { DemoTag } from '@/components/ui/badges';
 import { Icon } from '@/components/ui/Icon';
 import type { Utility } from '@/lib/domain/schemas';
 import { fmtDate } from '@/lib/format';
-import { DIFFICULTY_LABEL, GRENADE_LABEL, SIDE_LABEL, TECHNIQUE_LABEL, verification, youtubeId } from '@/lib/stuffs';
+import { GRENADE_LABEL, PRECISION_LABEL, SIDE_LABEL, throwSummary, verification, youtubeId } from '@/lib/stuffs';
 import styles from './stuffs.module.css';
 
 export type UtilityView = Utility & { placementUrl: string | null; aimUrl: string | null };
@@ -23,8 +23,22 @@ export function SideBadge({ side }: { side: Utility['side'] }) {
   );
 }
 
-export function VerificationNote({ u, long = false }: { u: Pick<Utility, 'verifiedAt' | 'openReports'>; long?: boolean }) {
+export function VerificationNote({
+  u,
+  long = false,
+}: {
+  u: Pick<Utility, 'verifiedAt' | 'openReports' | 'source' | 'sourceUpdatedAt'>;
+  long?: boolean;
+}) {
   const v = verification(u);
+  // Stuff importé et pas encore revérifié par la team : on affiche sa source plutôt qu'une alerte.
+  if (u.source === 'csnades' && v.kind === 'never') {
+    return (
+      <span className={styles.ver}>
+        Source csnades.gg{u.sourceUpdatedAt ? ` · mis à jour le ${fmtDate(u.sourceUpdatedAt)}` : ''}
+      </span>
+    );
+  }
   if (v.kind === 'reported') {
     return (
       <span className={`${styles.ver} ${styles.verWarn}`}>
@@ -38,12 +52,13 @@ export function VerificationNote({ u, long = false }: { u: Pick<Utility, 'verifi
 
 /** Carte d'une fiche : ouvre SA fiche, en conservant les filtres du catalogue dans l'URL. */
 export function StuffCard({ u, query }: { u: UtilityView; query: string }) {
+  const thumb = u.placementUrl ?? u.media?.poster ?? null;
   return (
     <Link className={styles.card} href={`/stuffs/${u.mapSlug}/${u.slug}${query}`}>
       <div className={styles.shot}>
-        {u.placementUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={u.placementUrl} alt="" loading="lazy" />
+        {thumb ? (
+          // eslint-disable-next-line @next/next/no-img-element -- capture de l'admin ou miniature csnades
+          <img src={thumb} alt="" loading="lazy" />
         ) : (
           <span className={styles.ph}>
             <Icon name="target" />
@@ -71,9 +86,10 @@ export function StuffCard({ u, query }: { u: UtilityView; query: string }) {
           <dd>{u.targetName}</dd>
         </dl>
         <div className={styles.meta}>
-          <span className={styles.tech}>{TECHNIQUE_LABEL[u.technique]}</span>
-          {u.difficulty ? <span>{DIFFICULTY_LABEL[u.difficulty]}</span> : null}
-          {youtubeId(u.videoUrl) ? (
+          <span className={styles.tech}>{throwSummary(u)}</span>
+          {u.precision ? <span>{PRECISION_LABEL[u.precision]}</span> : null}
+          {u.difficulty === 'easy' ? <span>Débutant</span> : null}
+          {youtubeId(u.videoUrl) || u.media ? (
             <span>
               <Icon name="video" style={{ width: 14, height: 14, verticalAlign: '-2px' }} /> Vidéo
             </span>

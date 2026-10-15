@@ -3,7 +3,7 @@ import { toDbError } from './db/errors';
 import { deriveLiveState } from './domain/live';
 import { isoToParisLocal, parisLocalToIso } from './paris-time';
 import { sniffImage } from './storage';
-import { applyFilters, filtersToQuery, parseFilters, slugify, tacticalGroups, verification, youtubeId } from './stuffs';
+import { applyFilters, catalogQuery, filtersToQuery, landingClusters, parseFilters, parseMode, slugify, tacticalGroups, throwSummary, verification, youtubeId } from './stuffs';
 import type { LiveStateRow, Utility } from './domain/schemas';
 
 describe('état « match en cours »', () => {
@@ -48,17 +48,57 @@ describe('stuffs', () => {
   });
   it('lit et réécrit les filtres de l’URL', () => {
     const f = parseFilters({ camp: 'CT', type: 'flash', zone: 'Site A', q: 'porte' });
-    expect(f).toEqual({ side: 'CT', type: 'flash', zone: 'Site A', q: 'porte' });
+    expect(f).toEqual({ side: 'CT', type: 'flash', zone: 'Site A', q: 'porte', beginner: false });
     expect(filtersToQuery(f)).toBe('?camp=CT&type=flash&zone=Site+A&q=porte');
-    expect(parseFilters({ camp: 'X', type: 'nuke' })).toEqual({ side: null, type: null, zone: null, q: '' });
+    expect(parseFilters({ camp: 'X', type: 'nuke' })).toEqual({ side: null, type: null, zone: null, q: '', beginner: false });
     expect(filtersToQuery(parseFilters({}))).toBe('');
+    expect(filtersToQuery(parseFilters({ debutant: '1' }))).toBe('?debutant=1');
+  });
+  it('mode d’affichage : explicite dans l’URL, sinon celui par défaut de la map', () => {
+    const f = parseFilters({});
+    expect(parseMode({}, 'carte')).toBe('carte');
+    expect(parseMode({ vue: 'bibliotheque' }, 'carte')).toBe('bibliotheque');
+    expect(parseMode({ vue: 'nimporte' })).toBe('bibliotheque');
+    expect(catalogQuery(f, 'carte')).toBe('?vue=carte');
+    expect(catalogQuery({ ...f, side: 'T' }, 'bibliotheque')).toBe('?camp=T&vue=bibliotheque');
+  });
+  it('résume le lancer et filtre les fiches « débutant »', () => {
+    expect(throwSummary({ movement: 'running', jump: true, click: 'left', technique: 'run_jumpthrow' })).toBe('Course + saut + clic gauche');
+    expect(throwSummary({ movement: 'stationary', jump: false, click: 'both', technique: 'static' })).toBe('Clic gauche + droit');
+    expect(throwSummary({ movement: null, jump: null, click: null, technique: 'jumpthrow' })).toBe('Jumpthrow');
+    const items = [u({ id: '1', difficulty: 'easy' }), u({ id: '2', difficulty: null })];
+    expect(applyFilters(items, { side: null, type: null, zone: null, q: '', beginner: true }).map((x) => x.id)).toEqual(['1']);
+  });
+  it('regroupe les points d’arrivée proches d’un même type, par étage', () => {
+    const at = (id: string, x: number, y: number, extra: Partial<Utility> = {}) =>
+      u({ id, landing: { x, y, level: 1 }, targetName: 'B Short', ...extra });
+    const items = [
+      at('1', 40, 40),
+      at('2', 41, 40.5),
+      at('3', 41, 40, { grenade: 'flash' }),
+      at('4', 60, 60, { targetName: 'Window' }),
+      at('5', 40, 40, { landing: { x: 40, y: 40, level: 2 } }),
+      u({ id: '6', landing: null }),
+    ];
+    const level1 = landingClusters(items, { level: 1, aspect: 1 });
+    expect(level1.map((c) => [c.grenade, c.items.map((x) => x.id).sort().join(',')])).toEqual([
+      ['smoke', '1,2'],
+      ['flash', '3'],
+      ['smoke', '4'],
+    ]);
+    expect(level1[0]).toMatchObject({ x: 40.5, y: 40.25, name: 'B Short' });
+    expect(landingClusters(items, { level: 2, aspect: 1 }).map((c) => c.items[0]!.id)).toEqual(['5']);
+    // Image deux fois plus large que haute : 3 % de hauteur ne valent que 1,5 % du grand côté.
+    const wide = [at('a', 50, 50), at('b', 50, 53)];
+    expect(landingClusters(wide, { level: 1, aspect: 2 })).toHaveLength(1);
+    expect(landingClusters(wide, { level: 1, aspect: 1 })).toHaveLength(2);
   });
   it('filtre par camp (les fiches T + CT restent visibles), type, zone et texte sans accents', () => {
     const items = [u({ id: '1', side: 'T' }), u({ id: '2', side: 'CT', grenade: 'flash' }), u({ id: '3', side: 'BOTH', zone: 'Site B' })];
-    expect(applyFilters(items, { side: 'T', type: null, zone: null, q: '' }).map((x) => x.id)).toEqual(['1', '3']);
-    expect(applyFilters(items, { side: null, type: 'flash', zone: null, q: '' }).map((x) => x.id)).toEqual(['2']);
-    expect(applyFilters(items, { side: null, type: null, zone: 'Site B', q: '' }).map((x) => x.id)).toEqual(['3']);
-    expect(applyFilters(items, { side: null, type: null, zone: null, q: 'FENETRE' })).toHaveLength(3);
+    expect(applyFilters(items, { side: 'T', type: null, zone: null, q: '', beginner: false }).map((x) => x.id)).toEqual(['1', '3']);
+    expect(applyFilters(items, { side: null, type: 'flash', zone: null, q: '', beginner: false }).map((x) => x.id)).toEqual(['2']);
+    expect(applyFilters(items, { side: null, type: null, zone: 'Site B', q: '', beginner: false }).map((x) => x.id)).toEqual(['3']);
+    expect(applyFilters(items, { side: null, type: null, zone: null, q: 'FENETRE', beginner: false })).toHaveLength(3);
   });
   it('état de vérification', () => {
     expect(verification({ verifiedAt: null, openReports: 0 }).kind).toBe('never');

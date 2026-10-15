@@ -4,8 +4,9 @@
   display: grid;
   align-content: end;
   gap: 14px;
-  min-height: 250px;
-  padding: clamp(22px, 3cqi, 40px) var(--pad) 22px;
+  /* Bandeau compact : la carte de la map doit être visible dès l'ouverture. */
+  min-height: 150px;
+  padding: clamp(14px, 2cqi, 24px) var(--pad) 14px;
   isolation: isolate;
   overflow: hidden;
 }
@@ -46,7 +47,7 @@
   color: #fff;
 }
 .mapTitle {
-  font-size: clamp(54px, 9cqi, 130px);
+  font-size: clamp(40px, 6cqi, 84px);
 }
 .heroRow {
   display: flex;
@@ -96,7 +97,7 @@
   gap: 8px;
   overflow-x: auto;
   margin: 0;
-  padding: 14px var(--pad) 16px;
+  padding: 8px var(--pad) 10px;
   list-style: none;
   background: var(--void);
   scrollbar-width: thin;
@@ -106,8 +107,8 @@
 }
 .mcard {
   position: relative;
-  width: 168px;
-  height: 88px;
+  width: 150px;
+  height: 64px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -128,7 +129,7 @@
   background: linear-gradient(0deg, rgba(5, 5, 5, 0.92), rgba(5, 5, 5, 0.3));
 }
 .mcard b {
-  font: 800 18px/1.1 var(--f);
+  font: 800 16px/1.1 var(--f);
   font-stretch: 108%;
   white-space: nowrap;
 }
@@ -470,6 +471,9 @@
   font-size: 13px;
   color: var(--muted);
 }
+.meta > span {
+  white-space: nowrap;
+}
 .tech {
   padding: 3px 8px;
   background: var(--steel-2);
@@ -752,5 +756,34 @@
   }
   .mtile {
     aspect-ratio: 16 / 8;
+  }
+}
+
+/* Sur téléphone, la barre de filtres ne reste pas collée : elle mangerait la moitié de l'écran. */
+@container site (max-width: 700px) {
+  .tools {
+    position: static;
+  }
+}
+
+/* Sur grand écran : onglets Carte/Grille et recherche sur la même ligne, filtres dessous. */
+@container site (min-width: 901px) {
+  .tools {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  .tools > .modes {
+    grid-row: 1;
+    grid-column: 1;
+    margin-bottom: 0;
+  }
+  .tools > .searchRow {
+    grid-row: 1;
+    grid-column: 2;
+    justify-content: flex-end;
+  }
+  .tools > .toolsRow:not(.searchRow) {
+    grid-row: 2;
+    grid-column: 1 / -1;
   }
 }

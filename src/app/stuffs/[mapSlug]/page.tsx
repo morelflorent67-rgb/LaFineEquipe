@@ -108,11 +108,12 @@ export default async function MapStuffsPage({ params, searchParams }: Props) {
       <StuffsCatalog
         items={items}
         initial={parseFilters(sp)}
-        initialMode={parseMode(sp)}
+        initialMode={parseMode(sp, catalog.map.radars.length > 0 ? 'carte' : 'bibliotheque')}
         mapName={catalog.map.name}
         mapSlug={catalog.map.slug}
         aerialUrl={mediaUrl(catalog.map.aerialPath)}
         positions={catalog.positions}
+        radars={catalog.map.radars}
         isAdmin={viewer.role === 'admin'}
       />
     </>

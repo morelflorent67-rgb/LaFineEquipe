@@ -1,0 +1,525 @@
+/* Carte centrée sur les points d'arrivée (vues aériennes csnades, rectangulaires). */
+.wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.6fr);
+  gap: clamp(16px, 2cqi, 28px);
+  align-items: start;
+}
+.mapCol {
+  min-width: 0;
+}
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.bar:empty {
+  display: none;
+}
+.levels {
+  display: inline-flex;
+  border: 1px solid var(--line-2);
+}
+.levelBtn {
+  padding: 8px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--silver);
+  font: 700 13px/1 var(--f);
+  cursor: pointer;
+}
+.levelBtn + .levelBtn {
+  border-left: 1px solid var(--line-2);
+}
+.levelBtn em {
+  margin-left: 6px;
+  font: 500 11px/1 var(--mono);
+  font-style: normal;
+  color: var(--dim);
+}
+.levelBtn[aria-pressed='true'] {
+  background: var(--white);
+  color: #111;
+}
+.levelBtn[aria-pressed='true'] em {
+  color: #444;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 6px 4px;
+  border: 0;
+  background: none;
+  color: var(--silver);
+  font: 650 13px/1 var(--f);
+  cursor: pointer;
+}
+.switch {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--steel-3);
+  transition: background 0.2s;
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+.toggle[aria-pressed='true'] .switch {
+  background: var(--brand);
+}
+.toggle[aria-pressed='true'] .switch::after {
+  transform: translateX(16px);
+}
+.boxWrap {
+  position: relative;
+  /* Toute la vue aérienne visible sans défiler, quelle que soit sa forme. */
+  width: min(100%, calc((100svh - var(--nav-h) - var(--stuffs-tools-h, 120px) - 90px) * var(--ar, 1)));
+  min-width: min(100%, 320px);
+  margin-inline: auto;
+}
+.box {
+  position: relative;
+  aspect-ratio: var(--ar, 1);
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, #141416, #08080a 70%);
+  border: 1px solid var(--line-2);
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.box:focus-visible {
+  box-shadow: 0 0 0 2px #fff;
+}
+.box[data-dragging] {
+  cursor: grabbing;
+}
+.layer {
+  --k: 1;
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.radar,
+.callouts {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+.radar {
+  opacity: 0.9;
+}
+.links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.links polyline {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.7);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+  vector-effect: non-scaling-stroke;
+}
+.links .lineHl {
+  stroke: #fff;
+  stroke-width: 2.6;
+  stroke-dasharray: none;
+}
+.land,
+.from,
+.bounce {
+  position: absolute;
+}
+/* Point d'arrivée : rond coloré par type de grenade, taille constante à l'écran. */
+.land {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: scale(calc(1 / var(--k)));
+}
+.disc {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: rgba(5, 5, 5, 0.86);
+  transition:
+    box-shadow 0.2s,
+    background 0.2s,
+    opacity 0.2s;
+  animation: pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--d, 0) * 18ms);
+}
+.disc svg {
+  width: 16px;
+  height: 16px;
+}
+.count {
+  position: absolute;
+  right: -9px;
+  top: -9px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #fff;
+  color: #111;
+  font: 800 11px/1 var(--f);
+}
+.land:focus-visible {
+  outline: none;
+}
+.land:hover .disc,
+.land:focus-visible .disc {
+  background: #222;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+}
+.land[aria-pressed='true'] {
+  z-index: 3;
+}
+.land[aria-pressed='true'] .disc {
+  background: currentColor;
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.25),
+    0 0 22px currentColor;
+}
+.land[aria-pressed='true'] .disc svg {
+  color: #111;
+}
+.hasSel .land:not([aria-pressed='true']) .disc {
+  opacity: 0.32;
+}
+.hasSel .land:not([aria-pressed='true']) .count {
+  opacity: 0.4;
+}
+/* Point de lancer : lien direct vers la fiche, couleur du camp. */
+.from {
+  z-index: 4;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  text-decoration: none;
+  transform: scale(calc(1 / var(--k)));
+  animation: pop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.fromDot {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 2px solid #111;
+  background: currentColor;
+  box-shadow: 0 0 0 2px currentColor;
+  transition: inset 0.15s;
+}
+.fromLabel {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  transform: translateX(-50%);
+  padding: 3px 6px;
+  background: rgba(5, 5, 5, 0.88);
+  border: 1px solid currentColor;
+  font: 700 11px/1 var(--f);
+  color: #fff;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.from:hover .fromDot,
+.from:focus-visible .fromDot,
+.fromHl .fromDot {
+  inset: 0;
+}
+.from:hover .fromLabel,
+.from:focus-visible .fromLabel,
+.fromHl .fromLabel {
+  opacity: 1;
+}
+.from:focus-visible {
+  outline: none;
+}
+.bounce {
+  z-index: 2;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #111;
+  transform: scale(calc(1 / var(--k)));
+}
+.sideT {
+  color: #ff9b6b;
+}
+.sideCT {
+  color: #7fb6f0;
+}
+.sideBoth {
+  color: #e4e4e7;
+}
+.smoke {
+  color: var(--smoke);
+}
+.flash {
+  color: var(--flash);
+}
+.molotov {
+  color: var(--molo);
+}
+.he {
+  color: var(--he);
+}
+.tools {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 5;
+  display: grid;
+  gap: 6px;
+}
+.tool {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(20, 20, 22, 0.92);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  color: var(--white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    transform 0.15s;
+}
+.tool:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.tool:active {
+  transform: scale(0.94);
+}
+.tool svg {
+  width: 18px;
+  height: 18px;
+}
+.minus {
+  width: 14px;
+  height: 2px;
+  background: currentColor;
+}
+.zoom {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 5;
+  padding: 5px 8px;
+  background: rgba(5, 5, 5, 0.7);
+  font: 500 11px/1 var(--mono);
+  color: var(--silver);
+}
+.help {
+  margin: 10px 0 0;
+  font: 400 12px/1.5 var(--mono);
+  color: var(--dim);
+  text-align: center;
+}
+.panel {
+  position: sticky;
+  top: calc(var(--nav-h) + var(--stuffs-tools-h, 120px) + 16px);
+  display: grid;
+  gap: 14px;
+  max-height: calc(100svh - var(--nav-h) - var(--stuffs-tools-h, 120px) - 32px);
+  overflow: auto;
+  padding: 18px;
+  background: linear-gradient(180deg, #1c1c20, #111113);
+  border: 1px solid var(--line-2);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+.panel p {
+  margin: 0;
+}
+.panelTitle {
+  margin: 0;
+  font: 800 24px/1.1 var(--f);
+  font-stretch: 108%;
+}
+.stat {
+  font-size: 14px;
+  color: var(--silver);
+}
+.stat b {
+  font: 800 18px/1 var(--f);
+  color: var(--white);
+}
+.note {
+  font-size: 13px;
+  color: var(--dim);
+}
+.selMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px 5px 7px;
+  border: 1px solid currentColor;
+  font: 750 12px/1 var(--f);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.chip svg {
+  width: 14px;
+  height: 14px;
+}
+.list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.list li {
+  animation: rise 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+.item {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: #131315;
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.item:hover,
+.item:focus-visible,
+.itemHl {
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateX(4px);
+  outline: none;
+}
+.item img,
+.noShot {
+  width: 112px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #0b0b0c;
+}
+.noShot {
+  display: grid;
+  place-items: center;
+  color: var(--dim);
+}
+.noShot svg {
+  width: 20px;
+  height: 20px;
+}
+.itemText {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.item b {
+  font: 750 15px/1.2 var(--f);
+}
+.itemSub {
+  font-size: 12.5px;
+  color: var(--silver);
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font: 500 11px/1.3 var(--mono);
+  color: var(--dim);
+}
+.side {
+  font-weight: 700;
+}
+.easy {
+  color: var(--win);
+}
+/* Jamais d'opacité 0 au départ : une animation figée (onglet en arrière-plan) laisserait le contenu invisible. */
+@keyframes pop {
+  from {
+    scale: 0.4;
+  }
+}
+@keyframes rise {
+  from {
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .disc,
+  .from,
+  .list li {
+    animation: none;
+  }
+}
+@container site (max-width: 1100px) {
+  .wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel {
+    position: relative;
+    top: 0;
+    max-height: none;
+  }
+  .boxWrap {
+    width: 100%;
+  }
+}
+@container site (max-width: 560px) {
+  .box {
+    margin-inline: calc(var(--pad) * -1);
+    border-inline: 0;
+  }
+  .item {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .item img,
+  .noShot {
+    width: 96px;
+  }
+}
