@@ -660,3 +660,103 @@ button.syncStep:hover {
   object-fit: contain;
   background: #000;
 }
+
+/* ---------- Point de visée avec viseur superposé (centre exact de l'écran en jeu) ---------- */
+.aim {
+  display: grid;
+  gap: 10px;
+}
+.aimFrame {
+  --cross: #4dff7c;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--line-2);
+}
+.aimFrame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 50% 50%;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cross,
+.crossSmall {
+  position: absolute;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.cross {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.cross line {
+  stroke: var(--cross);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 1px #000);
+}
+/* Viseur classique : 4 traits et un point, taille fixe comme en jeu (il ne grossit pas avec le zoom). */
+.crossSmall {
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+.crossSmall i,
+.crossSmall b {
+  position: absolute;
+  background: var(--cross);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85);
+}
+.crossSmall i:nth-child(1),
+.crossSmall i:nth-child(2) {
+  top: -1px;
+  width: 9px;
+  height: 2px;
+}
+.crossSmall i:nth-child(1) {
+  right: 4px;
+}
+.crossSmall i:nth-child(2) {
+  left: 4px;
+}
+.crossSmall i:nth-child(3),
+.crossSmall i:nth-child(4) {
+  left: -1px;
+  width: 2px;
+  height: 9px;
+}
+.crossSmall i:nth-child(3) {
+  bottom: 4px;
+}
+.crossSmall i:nth-child(4) {
+  top: 4px;
+}
+.crossSmall b {
+  left: -1px;
+  top: -1px;
+  width: 2px;
+  height: 2px;
+}
+.crossHover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+}
+.crossHover:hover ~ .cross,
+.crossHover:hover ~ .crossSmall {
+  opacity: 0.3;
+}
+.trB .aimFrame {
+  height: 100%;
+  aspect-ratio: auto;
+  min-height: 0;
+}

@@ -4,6 +4,7 @@ import { publicMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { GrenadeIcon, SideBadge, VerificationNote } from '@/components/stuffs/StuffCard';
 import { ReportButton, ShareButton, TrainingMode, VideoEmbed } from '@/components/stuffs/FicheClient';
+import { AimImage } from '@/components/stuffs/AimImage';
 import { ConsoleCommand, LineupVideo } from '@/components/stuffs/LineupVideo';
 import styles from '@/components/stuffs/fiche.module.css';
 import { DemoTag, StateBlock } from '@/components/ui/badges';
@@ -146,7 +147,10 @@ export default async function StuffPage({ params, searchParams }: Props) {
   const mapImage = mapInfo ? mapCoverUrl(mapInfo) : null;
   const aerial = mediaUrl(res.data.aerialPath);
   const placement = mediaUrl(u.placementImage);
-  const aim = mediaUrl(u.aimImage) ?? u.media?.lineup ?? null;
+  const ownAim = mediaUrl(u.aimImage);
+  const aim = ownAim ?? u.media?.lineup ?? null;
+  // Capture csnades prise sans interface : on y superpose le viseur (centre exact de l'écran).
+  const aimNeedsCrosshair = !ownAim && Boolean(u.media?.lineup);
   const video = youtubeId(u.videoUrl);
   const media = u.media;
   const canonical = `/stuffs/${u.mapSlug}/${u.slug}`;
@@ -203,6 +207,7 @@ export default async function StuffPage({ params, searchParams }: Props) {
               targetName: u.targetName,
               placement,
               aim,
+              aimCrosshair: aimNeedsCrosshair,
               video: media ? { mp4: media.video.mp4, webm: media.video.webm, poster: media.poster } : null,
               steps: u.steps,
               position: idx >= 0 ? `${idx + 1} / ${siblings.length}` : 'brouillon',
@@ -259,9 +264,12 @@ export default async function StuffPage({ params, searchParams }: Props) {
                 <h2 id="s-aim">Point de visée</h2>
                 <p>Arrivée : {u.targetName}</p>
               </div>
+              {aim && aimNeedsCrosshair ? (
+                <AimImage src={aim} alt={`Point de visée vers ${u.targetName}`} />
+              ) : (
               <div className={styles.frame}>
                 {aim ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- capture de l'admin ou image de visée csnades
+                  // eslint-disable-next-line @next/next/no-img-element -- capture de l'admin
                   <img src={aim} alt={`Point de visée vers ${u.targetName}`} loading="lazy" />
                 ) : (
                   <div className={styles.ph}>
@@ -271,6 +279,7 @@ export default async function StuffPage({ params, searchParams }: Props) {
                   </div>
                 )}
               </div>
+              )}
             </section>
           ) : null}
 

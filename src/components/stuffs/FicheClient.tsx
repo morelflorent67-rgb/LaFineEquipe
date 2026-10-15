@@ -6,6 +6,7 @@ import { Dialog } from 'radix-ui';
 import { reportUtilityAction } from '@/app/stuffs/actions';
 import { Icon } from '@/components/ui/Icon';
 import { useToast } from '@/components/ui/Toaster';
+import { AimImage } from './AimImage';
 import styles from './fiche.module.css';
 
 /** Vidéo chargée seulement au clic (youtube-nocookie) : aucun traceur tant qu'on ne lance pas la lecture. */
@@ -133,6 +134,8 @@ export type TrainingSlide = {
   targetName: string;
   placement: string | null;
   aim: string | null;
+  /** Capture sans viseur (csnades) : le viseur est superposé au centre. */
+  aimCrosshair: boolean;
   /** Vidéo csnades du lineup : remplace la capture du placement quand elle existe. */
   video: { mp4: string; webm: string; poster: string } | null;
   steps: string[];
@@ -235,7 +238,9 @@ export function TrainingMode({ slide, initialOpen }: { slide: TrainingSlide; ini
               </figcaption>
             </figure>
             <figure>
-              {slide.aim ? (
+              {slide.aim && slide.aimCrosshair ? (
+                <AimImage src={slide.aim} alt={`Point de visée vers ${slide.targetName}`} compact />
+              ) : slide.aim ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={slide.aim} alt={`Point de visée vers ${slide.targetName}`} />
               ) : (
