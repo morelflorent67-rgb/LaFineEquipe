@@ -11,7 +11,7 @@
  * (pas de risque de double enregistrement). Les lenteurs sont journalisées (journaux Netlify).
  */
 
-export const READ_TIMEOUT_MS = 6_000;
+export const READ_TIMEOUT_MS = 3_500;
 export const WRITE_TIMEOUT_MS = 20_000;
 const SLOW_MS = 2_000;
 
