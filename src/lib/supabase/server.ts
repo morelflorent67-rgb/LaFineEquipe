@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { ConfigError, getServerEnv } from '@/lib/env';
+import { resilientFetch } from './fetch';
 
 function supabaseConfig() {
   const env = getServerEnv();
@@ -18,6 +19,7 @@ export async function createSupabaseServerClient(): Promise<SupabaseClient> {
   const { url, publishableKey } = supabaseConfig();
   const cookieStore = await cookies();
   return createServerClient(url, publishableKey, {
+    global: { fetch: resilientFetch },
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -42,5 +44,6 @@ export function createSupabaseServiceClient(): SupabaseClient {
   if (!secretKey) throw new ConfigError('SUPABASE_SECRET_KEY manquante : nécessaire pour la synchronisation.');
   return createClient(url, secretKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: { fetch: resilientFetch },
   });
 }
