@@ -1,4 +1,5 @@
 import type { Difficulty, Grenade, Side, Technique } from '@/lib/domain/schemas';
+import { techniqueFor } from '@/lib/stuffs';
 import { parseVtt } from './parse';
 import { csNadePageUrl, type CsDetailNade, type CsListNade, type CsMap, type CsTypePath } from './source';
 
@@ -91,20 +92,7 @@ export function splitTechnique(technique: string): { click: Click; jump: boolean
 }
 
 /** Notre technique simplifiée (filtres et anciennes fiches), déduite du mouvement et du saut. */
-export function legacyTechnique(movement: Movement, jump: boolean): Technique {
-  switch (movement) {
-    case 'stationary':
-      return jump ? 'jumpthrow' : 'static';
-    case 'running':
-      return jump ? 'run_jumpthrow' : 'runthrow';
-    case 'walking':
-      return jump ? 'other' : 'walkthrow';
-    case 'crouched_stationary':
-      return jump ? 'jump_crouch' : 'crouch';
-    case 'crouched_walking':
-      return jump ? 'other' : 'crouch';
-  }
-}
+export const legacyTechnique = (movement: Movement, jump: boolean): Technique => techniqueFor(movement, jump);
 
 const CONSOLE_RE = /^setpos [-0-9. ]+; ?setang [-0-9. ]+$/;
 

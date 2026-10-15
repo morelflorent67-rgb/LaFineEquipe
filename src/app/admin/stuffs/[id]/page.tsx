@@ -55,7 +55,7 @@ export default async function AdminUtilityPage({
               ) : null}
             </div>
           ) : (
-            <p>N’ajoute que des lineups testés en jeu par la team, avec vos propres captures.</p>
+            <p>Quatre étapes, comme sur csnades : la vidéo, le point d’arrivée, le point de lancer, puis les infos. N’ajoute que des lineups testés en jeu.</p>
           )}
         </div>
         <Link className="btn btn-ghost btn-sm" href="/admin/stuffs">
@@ -65,7 +65,12 @@ export default async function AdminUtilityPage({
       <section className={styles.panel}>
         <div className={styles.panelB}>
           <UtilityEditor
-            maps={maps.data.map((m) => ({ slug: m.slug, name: m.name }))}
+            maps={maps.data.map((m) => {
+              // Vue aérienne csnades (par étage), sinon celle téléversée par l'admin (proportions inconnues : carrée).
+              const aerial = mediaUrl(m.aerialPath);
+              const radars = m.radars.length > 0 ? m.radars : aerial ? [{ level: 1, imageUrl: aerial, width: 1000, height: 1000 }] : [];
+              return { slug: m.slug, name: m.name, radars };
+            })}
             utility={utility}
             defaultMap={defaultMap}
             images={{ placement: mediaUrl(utility?.placementImage ?? null), aim: mediaUrl(utility?.aimImage ?? null) }}

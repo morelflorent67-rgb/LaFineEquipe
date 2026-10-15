@@ -491,3 +491,172 @@
     grid-template-rows: 1fr 1fr;
   }
 }
+
+/* ---------- Vidéo du lineup (csnades) + étapes synchronisées ---------- */
+.lineup {
+  display: grid;
+  gap: 10px;
+}
+.videoBox {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--line-2);
+}
+.vid {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+.vid::cue {
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-family: var(--f);
+  font-size: 0.95em;
+}
+.vidBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.vidQ {
+  display: inline-flex;
+}
+.vidQ .vidBtn + .vidBtn {
+  border-left: 0;
+}
+.vidBtn {
+  padding: 7px 11px;
+  border: 1px solid var(--line-2);
+  background: transparent;
+  color: var(--silver);
+  font: 700 12.5px/1 var(--f);
+  cursor: pointer;
+}
+.vidBtn[aria-pressed='true'] {
+  background: var(--white);
+  border-color: var(--white);
+  color: #111;
+}
+.vidNote {
+  margin-left: auto;
+  font: 400 11.5px/1.3 var(--mono);
+  color: var(--dim);
+}
+.syncSteps {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.syncStep {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: #131315;
+  color: var(--white);
+  font: 600 15.5px/1.35 var(--f);
+  text-align: left;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+button.syncStep {
+  cursor: pointer;
+}
+button.syncStep:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.syncStep[aria-current='step'] {
+  border-color: var(--brand);
+  background: linear-gradient(90deg, rgba(227, 8, 14, 0.18), #131315 70%);
+}
+.syncN {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: var(--steel-2);
+  font: 800 13px/1 var(--f);
+}
+.syncStep[aria-current='step'] .syncN {
+  background: var(--brand);
+}
+.syncT {
+  font: 400 11.5px/1 var(--mono);
+  color: var(--dim);
+}
+.console {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line-2);
+  background: #0b0b0c;
+}
+.console code {
+  flex: 1 1 260px;
+  min-width: 0;
+  font: 400 12.5px/1.5 var(--mono);
+  color: var(--silver);
+  overflow-wrap: anywhere;
+}
+.hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--dim);
+}
+.source a {
+  font-weight: 700;
+}
+/* Mini-carte rectangulaire (vue aérienne csnades) : lancer, rebonds, arrivée. */
+.radarRect {
+  aspect-ratio: var(--ar, 1);
+}
+.radar .bounce {
+  fill: #111;
+  stroke: #fff;
+  stroke-width: 0.5;
+}
+.mFrom,
+.mTo,
+.mBounce {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.mFrom {
+  width: 11px;
+  height: 11px;
+  background: var(--brand-hi);
+  border: 2px solid #fff;
+}
+.mTo {
+  width: 16px;
+  height: 16px;
+  border: 2px dashed #fff;
+  background: rgba(5, 5, 5, 0.4);
+}
+.mBounce {
+  width: 7px;
+  height: 7px;
+  background: #111;
+  border: 1.5px solid #fff;
+}
+.trB video {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  background: #000;
+}

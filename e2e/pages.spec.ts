@@ -49,7 +49,7 @@ test.describe('Stuffs', () => {
     await page.locator('a[href^="/stuffs/mirage/"]').first().click();
     await expect(page).toHaveURL(/\/stuffs\/mirage\/exemple-flash-mid-1\?type=flash/);
     await expect(page.getByRole('heading', { level: 1, name: 'Exemple · Flash mid' })).toBeVisible();
-    await page.getByRole('link', { name: /Retour au catalogue \(filtres conservés\)/ }).click();
+    await page.getByRole('link', { name: /Retour à la grille \(filtres conservés\)/ }).click();
     await expect(page).toHaveURL(/\/stuffs\/mirage\?type=flash/);
     await expect(page.getByRole('button', { name: /^Flash/ })).toHaveAttribute('aria-pressed', 'true');
   });

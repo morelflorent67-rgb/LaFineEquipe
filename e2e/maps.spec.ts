@@ -60,7 +60,7 @@ test.describe('Maps et carte tactique', () => {
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(page).not.toHaveURL(/entrainement/);
-    await page.getByRole('link', { name: '← Retour à la carte tactique' }).click();
+    await page.getByRole('link', { name: '← Retour à la carte' }).click();
     await expect(page).toHaveURL(/\/stuffs\/mirage\?vue=carte$/);
     await expect(page.getByRole('tab', { name: /Carte tactique/ })).toHaveAttribute('aria-selected', 'true');
   });

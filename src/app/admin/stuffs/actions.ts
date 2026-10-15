@@ -7,7 +7,7 @@ import { requireAdmin } from '@/lib/auth/guards';
 import { call, getDb } from '@/lib/db';
 import { failure, type ActionResult } from '@/lib/actions/result';
 import { deleteMedia, MAX_IMAGE_BYTES, putMedia, sniffImage } from '@/lib/storage';
-import { slugify } from '@/lib/stuffs';
+import { slugify, techniqueFor } from '@/lib/stuffs';
 import { utilityInputSchema, type UtilityInput } from '@/lib/stuffs-input';
 import { utilitySchema } from '@/lib/domain/schemas';
 
@@ -33,6 +33,8 @@ export async function saveUtilityAction(input: UtilityInput): Promise<ActionResu
         p: {
           ...d,
           slug,
+          // Avec le détail du lancer, la technique simplifiée s'en déduit (plus de double saisie).
+          technique: d.movement ? techniqueFor(d.movement, d.jump ?? false) : d.technique,
           steps: d.steps.filter((s) => s.length > 0),
           tags: d.tags.filter((t) => t.length > 0),
         },

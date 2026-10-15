@@ -32,6 +32,22 @@ export const PRECISION_LABEL: Record<NonNullable<Utility['precision']>, string> 
   very_precise: 'Très précis',
 };
 
+/** Technique simplifiée (filtres, anciennes fiches) déduite du mouvement et du saut. */
+export function techniqueFor(movement: NonNullable<Utility['movement']>, jump: boolean): Technique {
+  switch (movement) {
+    case 'stationary':
+      return jump ? 'jumpthrow' : 'static';
+    case 'running':
+      return jump ? 'run_jumpthrow' : 'runthrow';
+    case 'walking':
+      return jump ? 'other' : 'walkthrow';
+    case 'crouched_stationary':
+      return jump ? 'jump_crouch' : 'crouch';
+    case 'crouched_walking':
+      return jump ? 'other' : 'crouch';
+  }
+}
+
 /** Résumé du lancer : « Course + saut + clic gauche » (ou la technique simplifiée des anciennes fiches). */
 export function throwSummary(u: Pick<Utility, 'movement' | 'jump' | 'click' | 'technique'>): string {
   if (!u.movement || !u.click) return TECHNIQUE_LABEL[u.technique];

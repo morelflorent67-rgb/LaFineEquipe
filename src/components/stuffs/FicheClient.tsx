@@ -133,6 +133,8 @@ export type TrainingSlide = {
   targetName: string;
   placement: string | null;
   aim: string | null;
+  /** Vidéo csnades du lineup : remplace la capture du placement quand elle existe. */
+  video: { mp4: string; webm: string; poster: string } | null;
   steps: string[];
   position: string;
   prevHref: string | null;
@@ -213,7 +215,12 @@ export function TrainingMode({ slide, initialOpen }: { slide: TrainingSlide; ini
           </div>
           <div className={styles.trB} key={slide.title}>
             <figure>
-              {slide.placement ? (
+              {slide.video ? (
+                <video poster={slide.video.poster} muted loop playsInline autoPlay controls aria-label={`Vidéo : ${slide.title}`}>
+                  <source src={slide.video.webm} type="video/webm" />
+                  <source src={slide.video.mp4} type="video/mp4" />
+                </video>
+              ) : slide.placement ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={slide.placement} alt={`Placement : ${slide.originName}`} />
               ) : (
@@ -224,7 +231,7 @@ export function TrainingMode({ slide, initialOpen }: { slide: TrainingSlide; ini
               )}
               <figcaption>
                 1 · {slide.originName}
-                <span>Reproduis le placement</span>
+                <span>{slide.video ? 'Regarde le placement et le lancer' : 'Reproduis le placement'}</span>
               </figcaption>
             </figure>
             <figure>

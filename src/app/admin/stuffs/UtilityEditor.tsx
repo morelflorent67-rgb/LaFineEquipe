@@ -1,13 +1,23 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useRef, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { AlertDialog } from 'radix-ui';
 import { Icon } from '@/components/ui/Icon';
 import { useToast } from '@/components/ui/Toaster';
 import { useReturnFocus } from '@/components/ui/useReturnFocus';
-import type { MapInfo, Utility } from '@/lib/domain/schemas';
-import { DIFFICULTY_LABEL, GRENADE_LABEL, SIDE_LABEL, slugify, TECHNIQUE_LABEL } from '@/lib/stuffs';
+import type { MapInfo, RadarPoint, Utility } from '@/lib/domain/schemas';
+import {
+  CLICK_LABEL,
+  DIFFICULTY_LABEL,
+  GRENADE_LABEL,
+  MOVEMENT_LABEL,
+  PRECISION_LABEL,
+  SIDE_LABEL,
+  slugify,
+  throwSummary,
+  youtubeId,
+} from '@/lib/stuffs';
 import {
   deleteUtilityAction,
   markUtilityVerifiedAction,
@@ -15,54 +25,110 @@ import {
   saveUtilityAction,
   uploadUtilityImageAction,
 } from './actions';
+import { RadarPicker, type PickerRadar } from './RadarPicker';
+import styles from './wizard.module.css';
 
 type Props = {
-  maps: Pick<MapInfo, 'slug' | 'name'>[];
+  maps: (Pick<MapInfo, 'slug' | 'name'> & { radars: PickerRadar[] })[];
   utility: Utility | null;
   defaultMap: string;
   images: { placement: string | null; aim: string | null };
 };
 
-const field = { display: 'grid', gap: 7 } as const;
+const STEPS = [
+  ['Vidéo', 'map, grenade, vidéo'],
+  ['Arrivée', 'où tombe la grenade'],
+  ['Lancer', 'd’où la lancer'],
+  ['Infos', 'technique et étapes'],
+] as const;
 
+type Movement = NonNullable<Utility['movement']>;
+type Click = NonNullable<Utility['click']>;
+type Precision = NonNullable<Utility['precision']>;
+
+/**
+ * Assistant d'ajout et de modification d'un stuff, dans l'ordre de csnades :
+ * 1. vidéo (+ map, grenade, camp), 2. clic sur le point d'arrivée, 3. clic sur le point de lancer,
+ * 4. infos (technique, étapes…). Tout reste modifiable en revenant à une étape précédente.
+ */
 export function UtilityEditor({ maps, utility, defaultMap, images }: Props) {
   const router = useRouter();
   const toast = useToast();
+  const focus = useReturnFocus();
+  const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [saving, startSave] = useTransition();
-  const [title, setTitle] = useState(utility?.title ?? '');
-  const [slug, setSlug] = useState(utility?.slug ?? '');
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, startBusy] = useTransition();
-  const focus = useReturnFocus();
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
-  function onSubmit(form: FormData, status: 'draft' | 'published') {
+  const [mapSlug, setMapSlug] = useState(utility?.mapSlug ?? defaultMap);
+  const [grenade, setGrenade] = useState<Utility['grenade']>(utility?.grenade ?? 'smoke');
+  const [side, setSide] = useState<Utility['side']>(utility?.side ?? 'T');
+  const [videoUrl, setVideoUrl] = useState(utility?.videoUrl ?? '');
+  const [landing, setLanding] = useState<RadarPoint | null>(utility?.landing ?? null);
+  const [throwPt, setThrowPt] = useState<RadarPoint | null>(utility?.throw ?? null);
+  const [level, setLevel] = useState(utility?.landing?.level ?? 1);
+  const [targetName, setTargetName] = useState(utility?.targetName ?? '');
+  const [originName, setOriginName] = useState(utility?.originName ?? '');
+  const [title, setTitle] = useState(utility?.title ?? '');
+  const [titleEdited, setTitleEdited] = useState(Boolean(utility));
+  const [slug, setSlug] = useState(utility?.slug ?? '');
+  const [movement, setMovement] = useState<Movement | ''>(utility?.movement ?? 'stationary');
+  const [click, setClick] = useState<Click | ''>(utility?.click ?? 'left');
+  const [jump, setJump] = useState(utility?.jump ?? false);
+  const [precision, setPrecision] = useState<Precision | ''>(utility?.precision ?? '');
+  const [difficulty, setDifficulty] = useState<NonNullable<Utility['difficulty']> | ''>(utility?.difficulty ?? '');
+  const [stepsText, setStepsText] = useState(utility?.steps.join('\n') ?? '');
+  const [description, setDescription] = useState(utility?.description ?? '');
+  const [zone, setZone] = useState(utility?.zone ?? '');
+  const [tags, setTags] = useState(utility?.tags.join(', ') ?? '');
+
+  const map = maps.find((m) => m.slug === mapSlug) ?? maps[0];
+  const autoTitle = targetName && originName ? `${targetName.trim()} depuis ${originName.trim()}` : '';
+  const finalTitle = titleEdited ? title : autoTitle;
+  const yt = youtubeId(videoUrl);
+  const done = [Boolean(mapSlug), Boolean(landing && targetName.trim()), Boolean(throwPt && originName.trim()), finalTitle.trim().length >= 2];
+
+  function changeMap(slug: string) {
+    setMapSlug(slug);
+    // Les points placés appartiennent à la vue aérienne de l'ancienne map.
+    setLanding(null);
+    setThrowPt(null);
+    setLevel(1);
+  }
+
+  function save(status: 'draft' | 'published') {
     setError(null);
-    const get = (k: string) => String(form.get(k) ?? '');
     startSave(async () => {
       const res = await saveUtilityAction({
         id: utility?.id ?? null,
-        mapSlug: get('mapSlug'),
-        title,
-        slug: slug || slugify(title),
-        side: get('side') as 'T',
-        grenade: get('grenade') as 'smoke',
-        zone: get('zone'),
-        originName: get('originName'),
-        targetName: get('targetName'),
-        purpose: get('purpose'),
-        description: get('description'),
-        steps: get('steps')
+        mapSlug,
+        title: finalTitle,
+        slug: slug || slugify(`${grenade} ${finalTitle}`),
+        side,
+        grenade,
+        zone,
+        originName,
+        targetName,
+        purpose: utility?.purpose ?? '',
+        description,
+        steps: stepsText
           .split('\n')
           .map((s) => s.trim())
           .filter(Boolean),
-        technique: get('technique') as 'static',
-        difficulty: get('difficulty') as 'easy',
-        tags: get('tags')
+        technique: utility?.technique ?? 'static',
+        difficulty,
+        movement,
+        click,
+        jump: movement ? jump : null,
+        precision,
+        throw: throwPt,
+        landing,
+        tags: tags
           .split(',')
           .map((s) => s.trim())
           .filter(Boolean),
-        videoUrl: get('videoUrl'),
+        videoUrl,
         status,
       });
       if (res.ok) {
@@ -76,132 +142,259 @@ export function UtilityEditor({ maps, utility, defaultMap, images }: Props) {
     });
   }
 
-  const formRef = useRef<HTMLFormElement>(null);
-
   return (
     <div style={{ display: 'grid', gap: 22 }}>
+      {utility?.source === 'csnades' ? (
+        <p className={styles.notice}>
+          Stuff importé de csnades.gg : une nouvelle importation remplacera tes modifications (sauf brouillon/publié). Pour une
+          version de la team, crée plutôt un nouveau stuff.
+        </p>
+      ) : null}
+
+      <ol className={styles.steps} aria-label="Étapes">
+        {STEPS.map(([label, hint], i) => (
+          <li key={label}>
+            <button type="button" className={styles.stepBtn} aria-current={step === i ? 'step' : undefined} data-done={done[i]} onClick={() => setStep(i)}>
+              {i + 1}. {label}
+              <small>{done[i] ? 'OK' : hint}</small>
+            </button>
+          </li>
+        ))}
+      </ol>
+
       <form
-        ref={formRef}
-        style={{ display: 'grid', gap: 16 }}
+        className={styles.pane}
         onSubmit={(e) => {
           e.preventDefault();
-          const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-          onSubmit(new FormData(e.currentTarget), submitter?.value === 'published' ? 'published' : 'draft');
+          if (step < 3) setStep(step + 1);
+          else save('published');
         }}
       >
-        <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))' }}>
-          <div style={field}>
-            <label htmlFor="title">Titre</label>
-            <input id="title" className="input" required maxLength={80} value={title} onChange={(e) => setTitle(e.target.value)} />
-          </div>
-          <div style={field}>
-            <label htmlFor="slug">Identifiant d’URL</label>
-            <input
-              id="slug"
-              className="input"
-              maxLength={80}
-              value={slug}
-              placeholder={slugify(title) || 'ex. smoke-fenetre'}
-              onChange={(e) => setSlug(e.target.value)}
+        {step === 0 ? (
+          <>
+            <h2>1. Vidéo, map et grenade</h2>
+            <div className={styles.grid}>
+              <div className={styles.field}>
+                <label htmlFor="mapSlug">Map</label>
+                <select id="mapSlug" className="select" value={mapSlug} onChange={(e) => changeMap(e.target.value)}>
+                  {maps.map((m) => (
+                    <option key={m.slug} value={m.slug}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="grenade">Grenade</label>
+                <select id="grenade" className="select" value={grenade} onChange={(e) => setGrenade(e.target.value as Utility['grenade'])}>
+                  {(['smoke', 'flash', 'molotov', 'he'] as const).map((g) => (
+                    <option key={g} value={g}>
+                      {GRENADE_LABEL[g]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="side">Camp</label>
+                <select id="side" className="select" value={side} onChange={(e) => setSide(e.target.value as Utility['side'])}>
+                  {(['T', 'CT', 'BOTH'] as const).map((s) => (
+                    <option key={s} value={s}>
+                      {SIDE_LABEL[s]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            {utility?.media ? (
+              <div className={styles.preview}>
+                <video poster={utility.media.poster} muted loop playsInline controls preload="none">
+                  <source src={utility.media.video.webm} type="video/webm" />
+                  <source src={utility.media.video.mp4} type="video/mp4" />
+                </video>
+              </div>
+            ) : (
+              <div className={styles.field}>
+                <label htmlFor="videoUrl">Vidéo YouTube (facultatif, avec le moment du lineup si la vidéo en contient plusieurs)</label>
+                <input
+                  id="videoUrl"
+                  className="input"
+                  type="url"
+                  maxLength={200}
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://youtu.be/…?t=42"
+                />
+                {videoUrl && !yt ? <span style={{ color: '#ff9b93', fontSize: 13 }}>Lien non reconnu : seuls les liens YouTube sont acceptés.</span> : null}
+                {yt ? (
+                  <div className={styles.preview}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- miniature YouTube de la vidéo saisie */}
+                    <img src={`https://i.ytimg.com/vi/${yt}/hqdefault.jpg`} alt="Miniature de la vidéo YouTube" />
+                  </div>
+                ) : null}
+              </div>
+            )}
+            <p>Conseils : vidéo 16:9 en 1080p, interface masquée (cl_draw_only_deathnotices 1), placement, visée et lancer bien visibles. Les captures se téléversent après le premier enregistrement.</p>
+          </>
+        ) : null}
+
+        {step === 1 ? (
+          <>
+            <h2>2. Où tombe la grenade ?</h2>
+            <p>Clique sur la vue aérienne de {map?.name} à l’endroit exact où la grenade arrive.</p>
+            <RadarPicker
+              radars={map?.radars ?? []}
+              level={level}
+              onLevel={setLevel}
+              point={landing}
+              other={throwPt}
+              kind="landing"
+              onPick={setLanding}
+              label={`Point d’arrivée sur ${map?.name ?? 'la map'}`}
             />
-          </div>
-          <div style={field}>
-            <label htmlFor="mapSlug">Map</label>
-            <select id="mapSlug" name="mapSlug" className="select" defaultValue={utility?.mapSlug ?? defaultMap}>
-              {maps.map((m) => (
-                <option key={m.slug} value={m.slug}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={field}>
-            <label htmlFor="zone">Zone</label>
-            <input id="zone" name="zone" className="input" maxLength={40} defaultValue={utility?.zone ?? ''} placeholder="ex. Mid, Site A" />
-          </div>
-          <div style={field}>
-            <label htmlFor="side">Camp</label>
-            <select id="side" name="side" className="select" defaultValue={utility?.side ?? 'T'}>
-              {(['T', 'CT', 'BOTH'] as const).map((s) => (
-                <option key={s} value={s}>
-                  {SIDE_LABEL[s]}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={field}>
-            <label htmlFor="grenade">Grenade</label>
-            <select id="grenade" name="grenade" className="select" defaultValue={utility?.grenade ?? 'smoke'}>
-              {(['smoke', 'flash', 'molotov', 'he'] as const).map((g) => (
-                <option key={g} value={g}>
-                  {GRENADE_LABEL[g]}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={field}>
-            <label htmlFor="originName">Départ</label>
-            <input id="originName" name="originName" className="input" required maxLength={80} defaultValue={utility?.originName ?? ''} />
-          </div>
-          <div style={field}>
-            <label htmlFor="targetName">Arrivée</label>
-            <input id="targetName" name="targetName" className="input" required maxLength={80} defaultValue={utility?.targetName ?? ''} />
-          </div>
-          <div style={field}>
-            <label htmlFor="technique">Lancer</label>
-            <select id="technique" name="technique" className="select" defaultValue={utility?.technique ?? 'static'}>
-              {Object.entries(TECHNIQUE_LABEL).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={field}>
-            <label htmlFor="difficulty">Difficulté</label>
-            <select id="difficulty" name="difficulty" className="select" defaultValue={utility?.difficulty ?? 'medium'}>
-              {Object.entries(DIFFICULTY_LABEL).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div style={field}>
-          <label htmlFor="purpose">À quoi sert ce stuff ?</label>
-          <input id="purpose" name="purpose" className="input" maxLength={160} defaultValue={utility?.purpose ?? ''} />
-        </div>
-        <div style={field}>
-          <label htmlFor="steps">Étapes (une par ligne, 12 maximum)</label>
-          <textarea id="steps" name="steps" className="textarea" rows={5} defaultValue={utility?.steps.join('\n') ?? ''} />
-        </div>
-        <div style={field}>
-          <label htmlFor="description">Remarques</label>
-          <textarea id="description" name="description" className="textarea" maxLength={600} defaultValue={utility?.description ?? ''} />
-        </div>
-        <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))' }}>
-          <div style={field}>
-            <label htmlFor="videoUrl">Vidéo YouTube (facultatif)</label>
-            <input id="videoUrl" name="videoUrl" className="input" type="url" maxLength={200} defaultValue={utility?.videoUrl ?? ''} placeholder="https://youtu.be/…" />
-          </div>
-          <div style={field}>
-            <label htmlFor="tags">Mots-clés (séparés par des virgules)</label>
-            <input id="tags" name="tags" className="input" maxLength={200} defaultValue={utility?.tags.join(', ') ?? ''} />
-          </div>
-        </div>
+            <div className={styles.field} style={{ maxWidth: 420 }}>
+              <label htmlFor="targetName">Nom de l’arrivée (callout, en anglais comme en jeu)</label>
+              <input id="targetName" className="input" required maxLength={80} value={targetName} onChange={(e) => setTargetName(e.target.value)} placeholder="ex. Window, B Short" />
+            </div>
+          </>
+        ) : null}
+
+        {step === 2 ? (
+          <>
+            <h2>3. D’où la lancer ?</h2>
+            <p>Clique maintenant sur la position du joueur au moment du lancer. Le point d’arrivée reste affiché pour repère.</p>
+            <RadarPicker
+              radars={map?.radars ?? []}
+              level={level}
+              onLevel={setLevel}
+              point={throwPt}
+              other={landing}
+              kind="throw"
+              onPick={setThrowPt}
+              label={`Point de lancer sur ${map?.name ?? 'la map'}`}
+            />
+            <div className={styles.field} style={{ maxWidth: 420 }}>
+              <label htmlFor="originName">Nom du départ (callout)</label>
+              <input id="originName" className="input" required maxLength={80} value={originName} onChange={(e) => setOriginName(e.target.value)} placeholder="ex. T Spawn" />
+            </div>
+          </>
+        ) : null}
+
+        {step === 3 ? (
+          <>
+            <h2>4. Infos</h2>
+            <div className={styles.grid}>
+              <div className={styles.field}>
+                <label htmlFor="title">Titre</label>
+                <input
+                  id="title"
+                  className="input"
+                  required
+                  maxLength={80}
+                  value={finalTitle}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    setTitleEdited(true);
+                  }}
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="slug">Identifiant d’URL</label>
+                <input id="slug" className="input" maxLength={80} value={slug} placeholder={slugify(`${grenade} ${finalTitle}`) || 'ex. smoke-window'} onChange={(e) => setSlug(e.target.value)} />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="movement">Mouvement</label>
+                <select id="movement" className="select" value={movement} onChange={(e) => setMovement(e.target.value as Movement)}>
+                  {(Object.keys(MOVEMENT_LABEL) as Movement[]).map((k) => (
+                    <option key={k} value={k}>
+                      {MOVEMENT_LABEL[k]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="click">Clic</label>
+                <select id="click" className="select" value={click} onChange={(e) => setClick(e.target.value as Click)}>
+                  {(Object.keys(CLICK_LABEL) as Click[]).map((k) => (
+                    <option key={k} value={k}>
+                      {CLICK_LABEL[k]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="precision">Précision demandée</label>
+                <select id="precision" className="select" value={precision} onChange={(e) => setPrecision(e.target.value as Precision)}>
+                  <option value="">Non précisée</option>
+                  {(Object.keys(PRECISION_LABEL) as Precision[]).map((k) => (
+                    <option key={k} value={k}>
+                      {PRECISION_LABEL[k]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="difficulty">Difficulté</label>
+                <select id="difficulty" className="select" value={difficulty} onChange={(e) => setDifficulty(e.target.value as 'easy')}>
+                  <option value="">Non précisée</option>
+                  {Object.entries(DIFFICULTY_LABEL).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {k === 'easy' ? `${v} (débutant)` : v}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <label className={styles.check}>
+              <input type="checkbox" checked={jump} onChange={(e) => setJump(e.target.checked)} /> Avec saut (jumpthrow)
+            </label>
+            <p>
+              Résumé affiché : <b>{movement && click ? throwSummary({ movement, click, jump, technique: 'static' }) : '—'}</b>
+            </p>
+            <div className={styles.field}>
+              <label htmlFor="steps">Étapes (une par ligne, 12 maximum)</label>
+              <textarea id="steps" className="textarea" rows={4} value={stepsText} onChange={(e) => setStepsText(e.target.value)} placeholder={'Se placer dans le coin\nViser la pointe de l’antenne\nSaut + lancer clic gauche'} />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="description">Remarques (facultatif)</label>
+              <textarea id="description" className="textarea" maxLength={600} value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div className={styles.grid}>
+              <div className={styles.field}>
+                <label htmlFor="zone">Zone (facultatif)</label>
+                <input id="zone" className="input" maxLength={40} value={zone} onChange={(e) => setZone(e.target.value)} placeholder="ex. Mid, Site A" />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="tags">Mots-clés (séparés par des virgules)</label>
+                <input id="tags" className="input" maxLength={200} value={tags} onChange={(e) => setTags(e.target.value)} />
+              </div>
+            </div>
+          </>
+        ) : null}
+
         {error ? (
           <p role="alert" style={{ margin: 0, color: '#ff9b93' }}>
             {error}
           </p>
         ) : null}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          <button type="submit" value="published" className="btn btn-red" disabled={saving}>
-            <Icon name="check" /> {utility?.status === 'published' ? 'Enregistrer (publiée)' : 'Enregistrer et publier'}
-          </button>
-          <button type="submit" value="draft" className="btn btn-steel" disabled={saving}>
+        <div className={styles.nav}>
+          {step > 0 ? (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep(step - 1)}>
+              ← Précédent
+            </button>
+          ) : null}
+          <span className={styles.spacer} />
+          <button type="button" className="btn btn-steel btn-sm" disabled={saving || !done[3]} onClick={() => save('draft')}>
             {utility?.status === 'published' ? 'Dépublier (brouillon)' : 'Enregistrer en brouillon'}
           </button>
+          {step < 3 ? (
+            <button type="submit" className="btn btn-red btn-sm">
+              Suivant →
+            </button>
+          ) : (
+            <button type="submit" className="btn btn-red btn-sm" disabled={saving}>
+              <Icon name="check" /> {utility?.status === 'published' ? 'Enregistrer (publié)' : 'Enregistrer et publier'}
+            </button>
+          )}
         </div>
       </form>
 
@@ -224,13 +417,18 @@ export function UtilityEditor({ maps, utility, defaultMap, images }: Props) {
                 })
               }
             >
-              <Icon name="check" /> Vérifiée en jeu aujourd’hui
+              <Icon name="check" /> Vérifié en jeu aujourd’hui
             </button>
-            <button type="button" className="btn btn-danger btn-sm" disabled={busy} onClick={() => {
+            <button
+              type="button"
+              className="btn btn-danger btn-sm"
+              disabled={busy}
+              onClick={() => {
                 focus.remember();
                 setConfirmDelete(true);
-              }}>
-              <Icon name="trash" /> Supprimer la fiche
+              }}
+            >
+              <Icon name="trash" /> Supprimer le stuff
             </button>
           </div>
           <AlertDialog.Root open={confirmDelete} onOpenChange={setConfirmDelete}>
@@ -239,8 +437,8 @@ export function UtilityEditor({ maps, utility, defaultMap, images }: Props) {
               <AlertDialog.Content className="dialog" onCloseAutoFocus={focus.onCloseAutoFocus}>
                 <AlertDialog.Title>Supprimer « {utility.title} » ?</AlertDialog.Title>
                 <AlertDialog.Description className="desc">
-                  La fiche, ses captures et ses signalements seront supprimés définitivement. Pour la masquer, repasse-la en
-                  brouillon.
+                  Le stuff, ses captures et ses signalements seront supprimés définitivement. Pour le masquer, repasse-le en brouillon.
+                  {utility.source === 'csnades' ? ' Attention : une nouvelle importation csnades le recréerait.' : ''}
                 </AlertDialog.Description>
                 <div className="actions">
                   <AlertDialog.Cancel asChild>
@@ -268,11 +466,7 @@ export function UtilityEditor({ maps, utility, defaultMap, images }: Props) {
             </AlertDialog.Portal>
           </AlertDialog.Root>
         </>
-      ) : (
-        <p className="muted" style={{ margin: 0 }}>
-          Les captures pourront être ajoutées après le premier enregistrement.
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }
