@@ -72,7 +72,7 @@ export function StuffCard({ u, query }: { u: UtilityView; query: string }) {
         </dl>
         <div className={styles.meta}>
           <span className={styles.tech}>{TECHNIQUE_LABEL[u.technique]}</span>
-          <span>{DIFFICULTY_LABEL[u.difficulty]}</span>
+          {u.difficulty ? <span>{DIFFICULTY_LABEL[u.difficulty]}</span> : null}
           {youtubeId(u.videoUrl) ? (
             <span>
               <Icon name="video" style={{ width: 14, height: 14, verticalAlign: '-2px' }} /> Vidéo

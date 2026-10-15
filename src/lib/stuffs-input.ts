@@ -22,7 +22,7 @@ export const utilityInputSchema = z.object({
   purpose: text(160).default(''),
   description: text(600).default(''),
   steps: z.array(text(200)).max(12, '12 étapes maximum.').default([]),
-  technique: z.enum(['static', 'jumpthrow', 'runthrow', 'walkthrow', 'crouch', 'jump_crouch', 'other']),
+  technique: z.enum(['static', 'jumpthrow', 'runthrow', 'run_jumpthrow', 'walkthrow', 'crouch', 'jump_crouch', 'other']),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   tags: z.array(text(30)).max(10).default([]),
   videoUrl: z

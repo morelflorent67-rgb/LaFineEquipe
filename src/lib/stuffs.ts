@@ -7,6 +7,7 @@ export const TECHNIQUE_LABEL: Record<Technique, string> = {
   static: 'Statique',
   jumpthrow: 'Jumpthrow',
   runthrow: 'Runthrow',
+  run_jumpthrow: 'Run + jumpthrow',
   walkthrow: 'Walkthrow',
   crouch: 'Accroupi',
   jump_crouch: 'Saut accroupi',

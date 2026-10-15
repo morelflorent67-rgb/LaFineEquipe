@@ -114,7 +114,7 @@ export default async function StuffPage({ params, searchParams }: Props) {
             <GrenadeIcon grenade={u.grenade} /> {GRENADE_LABEL[u.grenade]}
           </span>
           <span className={styles.bdg}>{TECHNIQUE_LABEL[u.technique]}</span>
-          <span className={styles.bdg}>{DIFFICULTY_LABEL[u.difficulty]}</span>
+          {u.difficulty ? <span className={styles.bdg}>{DIFFICULTY_LABEL[u.difficulty]}</span> : null}
           {u.status === 'draft' ? <span className="chip unknown">Brouillon (visible par les admins)</span> : null}
           {u.isDemo ? <DemoTag /> : null}
         </div>
@@ -127,7 +127,7 @@ export default async function StuffPage({ params, searchParams }: Props) {
             slide={{
               title: u.title,
               mapName: u.mapName,
-              badges: `${GRENADE_LABEL[u.grenade]} · ${SIDE_LABEL[u.side]} · ${DIFFICULTY_LABEL[u.difficulty]}`,
+              badges: `${GRENADE_LABEL[u.grenade]} · ${SIDE_LABEL[u.side]}${u.difficulty ? ` · ${DIFFICULTY_LABEL[u.difficulty]}` : ''}`,
               technique: TECHNIQUE_LABEL[u.technique],
               originName: u.originName,
               targetName: u.targetName,
@@ -280,7 +280,7 @@ export default async function StuffPage({ params, searchParams }: Props) {
               </div>
               <div>
                 <dt>Difficulté</dt>
-                <dd>{DIFFICULTY_LABEL[u.difficulty]}</dd>
+                <dd>{u.difficulty ? DIFFICULTY_LABEL[u.difficulty] : 'Non précisée'}</dd>
               </div>
             </dl>
           </div>

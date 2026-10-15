@@ -19,7 +19,8 @@
     "faceit:check": "tsx --conditions=react-server scripts/faceit-check.ts",
     "sync": "tsx --conditions=react-server scripts/sync.ts",
     "local:reset": "tsx --conditions=react-server scripts/local-reset.ts",
-    "transfer": "tsx scripts/transfer-to-supabase.ts"
+    "transfer": "tsx scripts/transfer-to-supabase.ts",
+    "csnades": "tsx --conditions=react-server scripts/import-csnades.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.8",

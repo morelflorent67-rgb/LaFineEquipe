@@ -208,7 +208,7 @@ export const grenadeSchema = z.enum(['smoke', 'flash', 'molotov', 'he']);
 export type Grenade = z.infer<typeof grenadeSchema>;
 export const sideSchema = z.enum(['T', 'CT', 'BOTH']);
 export type Side = z.infer<typeof sideSchema>;
-export const techniqueSchema = z.enum(['static', 'jumpthrow', 'runthrow', 'walkthrow', 'crouch', 'jump_crouch', 'other']);
+export const techniqueSchema = z.enum(['static', 'jumpthrow', 'runthrow', 'run_jumpthrow', 'walkthrow', 'crouch', 'jump_crouch', 'other']);
 export type Technique = z.infer<typeof techniqueSchema>;
 export const difficultySchema = z.enum(['easy', 'medium', 'hard']);
 export type Difficulty = z.infer<typeof difficultySchema>;
@@ -237,8 +237,34 @@ export const mapSchema = z.object({
   sortOrder: z.number().int(),
   counts: mapCountsSchema,
   positionCount: z.number().int(),
+  /** Vues aériennes importées (une par niveau), coordonnées des stuffs en % de ces images. */
+  radars: z
+    .array(
+      z.object({
+        level: z.number().int(),
+        imageUrl: z.string(),
+        calloutsUrl: z.string().nullable(),
+        width: z.number().int(),
+        height: z.number().int(),
+      }),
+    )
+    .default([]),
 });
 export type MapInfo = z.infer<typeof mapSchema>;
+
+/** Point sur la vue aérienne, en % ; level = étage (Nuke en a deux). */
+const radarPointSchema = z.object({ x: z.number(), y: z.number(), level: z.number().int().default(1) });
+export type RadarPoint = z.infer<typeof radarPointSchema>;
+
+const csAsset = z.url().refine((u) => u.startsWith('https://assets.csnades.gg/'));
+export const externalMediaSchema = z.object({
+  video: z.object({ mp4: csAsset, webm: csAsset }),
+  videoLq: z.object({ mp4: csAsset, webm: csAsset }),
+  poster: csAsset,
+  posterSmall: csAsset.nullable(),
+  lineup: csAsset.nullable(),
+});
+export type ExternalMedia = z.infer<typeof externalMediaSchema>;
 
 export const utilitySchema = z.object({
   id: z.string(),
@@ -254,8 +280,10 @@ export const utilitySchema = z.object({
   purpose: z.string().nullable(),
   description: z.string().nullable(),
   steps: z.array(z.string()),
+  stepTimes: z.array(z.number()),
   technique: techniqueSchema,
-  difficulty: difficultySchema,
+  /** Absente pour un stuff importé que csnades ne classe pas « débutant ». */
+  difficulty: difficultySchema.nullable(),
   tags: z.array(z.string()),
   placementImage: z.string().nullable(),
   aimImage: z.string().nullable(),
@@ -266,7 +294,22 @@ export const utilitySchema = z.object({
   updatedAt: isoDate,
   openReports: z.number().int(),
   throwPositionId: z.string().nullable(),
-  landing: z.object({ x: z.number(), y: z.number() }).nullable(),
+  landing: radarPointSchema.nullable(),
+  /** Point de lancer placé directement sur la vue aérienne (stuffs importés, assistant d'ajout). */
+  throw: radarPointSchema.nullable(),
+  bounces: z.array(radarPointSchema),
+  movement: z.enum(['stationary', 'walking', 'running', 'crouched_stationary', 'crouched_walking']).nullable(),
+  click: z.enum(['left', 'right', 'both']).nullable(),
+  jump: z.boolean().nullable(),
+  precision: z.enum(['loose', 'precise', 'very_precise']).nullable(),
+  /** Vidéos et images hébergées par csnades (assets.csnades.gg uniquement, contrôlé en base). */
+  media: externalMediaSchema.nullable(),
+  consoleCmd: z.string().nullable(),
+  airTime: z.number().nullable(),
+  source: z.enum(['lfe', 'csnades']),
+  sourceUrl: z.string().nullable(),
+  sourceUpdatedAt: isoDate.nullable(),
+  credit: z.string().nullable(),
 });
 export type Utility = z.infer<typeof utilitySchema>;
 

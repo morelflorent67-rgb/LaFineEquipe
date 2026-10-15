@@ -42,7 +42,9 @@ describe('stuffs', () => {
     id: 'x', slug: 's', mapSlug: 'mirage', mapName: 'Mirage', title: 'Smoke fenêtre', side: 'T', grenade: 'smoke', zone: 'Mid',
     originName: 'Spawn', targetName: 'Fenêtre', purpose: null, description: null, steps: [], technique: 'static', difficulty: 'easy',
     tags: [], placementImage: null, aimImage: null, videoUrl: null, verifiedAt: null, status: 'published', isDemo: false,
-    updatedAt: '2026-10-01T00:00:00Z', openReports: 0, throwPositionId: null, landing: null, ...over,
+    updatedAt: '2026-10-01T00:00:00Z', openReports: 0, throwPositionId: null, landing: null, stepTimes: [], throw: null, bounces: [],
+    movement: null, click: null, jump: null, precision: null, media: null, consoleCmd: null, airTime: null, source: 'lfe',
+    sourceUrl: null, sourceUpdatedAt: null, credit: null, ...over,
   });
   it('lit et réécrit les filtres de l’URL', () => {
     const f = parseFilters({ camp: 'CT', type: 'flash', zone: 'Site A', q: 'porte' });
