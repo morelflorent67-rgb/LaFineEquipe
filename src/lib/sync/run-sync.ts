@@ -43,6 +43,8 @@ const WINDOW_DAYS = 30;
  * restants sont laissés au passage suivant (5 min plus tard).
  */
 const MATCHES_BUDGET_MS = 18_000;
+/** Plafond global d'un passage « matchs », stats individuelles comprises. */
+const MATCHES_TOTAL_MS = 27_000;
 const UPSERT_CONCURRENCY = 6;
 
 /** Exécute `fn` sur chaque élément, `size` à la fois au plus. */
@@ -145,7 +147,8 @@ function factionOf(item: FaceitHistoryItem, faceitPlayerId: string): string | nu
 
 export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient = createFaceitClient()): Promise<JobReport> {
   const runId = await begin(db, 'matches', trigger);
-  const deadline = Date.now() + MATCHES_BUDGET_MS;
+  const started = Date.now();
+  const deadline = started + MATCHES_BUDGET_MS;
   if (!runId) return { job: 'matches', status: 'skipped', ok: 0, failed: 0, message: 'Une synchronisation des matchs est déjà en cours.' };
   let ok = 0;
   let failed = 0;
@@ -177,40 +180,14 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
       await pause(client.mode === 'fixtures' ? 0 : PAUSE_MS);
     }
 
-    // Un match partagé par plusieurs joueurs suivis = une seule ligne (clé : identifiant FACEIT du match).
-    // Enregistrés par petits groupes en parallèle : en ligne, chaque appel traverse l'Atlantique
-    // (fonctions Netlify aux États-Unis, base à Paris) ; un par un, 130 matchs dépassaient le budget.
-    await inPool([...collected.values()], UPSERT_CONCURRENCY, async ({ item, players }) => {
-      const winner = item.results?.winner;
-      await db.rpc('sync_upsert_match', {
-        p: {
-          faceitMatchId: item.match_id,
-          status: mapMatchStatus(item.status),
-          statusRaw: item.status ?? null,
-          startedAt: unixToIso(item.started_at),
-          finishedAt: unixToIso(item.finished_at),
-          score: mapMatchStatus(item.status) === 'finished' ? roundScoreFromHistory(item.results?.score) : null,
-          winnerFaction: winner === 'faction1' || winner === 'faction2' ? winner : null,
-          factions: Object.fromEntries(
-            Object.entries(item.teams ?? {})
-              .filter(([k]) => k === 'faction1' || k === 'faction2')
-              .map(([k, v]) => [k, { name: v.nickname ?? null }]),
-          ),
-          competitionName: item.competition_name ?? null,
-          faceitUrl: matchRoomUrl(item.faceit_url, item.match_id),
-          source: 'faceit_history',
-          players: [...players.entries()].map(([faceitPlayerId, faction]) => ({ faceit_player_id: faceitPlayerId, faction })),
-        },
-      });
-      ok++;
-    });
-
     // Détails (map + score en manches) pour les matchs terminés qui n'en ont pas encore.
     // Débit constaté : 20 appels/s ; 30 matchs = 60 appels espacés, sans risque de quota.
-    if (!fatal) {
+    // Passé avant l'enregistrement de l'historique, qui peut consommer tout le budget : sinon les détails
+    // ne partaient jamais et « Map en attente » restait affiché (constaté le 20/10/2026).
+    const fetchDetails = async (until: number) => {
       const pending = await call(db, 'sync_matches_needing_details', { p_limit: DETAILS_PER_PASS }, z.array(z.string()));
       for (const matchId of pending) {
-        if (Date.now() > deadline) break;
+        if (Date.now() > until) break;
         try {
           const match = await client.match(matchId);
           const map = mapFromVoting(match.voting);
@@ -254,6 +231,46 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
         }
         await pause(client.mode === 'fixtures' ? 0 : PAUSE_MS);
       }
+    };
+
+    if (!fatal) await fetchDetails(deadline); // arriéré d'abord : l'enregistrement ci-dessous peut épuiser le budget
+
+    // Un match partagé par plusieurs joueurs suivis = une seule ligne (clé : identifiant FACEIT du match).
+    // Enregistrés par petits groupes en parallèle : en ligne, chaque appel traverse l'Atlantique
+    // (fonctions Netlify aux États-Unis, base à Paris) ; un par un, 130 matchs dépassaient le budget.
+    await inPool([...collected.values()], UPSERT_CONCURRENCY, async ({ item, players }) => {
+      const winner = item.results?.winner;
+      try {
+        await db.rpc('sync_upsert_match', {
+        p: {
+          faceitMatchId: item.match_id,
+          status: mapMatchStatus(item.status),
+          statusRaw: item.status ?? null,
+          startedAt: unixToIso(item.started_at),
+          finishedAt: unixToIso(item.finished_at),
+          score: mapMatchStatus(item.status) === 'finished' ? roundScoreFromHistory(item.results?.score) : null,
+          winnerFaction: winner === 'faction1' || winner === 'faction2' ? winner : null,
+          factions: Object.fromEntries(
+            Object.entries(item.teams ?? {})
+              .filter(([k]) => k === 'faction1' || k === 'faction2')
+              .map(([k, v]) => [k, { name: v.nickname ?? null }]),
+          ),
+          competitionName: item.competition_name ?? null,
+          faceitUrl: matchRoomUrl(item.faceit_url, item.match_id),
+          source: 'faceit_history',
+          players: [...players.entries()].map(([faceitPlayerId, faction]) => ({ faceit_player_id: faceitPlayerId, faction })),
+        },
+      });
+        ok++;
+      } catch (err) {
+        if (!(err instanceof DbError)) throw err;
+        failed++; // repris au passage suivant ; ne bloque pas la suite
+        console.warn(`[sync] match ${item.match_id} non enregistré : ${err.code}`);
+      }
+    });
+
+    if (!fatal) {
+      await fetchDetails(started + MATCHES_TOTAL_MS - 6_000); // matchs tout juste enregistrés
 
       // Stats individuelles (Wall of Shame) des matchs terminés récents déjà détaillés.
       const needStats = await call(
@@ -263,7 +280,7 @@ export async function syncMatches(db: Db, trigger: Trigger, client: FaceitClient
         z.array(z.string()),
       );
       for (const matchId of needStats) {
-        if (Date.now() > deadline) break;
+        if (Date.now() > started + MATCHES_TOTAL_MS) break;
         try {
           await saveStats(matchId, await client.matchStats(matchId));
         } catch (err) {
