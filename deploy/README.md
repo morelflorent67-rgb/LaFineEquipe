@@ -1,13 +1,8 @@
-# Déploiement sur VPS (Ubuntu)
+# Déploiement sur le VPS (Docker, à côté de n8n)
 
-1. Connecte-toi en SSH au VPS, puis : `git clone https://github.com/morelflorent67-rgb/LaFineEquipe.git /tmp/lfe && sudo bash /tmp/lfe/deploy/setup-server.sh`
-2. Crée `/srv/lafineequipe/.env.production` (droits `chmod 600`, propriétaire `lfe`) avec les mêmes variables que `.env.example` :
-   `LFE_DATA_BACKEND=supabase`, `LFE_HOSTED=1`, `NODE_ENV=production`, `SITE_URL=https://fineequipe.com`,
-   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `LFE_ADMIN_EMAIL`,
-   `FACEIT_API_KEY`, `FACEIT_MODE=live`, `CRON_SECRET` (identique à celui du Vault Supabase).
-   Ces valeurs se recopient depuis Netlify (Site configuration › Environment variables) ou ton `.env.local`. Ne les colle jamais dans un chat.
-3. `sudo -u lfe bash /srv/lafineequipe/deploy/update.sh` (compile et démarre).
-4. Au démarrage au boot : `sudo env PATH=$PATH pm2 startup systemd -u lfe --hp /home/lfe` puis exécuter la commande affichée.
-5. DNS OVH (zone de fineequipe.com) : `A @` → IP du VPS, `CNAME www` → `fineequipe.com.`, supprimer l'ancien A Netlify (75.2.60.5).
-6. Supabase : le secret `lfe_site_url` du Vault pointe déjà vers https://fineequipe.com, donc rien à changer pour le cron.
-Mise à jour ensuite : relancer `update.sh`.
+- Code cloné dans `~/lafineequipe`, configuration dans `~/lafineequipe/deploy/.env` (non versionnée, `chmod 600`).
+- Variables : voir `.env.example`, avec `LFE_DATA_BACKEND=supabase`, `LFE_HOSTED=1`, `SITE_URL=https://fineequipe.com`, `FACEIT_MODE=live`.
+- Démarrer / mettre à jour : `bash ~/lafineequipe/deploy/update.sh`
+- Caddy (celui de n8n) : bloc `fineequipe.com { reverse_proxy lafineequipe:3000 }` ajouté au Caddyfile, puis `docker exec n8n-caddy-1 caddy reload --config /etc/caddy/Caddyfile`.
+- DNS OVH : `A @` → IP du VPS, `CNAME www` → `fineequipe.com.`
+- Logs : `docker logs -f deploy-lafineequipe-1`

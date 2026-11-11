@@ -1,0 +1,22 @@
+# Site LaFineEquipe, à côté de n8n : rejoint le réseau Docker de n8n pour que son Caddy puisse l'atteindre.
+# Les valeurs viennent du fichier deploy/.env (jamais commité).
+services:
+  lafineequipe:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        SITE_URL: ${SITE_URL}
+        LFE_DATA_BACKEND: ${LFE_DATA_BACKEND}
+        LFE_HOSTED: ${LFE_HOSTED}
+        FACEIT_MODE: ${FACEIT_MODE}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+    restart: unless-stopped
+    env_file: .env
+    mem_limit: 1g
+    networks: [n8n_default]
+
+networks:
+  n8n_default:
+    external: true

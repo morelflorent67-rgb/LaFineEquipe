@@ -1,0 +1,9 @@
+node_modules
+.next
+.data
+.git
+.env*
+test-results
+design
+e2e
+deploy/.env
