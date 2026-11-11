@@ -10,7 +10,7 @@ declare global {
 const EVERY_MS = 5 * 60 * 1000;
 
 export async function register() {
-  if (process.env.NEXT_RUNTIME !== 'nodejs' || process.env.NETLIFY || process.env.VERCEL) return;
+  if (process.env.NEXT_RUNTIME !== 'nodejs' || process.env.LFE_HOSTED === '1') return;
   if (process.env.LFE_DATA_BACKEND !== 'local' || process.env.FACEIT_MODE !== 'live') return;
   if (process.env.LFE_LOCAL_CRON === 'off' || globalThis.__lfeLocalCron) return;
 

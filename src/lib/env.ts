@@ -44,8 +44,8 @@ export function getServerEnv(): ServerEnv {
     throw new ConfigError(parsed.error.issues.map((i) => i.message).join(' '));
   }
   const e = parsed.data;
-  // Hébergement en ligne (Netlify, ou Vercel par le passé) : interdit les modes de développement.
-  const hosted = Boolean(process.env.NETLIFY || process.env.VERCEL);
+  // Hébergement en ligne (serveur de production, LFE_HOSTED=1) : interdit les modes de développement.
+  const hosted = process.env.LFE_HOSTED === '1';
 
   if (e.LFE_DATA_BACKEND === 'local' && hosted) {
     throw new ConfigError('Le mode de données « local » est réservé au développement : utilise « supabase » en ligne.');

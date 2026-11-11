@@ -1,8 +1,0 @@
-# Netlify détecte Next.js et applique automatiquement son adaptateur (pages, fonctions serveur, images).
-# Les secrets ne sont JAMAIS ici : ils se règlent dans Netlify › Site configuration › Environment variables.
-[build]
-  command = "npm run build"
-  publish = ".next"
-
-[build.environment]
-  NODE_VERSION = "22"
