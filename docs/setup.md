@@ -85,32 +85,22 @@ En mode local avec `FACEIT_MODE=live`, les profils réels sont enregistrés dans
    La clé publishable est publique par nature. La clé **secret** reste côté serveur : elle ne sert qu'à la synchronisation.
 7. Relance `npm run dev`, connecte-toi sur `/connexion`, puis ajoute un joueur et une entrée au Mur.
 
-## 4. Mise en ligne (Netlify + fineequipe.com)
+## 4. Mise en ligne (VPS + fineequipe.com)
 
-Mise en place réelle du 14/10/2026 : site sur Netlify (`super-brioche-43dc75.netlify.app`), base Supabase (Paris), domaine **fineequipe.com** chez OVH.
+Mise en place du 11/11/2026 (le site a quitté Netlify, dont les crédits étaient épuisés) : site dans un conteneur Docker sur le VPS Contabo (alias SSH `n8n-velto`), derrière le Caddy déjà présent pour n8n ; base Supabase (Paris) ; domaine **fineequipe.com** chez OVH.
 
-1. **Transférer les vraies données locales** (une fois, après les migrations) : arrête `npm run dev`, puis
-   ```bash
-   npm run transfer
-   ```
-   affiche ce qui serait copié sans rien écrire ;
-   ```bash
-   npm run transfer -- --apply
-   ```
-   copie réellement (relançable sans doublon). Les données de démo, les comptes et l'historique de synchro ne sont jamais copiés.
-2. **Netlify** : Add new project › Import an existing project › GitHub › dépôt LaFineEquipe. `netlify.toml` fixe la compilation et Node 22. Chaque `git push` sur `main` redéploie.
-3. **Variables d'environnement** (Site configuration › Environment variables › Import from a .env file) : `LFE_DATA_BACKEND=supabase`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `LFE_ADMIN_EMAIL`, `FACEIT_API_KEY`, `FACEIT_MODE=live`, `CRON_SECRET`, `SITE_URL=https://fineequipe.com`. Ne mets jamais `LFE_DATA_BACKEND=local`. Génère `CRON_SECRET` sur ton PC :
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-   ```
-4. **Synchro planifiée** : exécute `supabase/cron.sql` dans SQL Editor avec ton `CRON_SECRET` (relançable). Deux tâches toutes les 5 minutes, chacune dans sa propre requête : **Netlify coupe une requête après ~30 s** (constaté le 14/10/2026), la synchro des matchs s'arrête donc d'elle-même après 18 s et reprend au passage suivant. Vérifie dans Admin › Synchronisation que les passages arrivent.
-5. **Domaine (DNS externe chez OVH)** : Netlify › Domain management › Add a domain › `fineequipe.com` (garder le domaine **sans www** comme principal : liens canoniques et synchro l'utilisent). Chez OVH › Zone DNS : un seul **A** `fineequipe.com` → `75.2.60.5`, **CNAME** `www` → `super-brioche-43dc75.netlify.app.`, **aucun AAAA** (Netlify ne gère pas l'IPv6), enregistrements MX/SPF des e-mails inchangés. Le certificat HTTPS est créé automatiquement par Netlify une fois la zone propagée. Référence : [DNS externe Netlify](https://docs.netlify.com/manage/domains/configure-domains/configure-external-dns/).
+1. **Transférer les vraies données locales** (une fois, après les migrations) : `npm run transfer` (simulation), puis `npm run transfer -- --apply`.
+2. **Configuration du serveur** : fichier `~/lafineequipe/deploy/.env` sur le VPS (`chmod 600`, jamais commité) avec `LFE_DATA_BACKEND=supabase`, `LFE_HOSTED=1`, `SITE_URL=https://fineequipe.com`, `FACEIT_MODE=live`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `LFE_ADMIN_EMAIL`, `FACEIT_API_KEY`, `CRON_SECRET` (même valeur que dans le Vault Supabase).
+3. **Démarrer / mettre à jour** : `ssh n8n-velto`, puis `bash ~/lafineequipe/deploy/update.sh` (récupère `main`, recompile l'image, redémarre). Logs : `docker logs -f deploy-lafineequipe-1`. Voir `deploy/README.md`.
+4. **HTTPS** : bloc `fineequipe.com { reverse_proxy lafineequipe:3000 }` dans `~/n8n/Caddyfile` (+ redirection `www`), puis `docker exec n8n-caddy-1 caddy reload --config /etc/caddy/Caddyfile`. Le certificat Let's Encrypt est automatique.
+5. **Synchro planifiée** : `supabase/cron.sql` dans le SQL Editor Supabase (relançable) ; deux tâches toutes les 5 minutes appellent `https://fineequipe.com/api/cron/sync?job=profiles|matches`. Les budgets de temps (18 s pour les matchs) datent de la limite Netlify de 30 s ; ils peuvent être assouplis maintenant.
+6. **DNS OVH** : `A @` → `13.140.206.99` (IP du VPS), `CNAME www` → `fineequipe.com.`, pas d'AAAA, MX/TXT inchangés.
 
 ### Référencement et partage des liens
 
 `SITE_URL` doit être l'origine publique HTTPS, par exemple `https://ton-vrai-domaine.fr`, sans chemin ni paramètres. Les pages publiques l'utilisent pour leur lien canonique et le logo original dans les aperçus de partage. Sans origine publique valide, aucune URL absolue n'est inventée.
 
-L'indexation est activée seulement en compilation/exécution de production, avec Supabase, sans profils fictifs, et hors aperçus de déploiement (Netlify `CONTEXT` ≠ `production`, ou Vercel). En local et sur les aperçus, les pages indiquent `noindex`, `robots.txt` interdit l'exploration et le sitemap est vide. Redéploie après une modification de la configuration : certaines métadonnées sont calculées au chargement des modules.
+L'indexation est activée seulement en compilation/exécution de production, avec Supabase, sans profils fictifs, et hors aperçus de déploiement (Vercel). En local et sur les aperçus, les pages indiquent `noindex`, `robots.txt` interdit l'exploration et le sitemap est vide. Redéploie après une modification de la configuration : certaines métadonnées sont calculées au chargement des modules.
 
 Le sitemap contient les sept entrées publiques principales : accueil, ELO Run, matchs, clips, crosshairs, stuffs et joueurs. Les fiches détaillées restent découvrables via leurs liens publics ; elles ne sont pas encore listées individuellement dans le sitemap. Le Mur, la connexion et l'administration restent non indexables et ne publient pas d'aperçu nominatif. Les règles robots ne remplacent pas l'authentification et la RLS déjà en place.
 

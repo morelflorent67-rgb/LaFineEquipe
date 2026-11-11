@@ -39,7 +39,7 @@ L'accueil affiche : accès prioritaires (matchs en cours, ELO Run, stuffs) visib
 - Intégration FACEIT exclusivement côté serveur via la Data API v4 officielle.
 - Tâches planifiées fiables (Supabase scheduled functions ou cron de l'hébergeur), pas un `setInterval` dans le navigateur comme unique source de synchronisation.
 - Vitest pour logique métier, Playwright pour scénarios critiques, ESLint/formatage/typecheck.
-- Déploiement décidé le 14/10/2026 : site sur **Netlify**, base/auth/stockage sur **Supabase**, domaine **fineequipe.com** chez OVH (DNS à pointer vers Netlify). Dépôt GitHub public : https://github.com/morelflorent67-rgb/LaFineEquipe.
+- Déploiement décidé le 14/10/2026 : site sur un **VPS Contabo** (Docker + Caddy, migré de Netlify le 11/11/2026), base/auth/stockage sur **Supabase**, domaine **fineequipe.com** chez OVH (DNS vers l'IP du VPS). Dépôt GitHub public : https://github.com/morelflorent67-rgb/LaFineEquipe.
 
 Ne multiplie pas inutilement les frameworks. Propose une alternative seulement s'il y a une incompatibilité prouvée.
 
